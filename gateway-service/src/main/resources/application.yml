@@ -1,0 +1,123 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: animal-service
+          uri: http://animal-service:8081
+          predicates:
+            - Path=/api/animals/**
+          filters:
+            - name: RateLimit
+              args:
+                requestsPerSecond: 100
+            - name: CircuitBreaker
+              args:
+                name: animalCircuitBreaker
+                fallbackUri: forward:/fallback/animals
+        - id: adopter-service
+          uri: http://adopter-service:8082
+          predicates:
+            - Path=/api/adopters/**
+          filters:
+            - name: RateLimit
+              args:
+                requestsPerSecond: 100
+            - name: CircuitBreaker
+              args:
+                name: adopterCircuitBreaker
+                fallbackUri: forward:/fallback/adopters
+        - id: user-service
+          uri: http://user-service:8085
+          predicates:
+            - Path=/api/employees/**
+          filters:
+            - name: RateLimit
+              args:
+                requestsPerSecond: 50
+            - name: CircuitBreaker
+              args:
+                name: userCircuitBreaker
+                fallbackUri: forward:/fallback/users
+        - id: matching-service
+          uri: http://matching-service:8083
+          predicates:
+            - Path=/api/matching/**
+          filters:
+            - name: RateLimit
+              args:
+                requestsPerSecond: 30
+            - name: CircuitBreaker
+              args:
+                name: matchingCircuitBreaker
+                fallbackUri: forward:/fallback/matching
+        - id: reporting-service
+          uri: http://reporting-service:8084
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - name: RateLimit
+              args:
+                requestsPerSecond: 20
+            - name: CircuitBreaker
+              args:
+                name: reportingCircuitBreaker
+                fallbackUri: forward:/fallback/reports
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - name: RequestSize
+          args:
+            size: 10MB
+    circuitbreaker:
+      resilience4j:
+        circuitbreaker:
+          instances:
+            animalCircuitBreaker:
+              slidingWindowSize: 10
+              failureRateThreshold: 50
+              waitDurationInOpenState: 10s
+              permittedNumberOfCallsInHalfOpenState: 5
+            adopterCircuitBreaker:
+              slidingWindowSize: 10
+              failureRateThreshold: 50
+              waitDurationInOpenState: 10s
+              permittedNumberOfCallsInHalfOpenState: 5
+            userCircuitBreaker:
+              slidingWindowSize: 10
+              failureRateThreshold: 50
+              waitDurationInOpenState: 10s
+              permittedNumberOfCallsInHalfOpenState: 5
+            matchingCircuitBreaker:
+              slidingWindowSize: 10
+              failureRateThreshold: 50
+              waitDurationInOpenState: 10s
+              permittedNumberOfCallsInHalfOpenState: 5
+            reportingCircuitBreaker:
+              slidingWindowSize: 10
+              failureRateThreshold: 50
+              waitDurationInOpenState: 10s
+              permittedNumberOfCallsInHalfOpenState: 5
+
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: ${AUTH0_ISSUER_URI}
+        jwk-set-uri: ${AUTH0_JWK_SET_URI}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
