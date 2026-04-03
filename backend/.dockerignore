@@ -1,0 +1,9 @@
+**/target/
+**/.classpath
+**/.factorypath
+**/.project
+**/.settings/
+**/*.log
+.idea/
+.vscode/
+.git/

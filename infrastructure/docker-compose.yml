@@ -1,0 +1,108 @@
+services:
+  postgres-animals:
+    image: postgres:15-alpine
+    container_name: caring-iggy-animals-db
+    environment:
+      POSTGRES_DB: animals_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-animals-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-users:
+    image: postgres:15-alpine
+    container_name: caring-iggy-users-db
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-users-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  animal-service:
+    build:
+      context: ../backend
+      dockerfile: animal-service/Dockerfile
+    container_name: caring-iggy-animal-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-animals
+      DB_PORT: 5432
+      DB_NAME: animals_db
+      DB_USERNAME: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    depends_on:
+      postgres-animals:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  user-service:
+    build:
+      context: ../backend
+      dockerfile: user-service/Dockerfile
+    container_name: caring-iggy-user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-users
+      DB_PORT: 5432
+      DB_NAME: users_db
+      DB_USERNAME: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  matching-service:
+    build:
+      context: ../backend
+      dockerfile: matching-service/Dockerfile
+    container_name: caring-iggy-matching-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
+      ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+    depends_on:
+      - animal-service
+
+  reporting-service:
+    build:
+      context: ../backend
+      dockerfile: reporting-service/Dockerfile
+    container_name: caring-iggy-reporting-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
+      ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+    depends_on:
+      - animal-service
+
+volumes:
+  postgres-animals-data:
+  postgres-users-data:
+
+networks:
+  default:
+    name: caring-iggy-network
