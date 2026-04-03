@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --tenma-canvas: #f3f6f8;
+  --tenma-ink: #0f2435;
+  --tenma-muted: #4f6779;
+  --tenma-border: #d4dee5;
+  --tenma-accent: #2f7ca7;
+}
+
+@theme inline {
+  --color-background: var(--tenma-canvas);
+  --color-foreground: var(--tenma-ink);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-space-grotesk);
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(139, 189, 214, 0.32), transparent 34%),
+    radial-gradient(circle at 86% 12%, rgba(180, 210, 230, 0.25), transparent 33%),
+    linear-gradient(165deg, #f7fbfd 0%, #edf3f7 52%, #f8fcff 100%);
+  color: var(--tenma-ink);
+  font-family: var(--font-manrope), "Segoe UI", sans-serif;
+}
+
+h1,
+h2 {
+  font-family: var(--font-space-grotesk), "Segoe UI", sans-serif;
+}
+
+.reveal {
+  animation: tenma-rise 780ms ease both;
+}
+
+.reveal-delay-1 {
+  animation-delay: 120ms;
+}
+
+.reveal-delay-2 {
+  animation-delay: 220ms;
+}
+
+@keyframes tenma-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
