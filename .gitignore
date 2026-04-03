@@ -27,10 +27,3 @@
 
 # Environment files
 .env
-.env.local
-.env.*.local
-**/.env
-**/.env.local
-**/.env.*.local
-!.env.example
-!**/.env.example
