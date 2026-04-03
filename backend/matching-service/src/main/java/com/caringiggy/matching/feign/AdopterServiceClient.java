@@ -20,6 +20,6 @@ public interface AdopterServiceClient {
     @GetMapping("/api/adopters/restricted")
     List<Map<String, Object>> getAllAdoptersRestricted();
 
-    @GetMapping("/api/adopters/restricted")
+    @GetMapping("/api/adopters/restricted/search")
     Map<String, Object> getAdopterByNameAndTelephone(@RequestParam("name") String name, @RequestParam("telephone") String telephone);
 }

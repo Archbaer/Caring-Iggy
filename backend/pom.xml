@@ -19,6 +19,7 @@
 
     <modules>
         <module>animal-service</module>
+        <module>adopter-service</module>
         <module>user-service</module>
         <module>matching-service</module>
         <module>reporting-service</module>

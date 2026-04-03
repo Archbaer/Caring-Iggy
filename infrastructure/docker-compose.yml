@@ -33,6 +33,23 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-adopters:
+    image: postgres:15-alpine
+    container_name: caring-iggy-adopters-db
+    environment:
+      POSTGRES_DB: adopters_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-adopters-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   animal-service:
     build:
       context: ../backend
@@ -50,6 +67,27 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  adopter-service:
+    build:
+      context: ../backend
+      dockerfile: adopter-service/Dockerfile
+    container_name: caring-iggy-adopter-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-adopters
+      DB_PORT: 5432
+      DB_NAME: adopters_db
+      DB_USERNAME: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    depends_on:
+      postgres-adopters:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -86,6 +124,7 @@ services:
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
     depends_on:
       - animal-service
+      - adopter-service
 
   reporting-service:
     build:
@@ -98,10 +137,12 @@ services:
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
     depends_on:
       - animal-service
+      - adopter-service
 
 volumes:
   postgres-animals-data:
   postgres-users-data:
+  postgres-adopters-data:
 
 networks:
   default:
