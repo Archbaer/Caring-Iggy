@@ -180,14 +180,15 @@ public class AnimalService {
     private AnimalDetailDto toDetailDto(Animal animal) {
         PreviousOwnerDto previousOwnerDto = null;
         if (animal.getPreviousOwnerId() != null) {
-            previousOwnerRepository.findById(animal.getPreviousOwnerId())
-                    .ifPresent(owner -> previousOwnerDto = PreviousOwnerDto.builder()
+            previousOwnerDto = previousOwnerRepository.findById(animal.getPreviousOwnerId())
+                    .map(owner -> PreviousOwnerDto.builder()
                             .id(owner.getId())
                             .name(owner.getName())
                             .telephone(owner.getTelephone())
                             .email(owner.getEmail())
                             .address(owner.getAddress())
-                            .build());
+                            .build())
+                    .orElse(null);
         }
 
         return AnimalDetailDto.builder()
