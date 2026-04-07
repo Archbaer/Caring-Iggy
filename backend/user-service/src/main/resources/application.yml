@@ -34,3 +34,12 @@ management:
 logging:
   level:
     com.caringiggy: DEBUG
+
+auth:
+  session:
+    ttl: ${AUTH_SESSION_TTL:PT168H}
+    cookie-secure: ${AUTH_SESSION_COOKIE_SECURE:false}
+
+services:
+  adopter:
+    url: ${ADOPTER_SERVICE_URL:http://localhost:8082}

@@ -28,7 +28,7 @@ public class EmployeeRepository {
             .name(rs.getString("name"))
             .email(rs.getString("email"))
             .telephone(rs.getString("telephone"))
-            .role(EmployeeRole.values()[rs.getInt("role_id") - 1])
+            .role(EmployeeRole.valueOf(rs.getString("role")))
             .createdAt(getLocalDateTime(rs.getTimestamp("created_at")))
             .updatedAt(getLocalDateTime(rs.getTimestamp("updated_at")))
             .build();
@@ -38,17 +38,17 @@ public class EmployeeRepository {
     }
 
     public List<Employee> findAll() {
-        String sql = "SELECT * FROM employees ORDER BY created_at DESC";
+        String sql = "SELECT id, name, email, telephone, role, created_at, updated_at FROM employees ORDER BY created_at DESC";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Optional<Employee> findById(UUID id) {
-        String sql = "SELECT * FROM employees WHERE id = ?";
+        String sql = "SELECT id, name, email, telephone, role, created_at, updated_at FROM employees WHERE id = ?";
         return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
     }
 
     public Optional<Employee> findByEmail(String email) {
-        String sql = "SELECT * FROM employees WHERE email = ?";
+        String sql = "SELECT id, name, email, telephone, role, created_at, updated_at FROM employees WHERE lower(email) = lower(?)";
         return jdbcTemplate.query(sql, rowMapper, email).stream().findFirst();
     }
 
@@ -60,7 +60,7 @@ public class EmployeeRepository {
     }
 
     private Employee insert(Employee employee) {
-        String sql = "INSERT INTO employees (name, email, telephone, role_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (name, email, telephone, role) VALUES (?, ?, ?, ?) RETURNING id";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -68,7 +68,7 @@ public class EmployeeRepository {
             ps.setString(1, employee.getName());
             ps.setString(2, employee.getEmail());
             ps.setString(3, employee.getTelephone());
-            ps.setInt(4, employee.getRole() != null ? employee.getRole().ordinal() + 1 : 2);
+            ps.setString(4, (employee.getRole() != null ? employee.getRole() : EmployeeRole.STAFF).name());
             return ps;
         }, keyHolder);
 
@@ -78,9 +78,9 @@ public class EmployeeRepository {
     }
 
     private Employee update(Employee employee) {
-        String sql = "UPDATE employees SET name = ?, email = ?, telephone = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        String sql = "UPDATE employees SET name = ?, email = ?, telephone = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
         jdbcTemplate.update(sql, employee.getName(), employee.getEmail(), employee.getTelephone(),
-                employee.getRole() != null ? employee.getRole().ordinal() + 1 : 2, employee.getId());
+                (employee.getRole() != null ? employee.getRole() : EmployeeRole.STAFF).name(), employee.getId());
         return findById(employee.getId()).orElse(employee);
     }
 

@@ -40,7 +40,7 @@ class EmployeeControllerTest {
                 .name("Alice")
                 .email("alice@example.com")
                 .telephone("123456")
-                .role("EMPLOYEE")
+                .role("STAFF")
                 .build();
         when(employeeService.getAllEmployees()).thenReturn(List.of(employee));
 
@@ -57,7 +57,7 @@ class EmployeeControllerTest {
                 .name("Alice")
                 .email("alice@example.com")
                 .telephone("123456")
-                .role("EMPLOYEE")
+                .role("STAFF")
                 .build();
         when(employeeService.createEmployee(any(CreateEmployeeRequest.class))).thenReturn(created);
 
@@ -66,7 +66,7 @@ class EmployeeControllerTest {
                   "name": "Alice",
                   "email": "alice@example.com",
                   "telephone": "123456",
-                  "role": "employee"
+                  "role": "staff"
                 }
                 """;
 
@@ -75,7 +75,7 @@ class EmployeeControllerTest {
                         .content(payload))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Alice"))
-                .andExpect(jsonPath("$.role").value("EMPLOYEE"));
+                .andExpect(jsonPath("$.role").value("STAFF"));
     }
 
     @Test

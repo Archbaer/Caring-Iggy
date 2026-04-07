@@ -49,7 +49,7 @@ class EmployeeServiceTest {
         EmployeeDto created = employeeService.createEmployee(request);
 
         assertThat(created.getId()).isEqualTo(id);
-        assertThat(created.getRole()).isEqualTo(EmployeeRole.EMPLOYEE.name());
+        assertThat(created.getRole()).isEqualTo(EmployeeRole.STAFF.name());
         assertThat(created.getEmail()).isEqualTo("alice@example.com");
         verify(employeeRepository).save(any(Employee.class));
     }
@@ -72,12 +72,12 @@ class EmployeeServiceTest {
                 .name("Old Name")
                 .email("old@example.com")
                 .telephone("111111")
-                .role(EmployeeRole.EMPLOYEE)
+                .role(EmployeeRole.STAFF)
                 .build();
 
         UpdateEmployeeRequest request = UpdateEmployeeRequest.builder()
                 .name("New Name")
-                .role("org_head")
+                .role("admin")
                 .build();
 
         when(employeeRepository.findById(id)).thenReturn(Optional.of(existing));
@@ -88,7 +88,7 @@ class EmployeeServiceTest {
         assertThat(updated.getName()).isEqualTo("New Name");
         assertThat(updated.getEmail()).isEqualTo("old@example.com");
         assertThat(updated.getTelephone()).isEqualTo("111111");
-        assertThat(updated.getRole()).isEqualTo(EmployeeRole.ORG_HEAD.name());
+        assertThat(updated.getRole()).isEqualTo(EmployeeRole.ADMIN.name());
     }
 
     @Test
@@ -98,7 +98,7 @@ class EmployeeServiceTest {
                 .name("Bob")
                 .email("bob@example.com")
                 .telephone("999999")
-                .role(EmployeeRole.EMPLOYEE)
+                .role(EmployeeRole.STAFF)
                 .build();
         when(employeeRepository.findAll()).thenReturn(List.of(employee));
 
@@ -106,6 +106,6 @@ class EmployeeServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Bob");
-        assertThat(result.get(0).getRole()).isEqualTo(EmployeeRole.EMPLOYEE.name());
+        assertThat(result.get(0).getRole()).isEqualTo(EmployeeRole.STAFF.name());
     }
 }
