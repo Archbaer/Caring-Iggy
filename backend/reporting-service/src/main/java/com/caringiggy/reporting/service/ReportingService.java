@@ -52,9 +52,25 @@ public class ReportingService {
                 .build();
     }
 
+    /**
+     * Intake report filtered by month.
+     *
+     * CORRECTION NOTES (reporting backend - UI deferred/out of release scope):
+     * - Current filtering relies on String.startsWith(month) against the raw intakeDate field.
+     *   This assumes intakeDate is formatted as "YYYY-MM-DD" or "YYYY-MM" at the source.
+     *   Safer approach: parse intakeDate as LocalDate/YearMonth and compare by year-month.
+     * - Intake payloads from animal-service must reliably contain an "intakeDate" field.
+     *   If animal-service schema changes this field name or format, this filter will silently
+     *   return zero results. Add a null/empty guard and log a warning when intakeDate is missing.
+     *
+     * Expected contract:
+     *   GET /api/reports/intake?month=2026-04
+     *   → returns IntakeReport { month, totalIntake, byType, byStatus }
+     *   where only animals with intakeDate falling within the requested month are counted.
+     */
     public IntakeReport getIntakeReport(String month) {
         List<Map<String, Object>> animals = animalServiceClient.getAllAnimals();
-        
+
         Map<String, Long> byType = new HashMap<>();
         Map<String, Long> byStatus = new HashMap<>();
         long total = 0;
@@ -78,6 +94,29 @@ public class ReportingService {
                 .build();
     }
 
+    /**
+     * Adoption report filtered by month.
+     *
+     * CORRECTION NOTES (reporting backend - UI deferred/out of release scope):
+     * - BUG: The month parameter is accepted but NEVER used. The current loop counts ALL
+     *   animals with status="ADOPTED" regardless of when they were adopted.
+     * - FIX REQUIRED: Filter adoptions by a reliable adoption date field. Options:
+     *   a) If animal-service provides an "adoptionDate" or "adoptedAt" field, use it for
+     *      month filtering (same YearMonth comparison pattern as intakeDate above).
+     *   b) If adoption history is stored in a separate adoption-events table/service, query
+     *      that source with a date-range filter instead of scanning all animals.
+     *   c) As a fallback, if no adoption date exists, derive it from the animal's status
+     *      transition history (e.g., last status change to ADOPTED). This requires the
+     *      animal-service to expose status-change timestamps.
+     * - Until one of these fixes is applied, this endpoint returns cumulative adoptions,
+     *   not month-scoped data. Callers should be aware the "month" field in the response
+     *   is informational only and does not reflect actual filtering.
+     *
+     * Expected contract (after fix):
+     *   GET /api/reports/adoptions?month=2026-04
+     *   → returns AdoptionReport { month, totalAdoptions, byType }
+     *   where only animals adopted within the requested month are counted.
+     */
     public AdoptionReport getAdoptionReport(String month) {
         List<Map<String, Object>> animals = animalServiceClient.getAllAnimals();
         
