@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Fraunces, Public_Sans } from "next/font/google";
+import { PublicFooter } from "@/components/layout/public-footer";
+import { PublicHeader } from "@/components/layout/public-header";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const publicSans = Public_Sans({
+  variable: "--font-public-sans",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "TENMA | Intelligent Laundry System",
+  title: {
+    default: "Caring Iggy",
+    template: "%s | Caring Iggy",
+  },
   description:
-    "TENMA is the minimalist washing machine that adapts every cycle to your fabric, load size, and energy goals.",
+    "Caring Iggy connects adopters, staff, and administrators through one calm, role-aware adoption platform.",
 };
 
 export default function RootLayout({
@@ -26,9 +31,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${manrope.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${publicSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="shell-body">
+        <div className="shell-frame">
+          <PublicHeader />
+
+          <main className="shell-main">{children}</main>
+
+          <PublicFooter />
+        </div>
+      </body>
     </html>
   );
 }
