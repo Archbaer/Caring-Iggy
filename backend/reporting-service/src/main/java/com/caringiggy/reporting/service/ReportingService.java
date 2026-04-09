@@ -5,7 +5,6 @@ import com.caringiggy.reporting.dto.IntakeReport;
 import com.caringiggy.reporting.dto.SummaryReport;
 import com.caringiggy.reporting.feign.AdopterServiceClient;
 import com.caringiggy.reporting.feign.AnimalServiceClient;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +12,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Reporting release guardrail.
+ *
+ * Keep future repair work backend-only. Intake reporting must honor the upstream
+ * `intakeDate` payload semantics, and adoption reporting must filter by month using
+ * a reliable adoption date or adoption-history source.
+ */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReportingService {
 
     private final AnimalServiceClient animalServiceClient;
     private final AdopterServiceClient adopterServiceClient;
+
+    public ReportingService(AnimalServiceClient animalServiceClient, AdopterServiceClient adopterServiceClient) {
+        this.animalServiceClient = animalServiceClient;
+        this.adopterServiceClient = adopterServiceClient;
+    }
 
     public SummaryReport getSummary() {
         List<Map<String, Object>> animals = animalServiceClient.getAllAnimals();
@@ -41,27 +51,29 @@ public class ReportingService {
             else if ("PENDING".equals(status)) pending++;
         }
 
-        return SummaryReport.builder()
-                .totalAnimals(animals.size())
-                .totalAdopters(adopters.size())
-                .availableAnimals(available)
-                .adoptedAnimals(adopted)
-                .pendingAnimals(pending)
-                .animalsByType(animalsByType)
-                .animalsByStatus(animalsByStatus)
-                .build();
+        SummaryReport report = new SummaryReport();
+        report.setTotalAnimals(animals.size());
+        report.setTotalAdopters(adopters.size());
+        report.setAvailableAnimals(available);
+        report.setAdoptedAnimals(adopted);
+        report.setPendingAnimals(pending);
+        report.setAnimalsByType(animalsByType);
+        report.setAnimalsByStatus(animalsByStatus);
+        return report;
     }
 
     /**
      * Intake report filtered by month.
      *
      * CORRECTION NOTES (reporting backend - UI deferred/out of release scope):
+     * - Intake reporting must use the upstream `intakeDate` payload semantics, not a raw
+     *   string prefix match.
      * - Current filtering relies on String.startsWith(month) against the raw intakeDate field.
-     *   This assumes intakeDate is formatted as "YYYY-MM-DD" or "YYYY-MM" at the source.
-     *   Safer approach: parse intakeDate as LocalDate/YearMonth and compare by year-month.
+     *   That only works if intakeDate happens to be formatted as "YYYY-MM-DD" or "YYYY-MM".
+     *   Repair path: parse intakeDate as LocalDate/YearMonth and compare by year-month.
      * - Intake payloads from animal-service must reliably contain an "intakeDate" field.
-     *   If animal-service schema changes this field name or format, this filter will silently
-     *   return zero results. Add a null/empty guard and log a warning when intakeDate is missing.
+     *   If the field name or format changes, this filter can silently return zero results.
+     *   Add a null/empty guard and log a warning when intakeDate is missing.
      *
      * Expected contract:
      *   GET /api/reports/intake?month=2026-04
@@ -86,12 +98,12 @@ public class ReportingService {
             }
         }
 
-        return IntakeReport.builder()
-                .month(month)
-                .totalIntake(total)
-                .byType(byType)
-                .byStatus(byStatus)
-                .build();
+        IntakeReport report = new IntakeReport();
+        report.setMonth(month);
+        report.setTotalIntake(total);
+        report.setByType(byType);
+        report.setByStatus(byStatus);
+        return report;
     }
 
     /**
@@ -100,17 +112,17 @@ public class ReportingService {
      * CORRECTION NOTES (reporting backend - UI deferred/out of release scope):
      * - BUG: The month parameter is accepted but NEVER used. The current loop counts ALL
      *   animals with status="ADOPTED" regardless of when they were adopted.
-     * - FIX REQUIRED: Filter adoptions by a reliable adoption date field. Options:
-     *   a) If animal-service provides an "adoptionDate" or "adoptedAt" field, use it for
-     *      month filtering (same YearMonth comparison pattern as intakeDate above).
-     *   b) If adoption history is stored in a separate adoption-events table/service, query
-     *      that source with a date-range filter instead of scanning all animals.
-     *   c) As a fallback, if no adoption date exists, derive it from the animal's status
-     *      transition history (e.g., last status change to ADOPTED). This requires the
-     *      animal-service to expose status-change timestamps.
+     * - FIX REQUIRED: adoption reporting must filter by month using a reliable adoption
+     *   date or adoption-history source, not status alone.
+     * - Repair options:
+     *   a) If animal-service provides an "adoptionDate" or "adoptedAt" field, parse it and
+     *      compare by YearMonth, matching the intake-report repair pattern.
+     *   b) If adoption history lives in a separate adoption-events table or service, query
+     *      that source with a month range filter instead of scanning all animals.
+     *   c) If no adoption date exists, derive the adoption month from status transition
+     *      history, using the timestamp of the last change to ADOPTED.
      * - Until one of these fixes is applied, this endpoint returns cumulative adoptions,
-     *   not month-scoped data. Callers should be aware the "month" field in the response
-     *   is informational only and does not reflect actual filtering.
+     *   not month-scoped data. The "month" field in the response is informational only.
      *
      * Expected contract (after fix):
      *   GET /api/reports/adoptions?month=2026-04
@@ -132,10 +144,10 @@ public class ReportingService {
             }
         }
 
-        return AdoptionReport.builder()
-                .month(month)
-                .totalAdoptions(total)
-                .byType(byType)
-                .build();
+        AdoptionReport report = new AdoptionReport();
+        report.setMonth(month);
+        report.setTotalAdoptions(total);
+        report.setByType(byType);
+        return report;
     }
 }
