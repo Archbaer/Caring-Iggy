@@ -5,6 +5,7 @@ import com.caringiggy.matching.feign.AdopterServiceClient;
 import com.caringiggy.matching.feign.AnimalServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,13 +19,17 @@ public class MatchingService {
     private final AnimalServiceClient animalServiceClient;
     private final AdopterServiceClient adopterServiceClient;
 
+    @Value("${matching.enabled:false}")
+    private boolean matchingEnabled;
+
     public MatchingResponse findMatches(String name, String telephone) {
-        Map<String, Object> adopter = adopterServiceClient.getAdopterByNameAndTelephone(name, telephone);
+        Map<String, Object> adopter = adopterServiceClient.getAdopterProfileByNameAndTelephone(name, telephone);
         
         if (adopter == null || adopter.isEmpty()) {
             return MatchingResponse.builder()
                     .adopterName(name)
                     .adopterTelephone(telephone)
+                    .preferences(Collections.emptyMap())
                     .matchedAnimals(Collections.emptyList())
                     .matchCount(0)
                     .build();
@@ -32,7 +37,18 @@ public class MatchingService {
 
         String adopterName = (String) adopter.get("name");
         String adopterTelephone = (String) adopter.get("telephone");
-        Map<String, Object> preferences = (Map<String, Object>) adopter.get("preferences");
+        Map<String, Object> preferences = extractPreferences(adopter.get("preferences"));
+
+        if (!matchingEnabled) {
+            log.info("Matching endpoint requested for adopter {} but matching.enabled=false; returning guarded empty response", adopterName);
+            return MatchingResponse.builder()
+                    .adopterName(adopterName)
+                    .adopterTelephone(adopterTelephone)
+                    .preferences(preferences)
+                    .matchedAnimals(Collections.emptyList())
+                    .matchCount(0)
+                    .build();
+        }
 
         List<Map<String, Object>> allAnimals = animalServiceClient.getAnimalsByStatus("AVAILABLE");
         
@@ -49,6 +65,14 @@ public class MatchingService {
                 .matchedAnimals(matchedAnimals)
                 .matchCount(matchedAnimals.size())
                 .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> extractPreferences(Object preferences) {
+        if (preferences instanceof Map<?, ?> preferenceMap) {
+            return (Map<String, Object>) preferenceMap;
+        }
+        return Collections.emptyMap();
     }
 
     @SuppressWarnings("unchecked")

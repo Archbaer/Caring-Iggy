@@ -1,5 +1,8 @@
 package com.caringiggy.adopter.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.caringiggy.adopter.model.Adopter;
 import com.caringiggy.adopter.model.AdopterStatus;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import java.util.*;
 public class AdopterRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper;
 
     private final RowMapper<Adopter> adopterRowMapper = (rs, rowNum) -> {
         Adopter adopter = Adopter.builder()
@@ -27,29 +31,45 @@ public class AdopterRepository {
                 .email(rs.getString("email"))
                 .address(rs.getString("address"))
                 .status(AdopterStatus.valueOf(rs.getString("status")))
+                .preferences(parsePreferences(rs.getString("preferences")))
                 .createdAt(getLocalDateTime(rs.getTimestamp("created_at")))
                 .updatedAt(getLocalDateTime(rs.getTimestamp("updated_at")))
                 .build();
 
-        String interestedAnimalsStr = rs.getString("interested_animals");
-        if (interestedAnimalsStr != null && !interestedAnimalsStr.isEmpty()) {
-            String[] ids = interestedAnimalsStr.replace("{", "").replace("}", "").split(",");
-            List<UUID> animals = new ArrayList<>();
-            for (String id : ids) {
-                if (!id.trim().isEmpty()) {
-                    animals.add(UUID.fromString(id.trim()));
-                }
-            }
-            adopter.setInterestedAnimals(animals);
-        } else {
-            adopter.setInterestedAnimals(new ArrayList<>());
-        }
+        adopter.setInterestedAnimals(parseInterestedAnimals(rs.getString("interested_animals")));
 
         return adopter;
     };
 
     private LocalDateTime getLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
+    }
+
+    private Map<String, Object> parsePreferences(String preferencesJson) throws SQLException {
+        if (preferencesJson == null || preferencesJson.isBlank()) {
+            return new LinkedHashMap<>();
+        }
+
+        try {
+            return objectMapper.readValue(preferencesJson, new TypeReference<>() {});
+        } catch (JsonProcessingException exception) {
+            throw new SQLException("Failed to parse adopter preferences JSON", exception);
+        }
+    }
+
+    private List<UUID> parseInterestedAnimals(String interestedAnimalsStr) {
+        if (interestedAnimalsStr == null || interestedAnimalsStr.isBlank()) {
+            return new ArrayList<>();
+        }
+
+        String[] ids = interestedAnimalsStr.replace("{", "").replace("}", "").split(",");
+        List<UUID> animals = new ArrayList<>();
+        for (String id : ids) {
+            if (!id.trim().isEmpty()) {
+                animals.add(UUID.fromString(id.trim()));
+            }
+        }
+        return animals;
     }
 
     public List<Adopter> findAll() {

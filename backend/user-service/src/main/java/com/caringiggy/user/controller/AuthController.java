@@ -73,4 +73,18 @@ public class AuthController {
             @CookieValue(name = AuthService.SESSION_COOKIE_NAME, required = false) String sessionToken) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionEmployeeAccount(request, sessionToken));
     }
+
+    @PostMapping("/provision/staff")
+    public ResponseEntity<AuthResponse> provisionStaff(
+            @Valid @RequestBody ProvisionAccountRequest request,
+            @CookieValue(name = AuthService.SESSION_COOKIE_NAME, required = false) String sessionToken) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionStaffAccount(request, sessionToken));
+    }
+
+    @PostMapping("/provision/admin")
+    public ResponseEntity<AuthResponse> provisionAdmin(
+            @Valid @RequestBody ProvisionAccountRequest request,
+            @CookieValue(name = AuthService.SESSION_COOKIE_NAME, required = false) String sessionToken) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionAdminAccount(request, sessionToken));
+    }
 }

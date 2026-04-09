@@ -17,6 +17,7 @@ public class Account {
     private String email;
     private String passwordHash;
     private AccountRole role;
+    private AccountProfileType profileType;
     private UUID profileId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
