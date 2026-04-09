@@ -1,6 +1,7 @@
 package com.caringiggy.user.repository;
 
 import com.caringiggy.user.model.Account;
+import com.caringiggy.user.model.AccountProfileType;
 import com.caringiggy.user.model.AccountRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,7 +26,7 @@ public class AccountRepository {
 
     public Optional<Account> findById(UUID id) {
         return jdbcTemplate.query("""
-                SELECT id, email, password_hash, role, profile_id, created_at, updated_at
+                SELECT id, email, password_hash, role, profile_type, profile_id, created_at, updated_at
                 FROM accounts
                 WHERE id = ?
                 """, rowMapper, id).stream().findFirst();
@@ -33,7 +34,7 @@ public class AccountRepository {
 
     public Optional<Account> findByEmail(String email) {
         return jdbcTemplate.query("""
-                SELECT id, email, password_hash, role, profile_id, created_at, updated_at
+                SELECT id, email, password_hash, role, profile_type, profile_id, created_at, updated_at
                 FROM accounts
                 WHERE lower(email) = lower(?)
                 """, rowMapper, email).stream().findFirst();
@@ -41,7 +42,7 @@ public class AccountRepository {
 
     public List<Account> findAllByRole(AccountRole role) {
         return jdbcTemplate.query("""
-                SELECT id, email, password_hash, role, profile_id, created_at, updated_at
+                SELECT id, email, password_hash, role, profile_type, profile_id, created_at, updated_at
                 FROM accounts
                 WHERE role = ?
                 ORDER BY created_at DESC
@@ -50,13 +51,14 @@ public class AccountRepository {
 
     public Account insert(Account account) {
         UUID id = jdbcTemplate.queryForObject("""
-                INSERT INTO accounts (email, password_hash, role, profile_id)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO accounts (email, password_hash, role, profile_type, profile_id)
+                VALUES (?, ?, ?, ?, ?)
                 RETURNING id
                 """, UUID.class,
                 account.getEmail(),
                 account.getPasswordHash(),
                 account.getRole().name(),
+                account.getProfileType().name(),
                 account.getProfileId());
         return findById(id).orElseThrow();
     }
@@ -76,6 +78,7 @@ public class AccountRepository {
                 .email(rs.getString("email"))
                 .passwordHash(rs.getString("password_hash"))
                 .role(AccountRole.valueOf(rs.getString("role")))
+                .profileType(AccountProfileType.valueOf(rs.getString("profile_type")))
                 .profileId(rs.getObject("profile_id", UUID.class))
                 .createdAt(getLocalDateTime(rs.getTimestamp("created_at")))
                 .updatedAt(getLocalDateTime(rs.getTimestamp("updated_at")))

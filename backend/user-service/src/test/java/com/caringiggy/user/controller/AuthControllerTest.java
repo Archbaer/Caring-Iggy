@@ -47,6 +47,7 @@ class AuthControllerTest {
                 .user(SessionUserDto.builder()
                         .accountId(UUID.randomUUID())
                         .role("ADMIN")
+                        .profileType("EMPLOYEE")
                         .profileId(UUID.randomUUID())
                         .build())
                 .expiresAtEpochSeconds(1_900_000_000L)
@@ -82,6 +83,7 @@ class AuthControllerTest {
                 .user(SessionUserDto.builder()
                         .accountId(UUID.randomUUID())
                         .role("ADOPTER")
+                        .profileType("ADOPTER")
                         .profileId(UUID.randomUUID())
                         .build())
                 .expiresAtEpochSeconds(1_900_000_000L)
@@ -111,6 +113,7 @@ class AuthControllerTest {
                 .user(SessionUserDto.builder()
                         .accountId(UUID.randomUUID())
                         .role("STAFF")
+                        .profileType("EMPLOYEE")
                         .profileId(UUID.randomUUID())
                         .build())
                 .expiresAtEpochSeconds(1_900_000_000L)
@@ -130,5 +133,63 @@ class AuthControllerTest {
                                 .build())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.user.role").value("STAFF"));
+    }
+
+    @Test
+    void provision_staffEndpointReturnsCreated() throws Exception {
+        AuthResponse response = AuthResponse.builder()
+                .user(SessionUserDto.builder()
+                        .accountId(UUID.randomUUID())
+                        .role("STAFF")
+                        .profileType("EMPLOYEE")
+                        .profileId(UUID.randomUUID())
+                        .build())
+                .expiresAtEpochSeconds(1_900_000_000L)
+                .build();
+        when(authService.provisionStaffAccount(any(ProvisionAccountRequest.class), eq("admin-session")))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/auth/provision/staff")
+                        .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ProvisionAccountRequest.builder()
+                                .name("Staff User")
+                                .email("staff@example.com")
+                                .telephone("555-0100")
+                                .password("supersecret")
+                                .role("ADMIN")
+                                .build())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user.role").value("STAFF"))
+                .andExpect(jsonPath("$.user.profileType").value("EMPLOYEE"));
+    }
+
+    @Test
+    void provision_adminEndpointReturnsCreated() throws Exception {
+        AuthResponse response = AuthResponse.builder()
+                .user(SessionUserDto.builder()
+                        .accountId(UUID.randomUUID())
+                        .role("ADMIN")
+                        .profileType("EMPLOYEE")
+                        .profileId(UUID.randomUUID())
+                        .build())
+                .expiresAtEpochSeconds(1_900_000_000L)
+                .build();
+        when(authService.provisionAdminAccount(any(ProvisionAccountRequest.class), eq("admin-session")))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/auth/provision/admin")
+                        .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ProvisionAccountRequest.builder()
+                                .name("Admin User")
+                                .email("admin@example.com")
+                                .telephone("555-0101")
+                                .password("supersecret")
+                                .role("STAFF")
+                                .build())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user.role").value("ADMIN"))
+                .andExpect(jsonPath("$.user.profileType").value("EMPLOYEE"));
     }
 }
