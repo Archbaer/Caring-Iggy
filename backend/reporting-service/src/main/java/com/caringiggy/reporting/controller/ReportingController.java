@@ -4,16 +4,18 @@ import com.caringiggy.reporting.dto.AdoptionReport;
 import com.caringiggy.reporting.dto.IntakeReport;
 import com.caringiggy.reporting.dto.SummaryReport;
 import com.caringiggy.reporting.service.ReportingService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reports")
-@RequiredArgsConstructor
 public class ReportingController {
 
     private final ReportingService reportingService;
+
+    public ReportingController(ReportingService reportingService) {
+        this.reportingService = reportingService;
+    }
 
     @GetMapping("/summary")
     public ResponseEntity<SummaryReport> getSummary() {

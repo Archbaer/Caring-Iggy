@@ -14,5 +14,6 @@ import java.util.UUID;
 public class SessionUserDto {
     private UUID accountId;
     private String role;
+    private String profileType;
     private UUID profileId;
 }

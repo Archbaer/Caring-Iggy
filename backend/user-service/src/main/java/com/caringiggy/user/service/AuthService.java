@@ -58,6 +58,7 @@ public class AuthService {
                     .email(normalizeEmail(request.getEmail()))
                     .passwordHash(passwordEncoder.encode(request.getPassword()))
                     .role(AccountRole.ADOPTER)
+                    .profileType(AccountProfileType.ADOPTER)
                     .profileId(adopterProfileId)
                     .build());
 
@@ -74,7 +75,7 @@ public class AuthService {
     public AuthResponse provisionEmployeeAccount(ProvisionAccountRequest request, String sessionToken) {
         Account adminAccount = requireAuthenticatedAccount(sessionToken);
         if (adminAccount.getRole() != AccountRole.ADMIN) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Only admins can provision staff accounts");
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only admins can provision employee accounts");
         }
 
         AccountRole role = parseProvisionRole(request.getRole());
@@ -91,6 +92,7 @@ public class AuthService {
                 .email(normalizeEmail(request.getEmail()))
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(role)
+                .profileType(AccountProfileType.EMPLOYEE)
                 .profileId(employee.getId())
                 .build());
 
@@ -159,6 +161,18 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public AuthResponse provisionStaffAccount(ProvisionAccountRequest request, String sessionToken) {
+        ProvisionAccountRequest normalizedRequest = copyProvisionRequestWithRole(request, AccountRole.STAFF);
+        return provisionEmployeeAccount(normalizedRequest, sessionToken);
+    }
+
+    @Transactional
+    public AuthResponse provisionAdminAccount(ProvisionAccountRequest request, String sessionToken) {
+        ProvisionAccountRequest normalizedRequest = copyProvisionRequestWithRole(request, AccountRole.ADMIN);
+        return provisionEmployeeAccount(normalizedRequest, sessionToken);
+    }
+
     private AuthenticatedSession createAuthenticatedSession(Account account) {
         String token = sessionTokenGenerator.generate();
         LocalDateTime expiresAt = LocalDateTime.now().plus(authProperties.ttl());
@@ -177,6 +191,7 @@ public class AuthService {
                 .user(SessionUserDto.builder()
                         .accountId(account.getId())
                         .role(account.getRole().name())
+                        .profileType(account.getProfileType().name())
                         .profileId(account.getProfileId())
                         .build())
                 .expiresAtEpochSeconds(expiresAt.toEpochSecond(ZoneOffset.UTC))
@@ -215,6 +230,16 @@ public class AuthService {
 
     private String buildFullName(String firstName, String lastName) {
         return firstName.trim() + " " + lastName.trim();
+    }
+
+    private ProvisionAccountRequest copyProvisionRequestWithRole(ProvisionAccountRequest request, AccountRole role) {
+        return ProvisionAccountRequest.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .telephone(request.getTelephone())
+                .password(request.getPassword())
+                .role(role.name())
+                .build();
     }
 
     private String hashToken(String token) {
