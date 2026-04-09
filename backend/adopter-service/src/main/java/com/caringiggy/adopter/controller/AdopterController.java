@@ -43,6 +43,13 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdopterByNameAndTelephone(name, telephone));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<AdopterDto> getAdopterProfileByNameAndTelephone(
+            @RequestParam("name") String name,
+            @RequestParam("telephone") String telephone) {
+        return ResponseEntity.ok(adopterService.getAdopterProfileByNameAndTelephone(name, telephone));
+    }
+
     @GetMapping("/restricted/{id}")
     public ResponseEntity<AdopterRestrictedDto> getAdopterRestricted(@PathVariable UUID id) {
         return ResponseEntity.ok(adopterService.getAdopterRestricted(id));

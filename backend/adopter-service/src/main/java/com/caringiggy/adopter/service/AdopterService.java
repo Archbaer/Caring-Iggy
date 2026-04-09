@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -90,6 +91,12 @@ public class AdopterService {
                 .telephone(adopter.getTelephone())
                 .interestedAnimalId(firstInterestedAnimal)
                 .build();
+    }
+
+    public AdopterDto getAdopterProfileByNameAndTelephone(String name, String telephone) {
+        Adopter adopter = adopterRepository.findByNameAndTelephone(name, telephone)
+                .orElseThrow(() -> new RuntimeException("Adopter not found with name: " + name + " and telephone: " + telephone));
+        return toDto(adopter);
     }
 
     @Transactional
@@ -202,7 +209,7 @@ public class AdopterService {
                 .email(adopter.getEmail())
                 .address(adopter.getAddress())
                 .status(adopter.getStatus() != null ? adopter.getStatus().name() : null)
-                .preferences(adopter.getPreferences())
+                .preferences(adopter.getPreferences() != null ? adopter.getPreferences() : new LinkedHashMap<>())
                 .interestedAnimals(adopter.getInterestedAnimals())
                 .createdAt(adopter.getCreatedAt())
                 .updatedAt(adopter.getUpdatedAt())
