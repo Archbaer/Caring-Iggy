@@ -4,6 +4,8 @@ export const LOGIN_ROUTE = "/login";
 export const SIGNUP_ROUTE = "/signup";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const ADMIN_ROUTE_PREFIX = "/dashboard/admin";
+export const ADMIN_DEFAULT_ROUTE = "/dashboard/admin/adopters";
+export const STAFF_DEFAULT_ROUTE = "/animals";
 
 export type PathAccessDecision =
   | { action: "allow" }
@@ -30,13 +32,41 @@ export function hasAnyRole(
   return Boolean(session && roles.includes(session.role));
 }
 
+export function defaultRouteForRole(role: UserRole): string {
+  switch (role) {
+    case "ADMIN":
+      return ADMIN_DEFAULT_ROUTE;
+    case "STAFF":
+      return STAFF_DEFAULT_ROUTE;
+    case "ADOPTER":
+      return DASHBOARD_ROUTE;
+  }
+}
+
+export function resolveAuthenticatedRedirect(
+  session: AuthSession,
+  requestedRedirect: string | null | undefined,
+): string {
+  const safeRedirect = normalizeSafeRedirect(requestedRedirect);
+
+  if (safeRedirect) {
+    const accessDecision = evaluatePathAccess(safeRedirect.pathname, session);
+
+    if (accessDecision.action === "allow") {
+      return `${safeRedirect.pathname}${safeRedirect.search}${safeRedirect.hash}`;
+    }
+  }
+
+  return defaultRouteForRole(session.role);
+}
+
 export function evaluatePathAccess(
   pathname: string,
   session: AuthSession | null,
 ): PathAccessDecision {
   if (isAuthPage(pathname)) {
     return session
-      ? { action: "redirect", destination: DASHBOARD_ROUTE }
+      ? { action: "redirect", destination: defaultRouteForRole(session.role) }
       : { action: "allow" };
   }
 
@@ -49,8 +79,28 @@ export function evaluatePathAccess(
   }
 
   if (isAdminManagementPath(pathname) && !hasAnyRole(session, ["ADMIN"])) {
-    return { action: "redirect", destination: DASHBOARD_ROUTE };
+    return { action: "redirect", destination: defaultRouteForRole(session.role) };
   }
 
   return { action: "allow" };
+}
+
+function normalizeSafeRedirect(
+  requestedRedirect: string | null | undefined,
+): URL | null {
+  if (!requestedRedirect || !requestedRedirect.startsWith("/")) {
+    return null;
+  }
+
+  if (requestedRedirect.startsWith("//")) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(requestedRedirect, "https://caring-iggy.local");
+
+    return parsed.origin === "https://caring-iggy.local" ? parsed : null;
+  } catch {
+    return null;
+  }
 }

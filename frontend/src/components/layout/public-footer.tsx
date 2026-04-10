@@ -1,6 +1,10 @@
 import { ActionLink } from "@/components/ui/action-link";
+import { getCurrentSession } from "@/lib/auth/server-session";
+import { defaultRouteForRole } from "@/lib/auth/role-check";
 
-export function PublicFooter() {
+export async function PublicFooter() {
+  const session = await getCurrentSession();
+
   return (
     <footer className="shell-footer">
       <div className="footer-meta">
@@ -15,9 +19,15 @@ export function PublicFooter() {
         <ActionLink href="/animals" variant="chip">
           Browse animals
         </ActionLink>
-        <ActionLink href="/signup" variant="chip">
-          Start adoption
-        </ActionLink>
+        {session ? (
+          <ActionLink href={defaultRouteForRole(session.role)} variant="chip">
+            {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
+          </ActionLink>
+        ) : (
+          <ActionLink href="/signup" variant="chip">
+            Start adoption
+          </ActionLink>
+        )}
       </nav>
     </footer>
   );
