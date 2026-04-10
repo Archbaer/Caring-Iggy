@@ -1,40 +1,61 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+import { LoginForm } from "@/components/auth/login-form";
+import { getCurrentSession } from "@/lib/auth/server-session";
+import { resolveAuthenticatedRedirect } from "@/lib/auth/role-check";
+
+type PageProps = {
+  searchParams: Promise<{
+    redirect?: string | string[];
+  }>;
+};
+
+function readQueryValue(value?: string | string[]): string | undefined {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return undefined;
+}
+
+export default async function LoginPage({ searchParams }: PageProps) {
+  const [session, resolvedSearchParams] = await Promise.all([
+    getCurrentSession(),
+    searchParams,
+  ]);
+  const requestedRedirect = readQueryValue(resolvedSearchParams.redirect);
+
+  if (session) {
+    redirect(resolveAuthenticatedRedirect(session, requestedRedirect));
+  }
+
   return (
     <div className="page-shell">
       <section className="page-hero">
         <p className="eyebrow">Public auth route</p>
-        <h1 className="page-title">Login shell for existing accounts.</h1>
+        <h1 className="page-title">Welcome back to your adoption workspace.</h1>
         <p className="page-copy">
-          The authentication form, redirects, and session checks will be added in
-          the dedicated auth task. This page only anchors the route contract.
+          Sign in with an existing account to continue browsing animals, return to
+          your adopter dashboard, or resume administrator follow-up work.
         </p>
       </section>
 
       <section className="detail-grid">
         <article className="panel">
           <p className="eyebrow">Accounts</p>
-          <h2 className="panel-title">Supported roles</h2>
+          <h2 className="panel-title">One login, role-aware destination.</h2>
           <ul className="detail-list">
-            <li>Adopters sign in to manage interests and preferences.</li>
-            <li>Staff sign in for animal-management access later in the plan.</li>
-            <li>Admins sign in for adopter and staff management routes.</li>
+            <li>Adopters return to the protected dashboard by default.</li>
+            <li>Staff land back on the animal catalog for operational work.</li>
+            <li>Admins are routed directly to adopter-management screens.</li>
           </ul>
         </article>
 
-        <article className="panel">
-          <p className="eyebrow">Next route</p>
-          <h2 className="panel-title">Need an adopter account?</h2>
-          <p className="panel-copy">
-            Self-serve account creation belongs on the dedicated sign-up route.
-          </p>
-          <div className="route-actions">
-            <Link href="/signup" className="link-chip">
-              Go to sign-up scaffold
-            </Link>
-          </div>
-        </article>
+        <LoginForm />
       </section>
     </div>
   );
