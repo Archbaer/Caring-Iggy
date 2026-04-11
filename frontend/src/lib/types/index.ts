@@ -1,6 +1,9 @@
 export type {
   Role,
   SessionUser,
+  AuthSessionSnapshot,
+  AuthMutationResult,
+  LogoutResult,
   CsrfToken,
   BffError,
   LoginRequest,
