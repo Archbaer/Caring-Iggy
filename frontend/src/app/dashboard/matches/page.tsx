@@ -18,8 +18,8 @@ export default async function DashboardMatchesPage() {
         <p className="eyebrow">Protected route</p>
         <h1 className="page-title">Matching is not enabled in this release.</h1>
         <p className="page-copy">
-          Your dashboard access remains protected, but live match generation stays
-          off until the matching experience is ready for a dependable rollout.
+          Your dashboard access remains protected, but live matching stays off in
+          this release and no matching requests are executed yet.
         </p>
       </Card>
 
@@ -28,8 +28,8 @@ export default async function DashboardMatchesPage() {
         <h2 className="panel-title">This page intentionally shows no live results.</h2>
         <p className="panel-copy">
           We are keeping `/dashboard/matches` visible now so the protected route map
-          stays stable, without calling matching APIs, showing placeholder match
-          cards, or implying approvals that do not exist yet.
+          stays stable, with no live matching API requests, no placeholder match
+          cards, and no implied approvals that do not exist yet.
         </p>
         <div className="footer-actions">
           <ActionLink href="/dashboard" variant="secondary">
