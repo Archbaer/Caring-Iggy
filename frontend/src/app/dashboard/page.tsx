@@ -1,69 +1,159 @@
-import Link from "next/link";
+import { DashboardSectionNav } from "@/components/dashboard/dashboard-section-nav";
+import { InterestStatusList } from "@/components/dashboard/interest-status-list";
+import { ActionLink } from "@/components/ui/action-link";
+import { Card } from "@/components/ui/card";
+import { fetchAdopterProfile } from "@/lib/api/adopter";
+import { fetchAnimalForView } from "@/lib/api/animals";
+import { getRequiredRoleSession } from "@/lib/auth/server-session";
+import { MAX_INTERESTS } from "@/lib/types";
 
-const dashboardRoutes = [
-  {
-    href: "/dashboard/preferences",
-    title: "Preferences",
-    copy: "Future matching preferences editor for adopters.",
-  },
-  {
-    href: "/dashboard/interests",
-    title: "Interests",
-    copy: "Reserved for the max-three interested animals workflow.",
-  },
-  {
-    href: "/dashboard/matches",
-    title: "Matches",
-    copy: "Stable coming-soon route until backend matching reliability is fixed.",
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await getRequiredRoleSession("ADOPTER");
+  const result = session.profileId
+    ? await loadDashboardData(session.profileId)
+    : { kind: "error" as const, message: "Your adopter profile is not linked to this account yet." };
+
+  if (result.kind === "error") {
+    return (
+      <div className="page-shell">
+        <section className="page-hero">
+          <p className="eyebrow">Protected route</p>
+          <h1 className="page-title">Adopter dashboard</h1>
+          <p className="page-copy">Your account is protected, but dashboard data could not be loaded.</p>
+        </section>
+
+        <DashboardSectionNav currentPath="/dashboard" />
+
+        <section className="empty-state">
+          <p className="eyebrow">Dashboard error</p>
+          <h2 className="panel-title">We couldn&apos;t load your adopter workspace.</h2>
+          <p className="panel-copy">{result.message}</p>
+          <ActionLink href="/dashboard" variant="chip">
+            Retry dashboard
+          </ActionLink>
+        </section>
+      </div>
+    );
+  }
+
+  const { profile, interestAnimals } = result;
+  const preferenceSummary = profile.preferences.preferredAnimalTypes.length
+    ? profile.preferences.preferredAnimalTypes.join(", ")
+    : "No animal types saved yet.";
+  const ageSummary =
+    typeof profile.preferences.minAge === "number" || typeof profile.preferences.maxAge === "number"
+      ? `${profile.preferences.minAge ?? 0} to ${profile.preferences.maxAge ?? "any"}`
+      : "No age range saved yet.";
+
   return (
     <div className="page-shell">
-      <section className="page-hero">
-        <p className="eyebrow">Protected route</p>
-        <h1 className="page-title">Dashboard route scaffold.</h1>
-        <p className="page-copy">
-          This shell marks the protected adopter workspace without adding
-          middleware, session checks, or live data ahead of their dedicated tasks.
-        </p>
+      <section className="page-hero dashboard-hero">
+        <div className="dashboard-hero-copy">
+          <p className="eyebrow">Protected route</p>
+          <h1 className="page-title">Adopter dashboard</h1>
+          <p className="page-copy">
+            Keep your preferences up to date, track up to {MAX_INTERESTS} interested animals, and review real animal availability without any fake approval workflow labels.
+          </p>
+        </div>
+
+        <dl className="dashboard-metrics">
+          <div>
+            <dt>Name</dt>
+            <dd>{profile.name}</dd>
+          </div>
+          <div>
+            <dt>Interested animals</dt>
+            <dd>
+              {profile.interests.length} / {MAX_INTERESTS}
+            </dd>
+          </div>
+          <div>
+            <dt>Contact</dt>
+            <dd>{profile.email}</dd>
+          </div>
+        </dl>
       </section>
 
-      <section className="route-grid">
-        {dashboardRoutes.map((route) => (
-          <article key={route.href} className="route-card">
-            <span className="status-badge">Protected</span>
-            <h2 className="route-card-title">{route.title}</h2>
-            <p className="route-card-copy">{route.copy}</p>
-            <div className="route-actions">
-              <Link href={route.href} className="link-chip">
-                Open section
-              </Link>
-            </div>
-          </article>
-        ))}
-      </section>
+      <DashboardSectionNav currentPath="/dashboard" />
 
       <section className="panel-grid">
-        <article className="panel">
-          <p className="eyebrow">Adopter scope</p>
-          <h2 className="panel-title">Personal adoption workspace</h2>
-          <p className="panel-copy">
-            Counts, summaries, and mutation actions intentionally wait for typed
-            contracts, session utilities, and backend fixes.
-          </p>
-        </article>
+        <Card>
+          <p className="eyebrow">Preferences</p>
+          <h2 className="panel-title">Saved adoption preferences</h2>
+          <ul className="detail-list">
+            <li>
+              <strong>Animal types:</strong> {preferenceSummary}
+            </li>
+            <li>
+              <strong>Age range:</strong> {ageSummary}
+            </li>
+            <li>
+              <strong>Notes:</strong> {profile.preferences.notes?.trim() || "No notes saved yet."}
+            </li>
+          </ul>
+          <div className="route-actions">
+            <ActionLink href="/dashboard/preferences" variant="chip">
+              Edit preferences
+            </ActionLink>
+          </div>
+        </Card>
 
-        <article className="panel">
-          <p className="eyebrow">Admin scope</p>
-          <h2 className="panel-title">Management is route-separated.</h2>
+        <Card>
+          <p className="eyebrow">Interests</p>
+          <h2 className="panel-title">Current interested animals</h2>
           <p className="panel-copy">
-            Admin flows live under dedicated admin paths instead of the generic
-            adopter dashboard surface.
+            Keep no more than {MAX_INTERESTS} interested animals saved at once. This cap is enforced before the request leaves the browser and again in the protected BFF.
           </p>
-        </article>
+          <div className="route-actions">
+            <ActionLink href="/dashboard/interests" variant="chip">
+              Manage interests
+            </ActionLink>
+          </div>
+        </Card>
+      </section>
+
+      <section className="panel dashboard-form-panel">
+        <p className="eyebrow">Status</p>
+        <h2 className="panel-title">Interest status snapshot</h2>
+        <InterestStatusList
+          animals={interestAnimals}
+          emptyTitle="No interested animals saved"
+          emptyCopy="Once you save an animal to your interested list, its real adoption status will appear here from the shared status map."
+        />
       </section>
     </div>
   );
+}
+
+async function loadDashboardData(profileId: string) {
+  try {
+    const profile = await fetchAdopterProfile(profileId);
+    const interestAnimals = (
+      await Promise.all(
+        profile.interests.map(async (interest) => {
+          try {
+            return await fetchAnimalForView(interest.animalId);
+          } catch {
+            return null;
+          }
+        }),
+      )
+    ).filter((animal): animal is Awaited<ReturnType<typeof fetchAnimalForView>> => animal !== null);
+
+    return {
+      kind: "success" as const,
+      profile,
+      interestAnimals,
+    };
+  } catch (error) {
+    return {
+      kind: "error" as const,
+      message:
+        error instanceof Error
+          ? error.message
+          : "The adopter dashboard is temporarily unavailable.",
+    };
+  }
 }

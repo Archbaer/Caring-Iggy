@@ -1,10 +1,13 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
+import { defaultRouteForRole, LOGIN_ROUTE } from "@/lib/auth/role-check";
 import {
   SESSION_COOKIE_NAME,
   SESSION_STATE_COOKIE_NAME,
   decodeSessionState,
   type AuthSession,
+  type UserRole,
 } from "@/lib/auth/session";
 
 export async function getCurrentSession(): Promise<AuthSession | null> {
@@ -17,4 +20,18 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
   }
 
   return decodeSessionState(sessionState);
+}
+
+export async function getRequiredRoleSession(role: UserRole): Promise<AuthSession> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    redirect(LOGIN_ROUTE);
+  }
+
+  if (session.role !== role) {
+    redirect(defaultRouteForRole(session.role));
+  }
+
+  return session;
 }
