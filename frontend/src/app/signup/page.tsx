@@ -1,42 +1,63 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function SignupPage() {
+import { SignupForm } from "@/components/auth/signup-form";
+import { getCurrentSession } from "@/lib/auth/server-session";
+import { resolveAuthenticatedRedirect } from "@/lib/auth/role-check";
+
+type PageProps = {
+  searchParams: Promise<{
+    redirect?: string | string[];
+  }>;
+};
+
+function readQueryValue(value?: string | string[]): string | undefined {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return undefined;
+}
+
+export default async function SignupPage({ searchParams }: PageProps) {
+  const [session, resolvedSearchParams] = await Promise.all([
+    getCurrentSession(),
+    searchParams,
+  ]);
+  const requestedRedirect = readQueryValue(resolvedSearchParams.redirect);
+
+  if (session) {
+    redirect(resolveAuthenticatedRedirect(session, requestedRedirect));
+  }
+
   return (
     <div className="page-shell">
       <section className="page-hero">
         <p className="eyebrow">Public auth route</p>
-        <h1 className="page-title">Adopter sign-up scaffold.</h1>
+        <h1 className="page-title">Start an adopter account with calm, clear next steps.</h1>
         <p className="page-copy">
-          This route exists for future self-serve adopter registration. Staff and
-          admin account provisioning stays outside this public flow.
+          Public registration is reserved for adopters only. Staff and admin
+          accounts stay in separate provisioned flows so this route remains a
+          clean public boundary.
         </p>
       </section>
 
       <section className="panel-grid">
         <article className="panel">
-          <p className="eyebrow">Planned form</p>
-          <h2 className="panel-title">Account creation inputs</h2>
-          <p className="panel-copy">
-            Name, email, password, and future profile-linking fields will be
-            implemented alongside the auth BFF routes.
-          </p>
+          <p className="eyebrow">Public onboarding</p>
+          <h2 className="panel-title">What happens after account creation.</h2>
+          <ul className="detail-list">
+            <li>Your account is created through the frontend BFF only.</li>
+            <li>CSRF protection is refreshed from the session endpoint before submit.</li>
+            <li>Successful signup continues into the same role-aware redirect flow as login.</li>
+          </ul>
         </article>
 
-        <article className="panel">
-          <p className="eyebrow">Access note</p>
-          <h2 className="panel-title">Admin and staff are provisioned separately.</h2>
-          <p className="panel-copy">
-            This protects the route boundary and keeps the public sign-up page
-            limited to adopter onboarding.
-          </p>
-        </article>
+        <SignupForm />
       </section>
-
-      <div className="route-actions">
-        <Link href="/login" className="secondary-link">
-          Already have an account?
-        </Link>
-      </div>
     </div>
   );
 }

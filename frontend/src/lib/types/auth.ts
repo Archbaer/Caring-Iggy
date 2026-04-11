@@ -10,6 +10,21 @@ export interface SessionUser {
   profileId?: string;
 }
 
+export interface AuthSessionSnapshot {
+  user: SessionUser | null;
+  csrfToken: string;
+}
+
+export interface AuthMutationResult {
+  user: SessionUser;
+  csrfToken: string;
+}
+
+export interface LogoutResult {
+  ok: true;
+  csrfToken: string;
+}
+
 /** Shape of the signed CSRF token pair (cookie + header value). */
 export interface CsrfToken {
   token: string;
