@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { AnimalDetail } from "@/components/animals/animal-detail";
 import { fetchAnimalForView } from "@/lib/api/animals";
+import { getCurrentSession } from "@/lib/auth/server-session";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -38,7 +40,7 @@ async function loadAnimal(id: string): Promise<AnimalDetailResult> {
 export default async function AnimalDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const result = await loadAnimal(id);
+  const [result, session] = await Promise.all([loadAnimal(id), getCurrentSession()]);
 
   if (result.kind === "not-found") {
     notFound();
@@ -67,5 +69,29 @@ export default async function AnimalDetailPage({ params }: PageProps) {
     );
   }
 
-  return <AnimalDetail animal={result.animal} />;
+  const canEditAnimal = session?.role === "STAFF" || session?.role === "ADMIN";
+  const editorSlot = canEditAnimal
+    ? await renderEditorSlot(
+        result.animal,
+        session.role === "ADMIN" ? "ADMIN" : "STAFF",
+      )
+    : undefined;
+
+  return (
+    <AnimalDetail
+      animal={result.animal}
+      editorSlot={editorSlot}
+    />
+  );
+}
+
+async function renderEditorSlot(
+  animal: Awaited<ReturnType<typeof fetchAnimalForView>>,
+  userRole: "STAFF" | "ADMIN",
+): Promise<ReactNode> {
+  const { AnimalEditorSlot } = await import(
+    "@/components/animals/animal-editor-slot"
+  );
+
+  return <AnimalEditorSlot animal={animal} userRole={userRole} />;
 }

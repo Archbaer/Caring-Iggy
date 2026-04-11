@@ -1,13 +1,15 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { AnimalImage } from "@/components/animals/animal-image";
 import type { AnimalDetailView } from "@/lib/api/animals";
 
 type AnimalDetailProps = {
   animal: AnimalDetailView;
+  editorSlot?: ReactNode;
 };
 
-export function AnimalDetail({ animal }: AnimalDetailProps) {
+export function AnimalDetail({ animal, editorSlot }: AnimalDetailProps) {
   return (
     <div className="page-shell">
       <section className="page-hero animal-detail-hero">
@@ -65,13 +67,16 @@ export function AnimalDetail({ animal }: AnimalDetailProps) {
           </p>
         </article>
 
-        <article className="panel">
-          <p className="eyebrow">Staff region</p>
-          <h2 className="panel-title">Edit entrypoint reserved</h2>
-          <p className="panel-copy">
-            Staff-only edit controls will mount here in a later task. This public page intentionally shows the placeholder only.
-          </p>
-        </article>
+        {editorSlot ? (
+          <article className="panel">
+            <p className="eyebrow">Staff tools</p>
+            <h2 className="panel-title">Animal editor shell</h2>
+            <p className="panel-copy">
+              These controls are loaded only for authorized staff accounts, but all mutations still pass through protected server-side authorization.
+            </p>
+            {editorSlot}
+          </article>
+        ) : null}
       </section>
 
       <section className="empty-state">
