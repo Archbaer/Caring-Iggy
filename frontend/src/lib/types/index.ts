@@ -13,9 +13,14 @@ export type {
 
 export type {
   AnimalStatusCode,
+  AnimalGender,
+  AnimalSize,
   AnimalSummary,
   AnimalDetail,
   AnimalListParams,
+  PreviousOwner,
+  AnimalCreateRequest,
+  AnimalUpdateRequest,
 } from "./animal";
 
 export type { AnimalStatusLabel } from "../constants/status-map";
