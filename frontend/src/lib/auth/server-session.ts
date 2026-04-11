@@ -1,7 +1,11 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { defaultRouteForRole, LOGIN_ROUTE } from "@/lib/auth/role-check";
+import {
+  defaultRouteForRole,
+  hasAnyRole,
+  LOGIN_ROUTE,
+} from "@/lib/auth/role-check";
 import {
   SESSION_COOKIE_NAME,
   SESSION_STATE_COOKIE_NAME,
@@ -30,6 +34,22 @@ export async function getRequiredRoleSession(role: UserRole): Promise<AuthSessio
   }
 
   if (session.role !== role) {
+    redirect(defaultRouteForRole(session.role));
+  }
+
+  return session;
+}
+
+export async function getRequiredRoleGroupSession(
+  roles: readonly UserRole[],
+): Promise<AuthSession> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    redirect(LOGIN_ROUTE);
+  }
+
+  if (!hasAnyRole(session, roles)) {
     redirect(defaultRouteForRole(session.role));
   }
 
