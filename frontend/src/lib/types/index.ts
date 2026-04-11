@@ -25,7 +25,7 @@ export type {
   AdopterInterest,
   AdopterProfile,
   UpdatePreferencesRequest,
-  AddInterestRequest,
+  UpdateInterestsRequest,
 } from "./adopter";
 
 export { MAX_INTERESTS } from "./adopter";

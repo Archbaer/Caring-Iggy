@@ -14,18 +14,16 @@ export interface AdopterPreferences {
 /** An animal that an adopter has expressed interest in. */
 export interface AdopterInterest {
   animalId: string;
-  /** ISO-8601 timestamp when interest was recorded. */
-  createdAt: string;
 }
 
 /** Adopter profile returned from session-linked identity. */
 export interface AdopterProfile {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   telephone: string;
-  preferences: AdopterPreferences | null;
+  status: string;
+  preferences: AdopterPreferences;
   interests: AdopterInterest[];
 }
 
@@ -38,6 +36,6 @@ export interface UpdatePreferencesRequest {
 }
 
 /** Request body for adding an animal interest. */
-export interface AddInterestRequest {
-  animalId: string;
+export interface UpdateInterestsRequest {
+  interestedAnimalIds: string[];
 }
