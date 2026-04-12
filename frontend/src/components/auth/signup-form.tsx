@@ -51,9 +51,7 @@ export function SignupForm() {
     };
   }, []);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  async function submitSignup() {
     const token = csrfToken ?? (await refreshCsrfToken());
 
     if (!token) {
@@ -97,6 +95,11 @@ export function SignupForm() {
     }
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submitSignup();
+  }
+
   return (
     <article className="panel auth-panel">
       <p className="eyebrow">Adopter account</p>
@@ -105,7 +108,7 @@ export function SignupForm() {
         This public form is limited to adopter registration and posts only to the frontend auth BFF.
       </p>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" method="post" onSubmit={handleSubmit}>
         <div className="auth-grid">
           <FormField
             id="signup-first-name"
