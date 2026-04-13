@@ -187,13 +187,19 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(Account account, LocalDateTime expiresAt) {
+        SessionUserDto sessionUser = SessionUserDto.builder()
+                .accountId(account.getId())
+                .role(account.getRole().name())
+                .profileType(account.getProfileType().name())
+                .profileId(account.getProfileId())
+                .build();
+
         return AuthResponse.builder()
-                .user(SessionUserDto.builder()
-                        .accountId(account.getId())
-                        .role(account.getRole().name())
-                        .profileType(account.getProfileType().name())
-                        .profileId(account.getProfileId())
-                        .build())
+                .user(sessionUser)
+                .accountId(sessionUser.getAccountId().toString())
+                .role(sessionUser.getRole())
+                .profileType(sessionUser.getProfileType())
+                .profileId(sessionUser.getProfileId() != null ? sessionUser.getProfileId().toString() : null)
                 .expiresAtEpochSeconds(expiresAt.toEpochSecond(ZoneOffset.UTC))
                 .build();
     }
