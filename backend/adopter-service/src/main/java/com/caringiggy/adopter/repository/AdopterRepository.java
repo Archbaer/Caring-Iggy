@@ -140,21 +140,18 @@ public class AdopterRepository {
 
         int statusId = adopter.getStatus() != null ? adopter.getStatus().ordinal() + 1 : 1;
         String preferencesJson = adopter.getPreferences() != null ? toJsonString(adopter.getPreferences()) : null;
-        String interestedAnimalsArray = adopter.getInterestedAnimals() != null && !adopter.getInterestedAnimals().isEmpty()
-                ? "{" + String.join(",", adopter.getInterestedAnimals().stream().map(UUID::toString).toList()) + "}"
-                : "{}";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, adopter.getName());
             ps.setString(2, adopter.getTelephone());
             ps.setString(3, adopter.getEmail());
             ps.setString(4, adopter.getAddress());
             ps.setInt(5, statusId);
             ps.setString(6, preferencesJson);
-            ps.setString(7, interestedAnimalsArray);
+            ps.setArray(7, toUuidSqlArray(connection, adopter.getInterestedAnimals()));
             return ps;
         }, keyHolder);
 
@@ -173,20 +170,19 @@ public class AdopterRepository {
 
         int statusId = adopter.getStatus() != null ? adopter.getStatus().ordinal() + 1 : 1;
         String preferencesJson = adopter.getPreferences() != null ? toJsonString(adopter.getPreferences()) : null;
-        String interestedAnimalsArray = adopter.getInterestedAnimals() != null && !adopter.getInterestedAnimals().isEmpty()
-                ? "{" + String.join(",", adopter.getInterestedAnimals().stream().map(UUID::toString).toList()) + "}"
-                : "{}";
 
-        jdbcTemplate.update(sql,
-                adopter.getName(),
-                adopter.getTelephone(),
-                adopter.getEmail(),
-                adopter.getAddress(),
-                statusId,
-                preferencesJson,
-                interestedAnimalsArray,
-                adopter.getId()
-        );
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, adopter.getName());
+            ps.setString(2, adopter.getTelephone());
+            ps.setString(3, adopter.getEmail());
+            ps.setString(4, adopter.getAddress());
+            ps.setInt(5, statusId);
+            ps.setString(6, preferencesJson);
+            ps.setArray(7, toUuidSqlArray(connection, adopter.getInterestedAnimals()));
+            ps.setObject(8, adopter.getId());
+            return ps;
+        });
 
         return findById(adopter.getId()).orElse(adopter);
     }
@@ -223,5 +219,12 @@ public class AdopterRepository {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    private Array toUuidSqlArray(Connection connection, List<UUID> interestedAnimals) throws SQLException {
+        Object[] values = interestedAnimals == null
+                ? new Object[0]
+                : interestedAnimals.stream().map(UUID::toString).toArray();
+        return connection.createArrayOf("uuid", values);
     }
 }
