@@ -341,9 +341,10 @@ export default function AboutPage() {
               gap: "var(--space-5)",
             }}
           >
-            {VALUES.map((value) => (
+            {VALUES.map((value, i) => (
               <div
                 key={value.title}
+                className={`ci-enter ci-enter--${i + 1}`}
                 style={{
                   background: "var(--color-surface)",
                   borderRadius: "var(--radius-lg)",
@@ -435,8 +436,8 @@ export default function AboutPage() {
               gap: "var(--space-5)",
             }}
           >
-            {TEAM_MEMBERS.map((member) => (
-              <div key={member.name} style={{ textAlign: "center" }}>
+            {TEAM_MEMBERS.map((member, i) => (
+              <div key={member.name} className={`ci-enter ci-enter--${i + 1}`} style={{ textAlign: "center" }}>
                 <div
                   style={{
                     width: "8rem",
