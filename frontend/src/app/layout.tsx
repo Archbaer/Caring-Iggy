@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
-import { Fraunces, Public_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { PublicHeader } from "@/components/layout/public-header";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+  display: "swap",
 });
 
-const publicSans = Public_Sans({
-  variable: "--font-public-sans",
+const dmSans = DM_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-dm-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,13 +43,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${publicSans.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
-      <body className="shell-body">
-        <div className="shell-frame">
+      <body className="ci-body">
+        <div className="ci-frame">
           <PublicHeader />
 
-          <main className="shell-main">{children}</main>
+          <main className="ci-main">{children}</main>
 
           <PublicFooter />
         </div>
