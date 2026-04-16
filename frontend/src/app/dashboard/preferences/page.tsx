@@ -4,14 +4,45 @@ import { ActionLink } from "@/components/ui/action-link";
 import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalsForView } from "@/lib/api/animals";
 import { getRequiredRoleSession } from "@/lib/auth/server-session";
+import type { AdopterProfile } from "@/lib/types/adopter";
 
 export const dynamic = "force-dynamic";
 
+type PreferencesData =
+  | { kind: "success"; profile: AdopterProfile; availableTypes: string[]; availableBreeds: string[] }
+  | { kind: "error"; message: string };
+
+async function loadPreferencesData(profileId: string): Promise<PreferencesData> {
+  try {
+    const [profile, animals] = await Promise.all([
+      fetchAdopterProfile(profileId),
+      fetchAnimalsForView().catch(() => []),
+    ]);
+
+    return {
+      kind: "success",
+      profile,
+      availableTypes: Array.from(new Set(animals.map((animal) => animal.animalType))),
+      availableBreeds: Array.from(
+        new Set(animals.flatMap((a) => (a.breed ? [a.breed] : [])).values()),
+      ).sort(),
+    };
+  } catch (error) {
+    return {
+      kind: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Preferences are temporarily unavailable.",
+    };
+  }
+}
+
 export default async function DashboardPreferencesPage() {
   const session = await getRequiredRoleSession("ADOPTER");
-  const result = session.profileId
+  const result: PreferencesData = session.profileId
     ? await loadPreferencesData(session.profileId)
-    : { kind: "error" as const, message: "Your adopter profile is not linked to this account yet." };
+    : { kind: "error", message: "Your adopter profile is not linked to this account yet." };
 
   if (result.kind === "error") {
     return (
@@ -43,7 +74,7 @@ export default async function DashboardPreferencesPage() {
           <p className="eyebrow">Protected route</p>
           <h1 className="page-title">Preferences</h1>
           <p className="page-copy">
-            Save the adoption context staff should see first: animal types, age range, and concise notes that can guide follow-up.
+            Tell our team what kind of animal you are looking for — species, breed, age, and anything else that matters to your household.
           </p>
         </div>
 
@@ -51,8 +82,8 @@ export default async function DashboardPreferencesPage() {
           <p className="eyebrow">Current summary</p>
           <p className="panel-copy">
             {result.profile.preferences.preferredAnimalTypes.length > 0
-              ? `Saved types: ${result.profile.preferences.preferredAnimalTypes.join(", ")}.`
-              : "No animal types saved yet."}
+              ? `Saved: ${result.profile.preferences.preferredAnimalTypes.join(", ")}`
+              : "No preferences saved yet."}
           </p>
         </div>
       </section>
@@ -62,30 +93,8 @@ export default async function DashboardPreferencesPage() {
       <PreferencesForm
         initialPreferences={result.profile.preferences}
         availableTypes={result.availableTypes}
+        availableBreeds={result.availableBreeds}
       />
     </div>
   );
-}
-
-async function loadPreferencesData(profileId: string) {
-  try {
-    const [profile, animals] = await Promise.all([
-      fetchAdopterProfile(profileId),
-      fetchAnimalsForView().catch(() => []),
-    ]);
-
-    return {
-      kind: "success" as const,
-      profile,
-      availableTypes: Array.from(new Set(animals.map((animal) => animal.animalType))),
-    };
-  } catch (error) {
-    return {
-      kind: "error" as const,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Preferences are temporarily unavailable.",
-    };
-  }
 }

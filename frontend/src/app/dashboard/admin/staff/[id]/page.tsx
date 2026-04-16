@@ -1,9 +1,10 @@
-import { ActionLink } from "@/components/ui/action-link";
 import {
   fetchAdminEmployeeDetail,
   type AdminEmployeeDetail,
 } from "@/lib/api/admin";
 import { getRequiredRoleSession } from "@/lib/auth/server-session";
+
+import { AdminStaffDetailClient } from "@/components/admin/staff-detail-client";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -29,52 +30,27 @@ export default async function AdminStaffDetailPage({ params }: PageProps) {
           <p className="page-copy">The protected staff detail route could not be loaded.</p>
         </section>
 
+        <nav className="breadcrumb">
+          <a href="/dashboard/admin/staff" className="link-chip">
+            ← Staff
+          </a>
+        </nav>
+
         <section className="empty-state">
           <p className="eyebrow">Detail error</p>
           <h2 className="panel-title">We couldn&apos;t load this employee record.</h2>
           <p className="panel-copy">{result.message}</p>
-          <ActionLink href="/dashboard/admin/staff" variant="chip">
-            Back to staff directory
-          </ActionLink>
         </section>
       </div>
     );
   }
 
   return (
-    <div className="page-shell">
-      <section className="page-hero">
-        <p className="eyebrow">Admin route</p>
-        <h1 className="page-title">{result.employee.name}</h1>
-        <p className="page-copy">
-          Administrator-only employee detail route for <strong>{id}</strong>. Server authorization is rechecked before any role metadata is shown.
-        </p>
-      </section>
-
-      <section className="panel-grid">
-        <article className="panel">
-          <p className="eyebrow">Identity</p>
-          <h2 className="panel-title">Account metadata</h2>
-          <ul className="detail-list">
-            <li>
-              <strong>Email:</strong> {result.employee.email}
-            </li>
-            <li>
-              <strong>Telephone:</strong> {result.employee.telephone ?? "No telephone on file."}
-            </li>
-            <li>
-              <strong>Role:</strong> {result.employee.role}
-            </li>
-            <li>
-              <strong>Created:</strong> {result.employee.createdAt ?? "Unavailable"}
-            </li>
-            <li>
-              <strong>Updated:</strong> {result.employee.updatedAt ?? "Unavailable"}
-            </li>
-          </ul>
-        </article>
-      </section>
-    </div>
+    <AdminStaffDetailClient
+      employee={result.employee}
+      onUpdate={() => {}}
+      onDelete={() => {}}
+    />
   );
 }
 
