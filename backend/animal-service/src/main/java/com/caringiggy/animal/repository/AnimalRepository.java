@@ -14,7 +14,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +22,8 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class AnimalRepository {
+
+    private static final String[] GENERATED_ID_COLUMN = {"id"};
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -158,7 +159,7 @@ public class AnimalRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, GENERATED_ID_COLUMN);
             ps.setString(1, animal.getName());
             ps.setDate(2, animal.getDateOfBirth() != null ? Date.valueOf(animal.getDateOfBirth()) : null);
             ps.setInt(3, animal.getAnimalType() != null ? animal.getAnimalType().ordinal() + 1 : 1);

@@ -76,7 +76,7 @@ public class AdoptionHistoryRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setObject(1, history.getAdopterId());
             ps.setObject(2, history.getAnimalId());
             ps.setDate(3, history.getAdoptionDate() != null ? Date.valueOf(history.getAdoptionDate()) : Date.valueOf(LocalDate.now()));
