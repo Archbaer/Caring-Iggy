@@ -112,8 +112,8 @@ export default async function Home() {
 
       <div className="ci-trust-bar">
         <div className="ci-trust-bar__inner">
-          {trustPoints.map((point) => (
-            <div key={point.title} className="ci-trust-item">
+          {trustPoints.map((point, i) => (
+            <div key={point.title} className={`ci-trust-item ci-enter ci-enter--${i + 1}`}>
               <div className="ci-trust-item__icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
@@ -130,14 +130,14 @@ export default async function Home() {
 
       <section className="ci-section">
         <div className="ci-section__inner">
-          <div className="ci-section__header">
+          <div className="ci-section__header ci-enter">
             <p className="ci-section__eyebrow">Currently available</p>
             <h2 className="ci-section__title">Animals looking for homes.</h2>
             <p className="ci-section__copy">These animals are ready for adoption now. Browse their profiles to learn more about their personality and needs.</p>
           </div>
 
           {featuredAnimals.length > 0 ? (
-            <div className="ci-animal-grid" style={{ marginBottom: "var(--space-6)" }}>
+            <div className="ci-animal-grid ci-enter ci-enter--1" style={{ marginBottom: "var(--space-6)" }}>
               {featuredAnimals.map((animal) => (
                 <AnimalCard key={animal.id} animal={animal} />
               ))}
@@ -166,7 +166,7 @@ export default async function Home() {
 
           <div className="ci-steps">
             {processSteps.map((step, index) => (
-              <div key={step.title}>
+              <div key={step.title} className={`ci-enter ci-enter--${index + 1}`}>
                 <p className="ci-step__number">0{index + 1}</p>
                 <h3 className="ci-step__title">{step.title}</h3>
                 <p className="ci-step__copy">{step.copy}</p>
@@ -184,8 +184,8 @@ export default async function Home() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-6)" }}>
-            {testimonials.map((t) => (
-              <div key={t.adopter} className="ci-card" style={{ padding: "var(--space-5)" }}>
+            {testimonials.map((t, i) => (
+              <div key={t.adopter} className={`ci-card ci-enter ci-enter--${i + 1}`} style={{ padding: "var(--space-5)" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "1.125rem", fontStyle: "italic", color: "var(--color-ink-soft)", lineHeight: 1.6, marginBottom: "var(--space-4)" }}>
                   &ldquo;{t.quote}&rdquo;
                 </p>
@@ -204,8 +204,8 @@ export default async function Home() {
               <p className="ci-section__eyebrow">Our commitment</p>
               <h2 className="ci-section__title" style={{ marginBottom: "var(--space-5)" }}>Every animal deserves care.</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-                {values.map((value) => (
-                  <div key={value.title}>
+                {values.map((value, i) => (
+                  <div key={value.title} className={`ci-enter ci-enter--${i + 1}`}>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 500, color: "var(--color-ink)", marginBottom: "var(--space-1)" }}>{value.title}</p>
                     <p className="ci-body">{value.copy}</p>
                   </div>

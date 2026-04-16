@@ -25,7 +25,7 @@ function statusToBadge(status: string): string {
 
 export function AnimalCard({ animal }: AnimalCardProps) {
   return (
-    <article className="ci-card">
+    <article className="ci-card ci-enter">
       <div className="ci-card__media">
         <AnimalImage
           imageUrl={animal.imageUrl}
