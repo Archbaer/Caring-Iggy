@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { STATUS_CODES, toStatusLabel } from "@/lib/constants/status-map";
 import type { AnimalStatusCode } from "@/lib/types";
 
 type AnimalFiltersProps = {
@@ -10,47 +9,46 @@ type AnimalFiltersProps = {
 
 export function AnimalFilters({ status, type }: AnimalFiltersProps) {
   return (
-    <section className="panel animal-filters-panel">
-      <p className="eyebrow">Browse filters</p>
-      <div className="animal-filters-head">
-        <h2 className="panel-title">Refine the public adoption catalog.</h2>
-        <p className="panel-copy">
-          Filter by mapped status or animal type without leaving the server-rendered route.
-        </p>
+    <div className="ci-card" style={{ padding: "var(--space-5)" }}>
+      <p className="ci-label" style={{ marginBottom: "var(--space-4)" }}>Filter</p>
+
+      <div style={{ marginBottom: "var(--space-5)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.875rem", fontWeight: 600, color: "var(--color-ink)", marginBottom: "var(--space-2)" }}>Status</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+          {[{ value: "", label: "All" }, { value: "AVAILABLE", label: "Available" }, { value: "PENDING", label: "Pending" }].map((opt) => (
+            <Link
+              key={opt.value}
+              href={opt.value ? `/animals?status=${opt.value}` : "/animals"}
+              className={`ci-btn ci-btn--sm ${status === opt.value ? "ci-btn--primary" : "ci-btn--ghost-sm"}`}
+              style={status !== opt.value && opt.value !== "" ? { borderColor: "var(--color-border)", color: "var(--color-ink-soft)" } : {}}
+            >
+              {opt.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <form className="animal-filters-form" method="get">
-        <label className="animal-filter-field">
-          <span className="animal-filter-label">Status</span>
-          <select name="status" defaultValue={status ?? ""} className="animal-filter-input">
-            <option value="">All statuses</option>
-            {STATUS_CODES.map((code) => (
-              <option key={code} value={code}>
-                {toStatusLabel(code)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="animal-filter-field">
-          <span className="animal-filter-label">Type</span>
-          <input
-            name="type"
-            defaultValue={type ?? ""}
-            className="animal-filter-input"
-            placeholder="Dog, Cat, Rabbit..."
-          />
-        </label>
-
-        <div className="hero-actions animal-filters-actions">
-          <button type="submit" className="primary-link animal-filter-button">
-            Apply filters
-          </button>
-          <Link href="/animals" className="secondary-link">
-            Clear filters
-          </Link>
+      <div style={{ marginBottom: "var(--space-5)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.875rem", fontWeight: 600, color: "var(--color-ink)", marginBottom: "var(--space-2)" }}>Species</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+          {[{ value: "", label: "All" }, { value: "DOG", label: "Dog" }, { value: "CAT", label: "Cat" }].map((opt) => (
+            <Link
+              key={opt.value}
+              href={opt.value ? `/animals?type=${opt.value}` : "/animals"}
+              className={`ci-btn ci-btn--sm ${type === opt.value ? "ci-btn--primary" : "ci-btn--ghost-sm"}`}
+              style={type !== opt.value && opt.value !== "" ? { borderColor: "var(--color-border)", color: "var(--color-ink-soft)" } : {}}
+            >
+              {opt.label}
+            </Link>
+          ))}
         </div>
-      </form>
-    </section>
+      </div>
+
+      {(status || type) && (
+        <Link href="/animals" className="ci-btn ci-btn--ghost ci-btn--sm" style={{ width: "100%", justifyContent: "center" }}>
+          Clear filters
+        </Link>
+      )}
+    </div>
   );
 }
