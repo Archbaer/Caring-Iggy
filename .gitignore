@@ -11,6 +11,10 @@
 **/.mvn/
 **/*.class
 
+# Sisyphus
+.sisyphus/
+.playwright-mcp/
+
 # IDE / editor artifacts
 **/.classpath
 **/.project
