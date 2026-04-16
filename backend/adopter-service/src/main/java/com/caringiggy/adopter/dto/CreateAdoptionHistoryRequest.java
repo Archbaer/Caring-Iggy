@@ -1,6 +1,6 @@
 package com.caringiggy.adopter.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateAdoptionHistoryRequest {
-    @NotBlank(message = "Adopter ID is required")
+    @NotNull(message = "Adopter ID is required")
     private UUID adopterId;
     
-    @NotBlank(message = "Animal ID is required")
+    @NotNull(message = "Animal ID is required")
     private UUID animalId;
     
     private LocalDate adoptionDate;
