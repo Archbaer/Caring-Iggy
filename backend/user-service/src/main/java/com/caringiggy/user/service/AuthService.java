@@ -73,10 +73,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse provisionEmployeeAccount(ProvisionAccountRequest request, String sessionToken) {
-        Account adminAccount = requireAuthenticatedAccount(sessionToken);
-        if (adminAccount.getRole() != AccountRole.ADMIN) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Only admins can provision employee accounts");
-        }
+        requireAdminSession(sessionToken);
 
         AccountRole role = parseProvisionRole(request.getRole());
         ensureEmailAvailable(request.getEmail());
@@ -171,6 +168,13 @@ public class AuthService {
     public AuthResponse provisionAdminAccount(ProvisionAccountRequest request, String sessionToken) {
         ProvisionAccountRequest normalizedRequest = copyProvisionRequestWithRole(request, AccountRole.ADMIN);
         return provisionEmployeeAccount(normalizedRequest, sessionToken);
+    }
+
+    public void requireAdminSession(String sessionToken) {
+        Account account = requireAuthenticatedAccount(sessionToken);
+        if (account.getRole() != AccountRole.ADMIN) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only admins can access employee management");
+        }
     }
 
     private AuthenticatedSession createAuthenticatedSession(Account account) {
