@@ -18,6 +18,8 @@
 **/.settings/
 .idea/
 .vscode/
+.sisyphus/
+.playwright-mcp/
 
 # Logs and local runtime files
 **/*.log
