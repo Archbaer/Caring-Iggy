@@ -149,6 +149,9 @@ function normalizePreferences(
 function serializePreferences(input: AdopterPreferences): Record<string, unknown> {
   return {
     preferredAnimalTypes: input.preferredAnimalTypes,
+    ...(Array.isArray(input.preferredBreeds) && input.preferredBreeds.length > 0
+      ? { preferredBreeds: input.preferredBreeds }
+      : {}),
     ...(typeof input.minAge === "number" ? { minAge: input.minAge } : {}),
     ...(typeof input.maxAge === "number" ? { maxAge: input.maxAge } : {}),
     ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),

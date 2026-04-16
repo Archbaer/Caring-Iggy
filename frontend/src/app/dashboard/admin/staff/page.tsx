@@ -20,10 +20,10 @@ export default async function AdminStaffPage() {
     return (
       <div className="page-shell">
         <section className="page-hero">
-          <p className="eyebrow">Admin route</p>
+          <p className="eyebrow">Employee records</p>
           <h1 className="page-title">Staff management</h1>
           <p className="page-copy">
-            Administrator-only staff oversight is protected, but the employee directory could not be loaded right now.
+            The employee directory could not be loaded right now. Please try again in a moment.
           </p>
         </section>
 
@@ -39,10 +39,10 @@ export default async function AdminStaffPage() {
   return (
     <div className="page-shell">
       <section className="page-hero">
-        <p className="eyebrow">Admin route</p>
+        <p className="eyebrow">Employee records</p>
         <h1 className="page-title">Staff management</h1>
         <p className="page-copy">
-          Administrator-only staff oversight stays isolated from the generic dashboard. Employee records render from user-service data instead of placeholder shells.
+          Manage shelter staff and administrator accounts. Create, update, or deactivate employee access.
         </p>
       </section>
 
@@ -67,9 +67,9 @@ export default async function AdminStaffPage() {
       ) : (
         <section className="empty-state">
           <p className="eyebrow">No employee records</p>
-          <h2 className="panel-title">No staff or admin accounts are available.</h2>
+          <h2 className="panel-title">No staff accounts yet.</h2>
           <p className="panel-copy">
-            The protected staff route is active, but user-service did not return any employee records.
+            Staff and admin accounts will appear here once created.
           </p>
         </section>
       )}

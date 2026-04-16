@@ -7,15 +7,17 @@ import { saveAdopterPreferences, AdopterApiError } from "@/lib/api/adopter-clien
 import { fetchAuthSession } from "@/lib/api/auth";
 import type { AdopterPreferences } from "@/lib/types";
 
-type PreferencesField = "preferredAnimalTypes" | "minAge" | "maxAge" | "notes";
+type PreferencesField = "preferredAnimalTypes" | "preferredBreeds" | "minAge" | "maxAge" | "notes";
 
 type PreferencesFormProps = {
   initialPreferences: AdopterPreferences;
   availableTypes: string[];
+  availableBreeds: string[];
 };
 
 const EMPTY_FIELD_ERRORS: Record<PreferencesField, string[]> = {
   preferredAnimalTypes: [],
+  preferredBreeds: [],
   minAge: [],
   maxAge: [],
   notes: [],
@@ -24,9 +26,11 @@ const EMPTY_FIELD_ERRORS: Record<PreferencesField, string[]> = {
 export function PreferencesForm({
   initialPreferences,
   availableTypes,
+  availableBreeds,
 }: PreferencesFormProps) {
   const router = useRouter();
   const [selectedTypes, setSelectedTypes] = useState(initialPreferences.preferredAnimalTypes);
+  const [selectedBreeds, setSelectedBreeds] = useState<string[]>(initialPreferences.preferredBreeds ?? []);
   const [minAge, setMinAge] = useState(initialPreferences.minAge?.toString() ?? "");
   const [maxAge, setMaxAge] = useState(initialPreferences.maxAge?.toString() ?? "");
   const [notes, setNotes] = useState(initialPreferences.notes ?? "");
@@ -81,6 +85,7 @@ export function PreferencesForm({
         {
           preferences: {
             preferredAnimalTypes: selectedTypes,
+            preferredBreeds: selectedBreeds.length > 0 ? selectedBreeds : undefined,
             ...(minAge ? { minAge: Number(minAge) } : {}),
             ...(maxAge ? { maxAge: Number(maxAge) } : {}),
             ...(notes.trim() ? { notes: notes.trim() } : {}),
@@ -112,7 +117,7 @@ export function PreferencesForm({
         <p className="eyebrow">Animal types</p>
         <h2 className="panel-title">Preferred profiles</h2>
         <p className="panel-copy">
-          Save the animal types you want the team to keep in mind while matching remains offline.
+          Select the species you are most interested in adopting.
         </p>
 
         {sortedTypes.length > 0 ? (
@@ -145,6 +150,41 @@ export function PreferencesForm({
         {fieldErrors.preferredAnimalTypes[0] ? (
           <p className="auth-field-error">{fieldErrors.preferredAnimalTypes[0]}</p>
         ) : null}
+      </section>
+
+      <section className="panel dashboard-form-panel">
+        <p className="eyebrow">Breeds</p>
+        <h2 className="panel-title">Preferred breeds</h2>
+        <p className="panel-copy">
+          Select any specific breeds you are interested in. Leave all unchecked to see all breeds.
+        </p>
+
+        {availableBreeds.length > 0 ? (
+          <div className="dashboard-checkbox-grid">
+            {availableBreeds.map((breed) => {
+              const checked = selectedBreeds.includes(breed);
+
+              return (
+                <label key={breed} className="dashboard-checkbox-chip">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      setSelectedBreeds((current) =>
+                        checked
+                          ? current.filter((value) => value !== breed)
+                          : [...current, breed],
+                      );
+                    }}
+                  />
+                  <span>{breed}</span>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="panel-copy">No breed options available right now.</p>
+        )}
       </section>
 
       <section className="panel dashboard-form-panel">
@@ -192,23 +232,33 @@ export function PreferencesForm({
       </section>
 
       <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Notes</p>
-        <h2 className="panel-title">Context for the team</h2>
+        <p className="eyebrow">Additional context</p>
+        <h2 className="panel-title">Tell us about your home</h2>
+        <p className="panel-copy">
+          Include relevant details about your living situation, schedule, other pets, and what you are looking for in a companion. The more specific you are, the better we can match you.
+        </p>
         <label className="auth-field" htmlFor="preference-notes">
-          <span className="auth-label">Additional notes</span>
+          <span className="auth-label">Additional notes <span className="auth-label-hint">(max 500 characters)</span></span>
           <textarea
             id="preference-notes"
             className="dashboard-textarea"
             rows={5}
+            maxLength={500}
             value={notes}
             aria-invalid={fieldErrors.notes.length > 0}
             onChange={(event) => {
               setNotes(event.target.value);
             }}
+            placeholder="e.g. I have a large backyard, no other pets, work from home, looking for a calm dog around 2–5 years old..."
           />
-          {fieldErrors.notes[0] ? (
-            <span className="auth-field-error">{fieldErrors.notes[0]}</span>
-          ) : null}
+          <div className="auth-field-footer">
+            <span className="auth-char-count" aria-live="polite">
+              {notes.length}/500
+            </span>
+            {fieldErrors.notes[0] ? (
+              <span className="auth-field-error">{fieldErrors.notes[0]}</span>
+            ) : null}
+          </div>
         </label>
       </section>
 
@@ -250,10 +300,11 @@ function readFieldErrors(error: unknown): Record<PreferencesField, string[]> {
   }
 
   return {
-    preferredAnimalTypes: error.responseError.fieldErrors.preferredAnimalTypes ?? [],
-    minAge: error.responseError.fieldErrors.minAge ?? [],
-    maxAge: error.responseError.fieldErrors.maxAge ?? [],
-    notes: error.responseError.fieldErrors.notes ?? [],
+    preferredAnimalTypes: error.responseError.fieldErrors?.preferredAnimalTypes ?? [],
+    preferredBreeds: error.responseError.fieldErrors?.preferredBreeds ?? [],
+    minAge: error.responseError.fieldErrors?.minAge ?? [],
+    maxAge: error.responseError.fieldErrors?.maxAge ?? [],
+    notes: error.responseError.fieldErrors?.notes ?? [],
   };
 }
 

@@ -20,10 +20,10 @@ export default async function AdminAdoptersPage() {
     return (
       <div className="page-shell">
         <section className="page-hero">
-          <p className="eyebrow">Admin route</p>
+          <p className="eyebrow">Adopter records</p>
           <h1 className="page-title">Adopter management</h1>
           <p className="page-copy">
-            Administrator-only adopter oversight is protected, but the directory could not be loaded right now.
+            The adopter directory could not be loaded right now. Please try again in a moment.
           </p>
         </section>
 
@@ -39,10 +39,10 @@ export default async function AdminAdoptersPage() {
   return (
     <div className="page-shell">
       <section className="page-hero">
-        <p className="eyebrow">Admin route</p>
+        <p className="eyebrow">Adopter records</p>
         <h1 className="page-title">Adopter management</h1>
         <p className="page-copy">
-          Administrator-only adopter oversight stays on dedicated admin routes. These records come from the adopter service at request time; no placeholder data is rendered.
+          View and manage adopter profiles, track adoption history, and monitor interested animals across all accounts.
         </p>
       </section>
 
@@ -69,9 +69,9 @@ export default async function AdminAdoptersPage() {
       ) : (
         <section className="empty-state">
           <p className="eyebrow">No adopter records</p>
-          <h2 className="panel-title">No adopter profiles are available.</h2>
+          <h2 className="panel-title">No adopter profiles yet.</h2>
           <p className="panel-copy">
-            The admin route is live and protected, but adopter-service did not return any records.
+            Adopter accounts will appear here once registered.
           </p>
         </section>
       )}

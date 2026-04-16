@@ -5,6 +5,7 @@
 /** Adopter preference categories. */
 export interface AdopterPreferences {
   preferredAnimalTypes: string[];
+  preferredBreeds?: string[];
   maxAge?: number;
   minAge?: number;
   /** Additional free-text preferences. */

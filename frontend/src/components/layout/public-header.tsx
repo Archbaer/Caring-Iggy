@@ -20,10 +20,12 @@ export async function PublicHeader() {
   return (
     <header className="shell-header">
       <div className="shell-brand-block">
-        <p className="eyebrow">Caring Iggy</p>
         <Link href="/" className="brand-mark brand-link">
-          Calm adoption journeys for people and animals.
+          Caring Iggy
         </Link>
+        <p className="brand-tagline">
+          Calm adoption journeys for people and animals.
+        </p>
       </div>
 
       <nav aria-label="Primary" className="shell-nav">

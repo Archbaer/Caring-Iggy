@@ -16,19 +16,29 @@ type InterestsManagerProps = {
 };
 
 export function InterestsManager({
-  currentAnimals,
-  catalogAnimals,
+  currentAnimals: rawCurrentAnimals,
+  catalogAnimals: rawCatalogAnimals,
 }: InterestsManagerProps) {
   const router = useRouter();
-  const [selectedIds, setSelectedIds] = useState<string[]>(currentAnimals.map((animal) => animal.id));
+
+  const dedupedCurrent = Array.from(
+    new Map(rawCurrentAnimals.map((a) => [a.id, a])).values(),
+  );
+  const dedupedCatalog = Array.from(
+    new Map(rawCatalogAnimals.map((a) => [a.id, a])).values(),
+  );
+
+  const initialIds = Array.from(new Set(dedupedCurrent.map((a) => a.id)));
+
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialIds);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [pendingAnimalId, setPendingAnimalId] = useState<string | null>(null);
 
   useEffect(() => {
-    setSelectedIds(currentAnimals.map((animal) => animal.id));
-  }, [currentAnimals]);
+    setSelectedIds(Array.from(new Set(dedupedCurrent.map((a) => a.id))));
+  }, [dedupedCurrent]);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,13 +61,13 @@ export function InterestsManager({
   }, []);
 
   const animalsById = useMemo(
-    () => new Map([...catalogAnimals, ...currentAnimals].map((animal) => [animal.id, animal])),
-    [catalogAnimals, currentAnimals],
+    () => new Map([...dedupedCatalog, ...dedupedCurrent].map((animal) => [animal.id, animal])),
+    [dedupedCatalog, dedupedCurrent],
   );
-  const selectedAnimals = selectedIds
+  const selectedAnimals = Array.from(new Set(selectedIds))
     .map((animalId) => animalsById.get(animalId))
     .filter((animal): animal is AnimalSummaryView => Boolean(animal));
-  const availableAnimals = catalogAnimals.filter((animal) => !selectedIds.includes(animal.id));
+  const availableAnimals = dedupedCatalog.filter((animal) => !selectedIds.includes(animal.id));
   const capReached = selectedIds.length >= MAX_INTERESTS;
 
   return (
@@ -180,7 +190,7 @@ export function InterestsManager({
       setSuccessMessage("Interested animals updated.");
       router.refresh();
     } catch (error) {
-      setSelectedIds(currentAnimals.map((animal) => animal.id));
+      setSelectedIds(Array.from(new Set(dedupedCurrent.map((a) => a.id))));
       setErrorMessage(toDisplayMessage(error));
 
       if (error instanceof AdopterApiError && error.responseError.code === "FORBIDDEN") {

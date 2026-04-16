@@ -1,155 +1,143 @@
+import Link from "next/link";
+
+import { AnimalCard } from "@/components/animals/animal-card";
 import { ActionLink } from "@/components/ui/action-link";
 import { Card } from "@/components/ui/card";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { fetchAnimalsForView } from "@/lib/api/animals";
+
+export const dynamic = "force-dynamic";
 
 const trustPoints = [
   {
-    title: "Gentle screening",
-    copy: "Families get clear guidance, realistic timelines, and role-aware follow-up instead of a rushed funnel.",
+    title: "Meet before you commit",
+    copy: "Every animal profile includes temperament notes, care history, and realistic expectations — so introductions go smoothly.",
   },
   {
-    title: "Transparent care notes",
-    copy: "Each profile is designed to surface temperament, medical context, and next-step readiness with plain language.",
+    title: "We handle the details",
+    copy: "Our team guides medical records, introductions, and placement decisions so you can focus on building a bond.",
   },
   {
-    title: "One shared system",
-    copy: "Public pages, adopter dashboards, and staff workflows are all being shaped inside one consistent platform.",
-  },
-];
-
-const featuredAnimals = [
-  {
-    name: "Maple",
-    breed: "Italian Greyhound mix",
-    note: "Quiet mornings, blanket burrower, happiest with a patient home.",
-    status: "Placeholder profile",
-  },
-  {
-    name: "Juniper",
-    breed: "Whippet mix",
-    note: "People-oriented, quick learner, ready for a home with steady routines.",
-    status: "Placeholder profile",
-  },
-  {
-    name: "Pico",
-    breed: "Miniature pinscher mix",
-    note: "Small and alert with a playful streak, ideal for adopters wanting an active companion.",
-    status: "Placeholder profile",
+    title: "Stay connected",
+    copy: "Track your adoption status, save interested animals, and receive updates from the shelter team in one place.",
   },
 ];
 
 const processSteps = [
   {
-    title: "Browse with context",
-    copy: "Start with profiles shaped for clarity so you can compare temperament, care needs, and adoption readiness on the server-rendered catalog.",
+    title: "Browse available animals",
+    copy: "Filter by species, age, and temperament to find animals that match your home and lifestyle.",
   },
   {
-    title: "Share your fit",
-    copy: "Create an adopter account when you are ready to save interests and describe the home, pace, and support you can offer.",
+    title: "Create an account",
+    copy: "Sign up to save your favourite animals and tell our team about your living situation and preferences.",
   },
   {
-    title: "Move together",
-    copy: "Staff use the same platform to guide introductions, confirm readiness, and keep status changes visible without separate tooling.",
+    title: "Meet your match",
+    copy: "Once approved, we arrange a visit so you can meet the animal before finalising the adoption.",
   },
 ];
 
-export default function Home() {
+async function loadFeaturedAnimals() {
+  try {
+    const animals = await fetchAnimalsForView({ status: "AVAILABLE" });
+    return animals.slice(0, 3);
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const featuredAnimals = await loadFeaturedAnimals();
+
   return (
     <div className="page-shell">
       <Card as="section" variant="hero" className="landing-hero">
         <div className="landing-hero-copy">
-          <p className="eyebrow">Calm adoption, carefully guided</p>
+          <p className="eyebrow">San Francisco Animal Shelter</p>
           <h1 className="page-title">
-            A softer path to meeting the right animal.
+            Every animal deserves a home.
           </h1>
           <p className="page-copy">
-            Caring Iggy is building one restrained, readable adoption experience
-            for visitors, adopters, and shelter staff. The public landing page is
-            designed to earn trust first: clear next steps, honest placeholders,
-            and a steady invitation into the animal catalog.
+            Caring Iggy connects adopted animals with loving families through a
+            transparent, guided adoption process. Browse our current residents,
+            learn their stories, and take the first step toward welcoming a new
+            companion.
           </p>
 
           <div className="hero-actions">
-            <ActionLink href="/animals">Browse available animals</ActionLink>
+            <ActionLink href="/animals">Meet our animals</ActionLink>
             <ActionLink href="/signup" variant="secondary">
-              Start an adopter profile
+              Create an account
             </ActionLink>
           </div>
         </div>
 
         <Card className="hero-trust-panel landing-trust-card">
-          <p className="eyebrow">Why it feels reliable</p>
-          <h2 className="panel-title">Built for clarity before conversion.</h2>
+          <p className="eyebrow">Why Caring Iggy</p>
+          <h2 className="panel-title">Adoption, not just placement.</h2>
           <p className="panel-copy">
-            Every public step is intentionally quiet: no browser-side service
-            calls, no inflated urgency, and no mismatched flows that would need to
-            be rebuilt when auth and dashboard features arrive.
+            We believe successful adoptions start with honest profiles, careful
+            matching, and ongoing support — not just filling kennels.
           </p>
 
           <dl className="trust-metrics" aria-label="Trust highlights">
             <div>
-              <dt>Server-first</dt>
-              <dd>Fast initial reads and safer future session boundaries.</dd>
+              <dt>200+ placements</dt>
+              <dd>Since opening our doors in 2018.</dd>
             </div>
             <div>
-              <dt>Accessible</dt>
-              <dd>Readable contrast, clear headings, responsive sections.</dd>
+              <dt>Transparent profiles</dt>
+              <dd>Real temperaments, real history, real photos.</dd>
             </div>
             <div>
-              <dt>Grounded</dt>
-              <dd>Placeholder animals stay honest until catalog data lands.</dd>
+              <dt>Team support</dt>
+              <dd>Dedicated staff guide you through every step.</dd>
             </div>
           </dl>
         </Card>
       </Card>
 
+      <div className="section-divider" aria-hidden="true" />
+
       <section className="landing-section">
         <SectionHeading
-          eyebrow="Mission and trust"
-          title="Designed to make adoption feel steady, not overwhelming."
-          copy="The first release centers on public confidence: warm narrative, careful information hierarchy, and visible preparation for role-aware workflows that will arrive next."
+          eyebrow="Currently available"
+          title="Animals looking for their forever home."
+          copy="These animals are ready for adoption now. Browse their profiles to learn more about their personality and needs."
         />
 
-        <div className="panel-grid">
-          {trustPoints.map((point) => (
-            <Card key={point.title}>
-              <p className="eyebrow">Trust signal</p>
-              <h3 className="panel-title">{point.title}</h3>
-              <p className="panel-copy">{point.copy}</p>
-            </Card>
-          ))}
+        {featuredAnimals.length > 0 ? (
+          <div className="featured-grid">
+            {featuredAnimals.map((animal) => (
+              <AnimalCard key={animal.id} animal={animal} />
+            ))}
+          </div>
+        ) : (
+          <Card className="empty-state">
+            <p className="eyebrow">No animals available</p>
+            <h2 className="panel-title">Check back soon.</h2>
+            <p className="panel-copy">
+              New animals arrive regularly. Create an account to be notified when
+              adoption spots open up.
+            </p>
+          </Card>
+        )}
+
+        <div className="section-cta">
+          <ActionLink href="/animals">
+            View all available animals
+          </ActionLink>
         </div>
       </section>
 
-      <section className="landing-section">
-        <SectionHeading
-          eyebrow="Featured animals"
-          title="Early profile placeholders that preview the browsing tone."
-          copy="These are static server-safe stubs for now. They establish the calm editorial rhythm of the catalog without introducing live microservice reads on the landing page."
-        />
-
-        <div className="featured-grid">
-          {featuredAnimals.map((animal) => (
-            <Card key={animal.name} className="featured-animal-card animal-card">
-              <div className="animal-card-media placeholder-animal-media" aria-hidden="true">
-                <span>{animal.name.slice(0, 1)}</span>
-              </div>
-              <div className="animal-card-body">
-                <span className="status-badge">{animal.status}</span>
-                <h3 className="route-card-title">{animal.name}</h3>
-                <p className="animal-breed">{animal.breed}</p>
-                <p className="route-card-copy">{animal.note}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <div className="section-divider" aria-hidden="true" />
 
       <section className="landing-section">
         <SectionHeading
-          eyebrow="Process"
-          title="A three-step rhythm that will scale into the full product."
-          copy="The landing page introduces the adoption journey in the same order the platform itself is being built: browse first, capture fit second, coordinate with staff third."
+          eyebrow="Our approach"
+          title="How adoption works at Caring Iggy."
+          copy="We take time to make the right match — for you and for the animal."
         />
 
         <div className="process-grid">
@@ -163,18 +151,38 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="section-divider" aria-hidden="true" />
+
+      <section className="landing-section">
+        <SectionHeading
+          eyebrow="Shelter values"
+          title="What sets us apart."
+          copy="We built Caring Iggy around the belief that good adoptions require good information, realistic expectations, and genuine support."
+        />
+
+        <div className="panel-grid">
+          {trustPoints.map((point) => (
+            <Card key={point.title}>
+              <p className="eyebrow">Our commitment</p>
+              <h3 className="panel-title">{point.title}</h3>
+              <p className="panel-copy">{point.copy}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       <Card as="section" className="cta-band">
         <SectionHeading
-          eyebrow="Next step"
-          title="When you are ready, the catalog is the best place to begin."
-          copy="Browse the animal route now, then return later for account creation, interests, and guided follow-up as the next phases land."
+          eyebrow="Ready to begin?"
+          title="Browse animals waiting for a home."
+          copy="Take your time browsing. When you find someone you'd like to know better, create an account and let our team know."
           className="cta-heading"
         />
 
         <div className="hero-actions cta-actions">
-          <ActionLink href="/animals">Go to /animals</ActionLink>
+          <ActionLink href="/animals">Meet our animals</ActionLink>
           <ActionLink href="/login" variant="secondary">
-            Existing account login
+            Sign in to your account
           </ActionLink>
         </div>
       </Card>

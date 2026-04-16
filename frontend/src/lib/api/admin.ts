@@ -92,6 +92,15 @@ export interface ProvisionStaffRequest {
   role: "STAFF" | "ADMIN";
 }
 
+export interface UpdateAdopterRequest {
+  name?: string;
+  telephone?: string;
+  email?: string;
+  address?: string;
+  status?: string;
+  preferences?: Record<string, unknown>;
+}
+
 export interface UpdateStaffRequest {
   name?: string;
   email?: string;
@@ -228,6 +237,25 @@ export async function provisionStaff(
   };
 }
 
+export async function updateAdopter(
+  adopterId: string,
+  body: UpdateAdopterRequest,
+): Promise<AdminAdopterDetail> {
+  const response = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new AdminApiError(
+      `Failed to update adopter: ${response.status}`,
+      response.status,
+      await safeReadJson(response),
+    );
+  }
+  return mapAdminAdopterDetail(await response.json());
+}
+
 export async function updateStaff(
   employeeId: string,
   body: UpdateStaffRequest,
@@ -336,6 +364,16 @@ function mapAdminAdopterSummary(input: BackendAdopterDto): AdminAdopterSummary {
     telephone: input.telephone,
     status: input.status,
     interestCount: Array.isArray(input.interestedAnimals) ? input.interestedAnimals.length : 0,
+  };
+}
+
+function mapAdminAdopterDetail(input: BackendAdopterDto): AdminAdopterDetail {
+  const summary = mapAdminAdopterSummary(input);
+  return {
+    ...summary,
+    ...(input.address?.trim() ? { address: input.address } : {}),
+    preferences: normalizePreferences(input.preferences),
+    history: [],
   };
 }
 
