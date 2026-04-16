@@ -52,53 +52,51 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
   const type = rawType || undefined;
   const result = await loadAnimals(status, type);
 
+  const totalCount = result.kind === "success" ? result.animals.length : undefined;
+
   return (
-    <div className="page-shell">
-      <section className="page-hero">
-        <p className="eyebrow">Public route</p>
-        <h1 className="page-title">Browse animals ready for their next home.</h1>
-        <p className="page-copy">
-          Explore the public catalog with server-rendered filters for adoption
-          status and animal type.
-          {status ? ` Currently filtered to ${toStatusLabel(status)}.` : ""}
-        </p>
-        <div className="hero-actions">
-          <Link href="/" className="secondary-link">
-            Return to route map
-          </Link>
-        </div>
-      </section>
-
-      <AnimalFilters status={status} type={type} />
-
-      {result.kind === "error" ? (
-        <section className="empty-state">
-          <p className="eyebrow">Catalog error</p>
-          <h2 className="panel-title">Animal data is not available.</h2>
-          <p className="panel-copy">{result.message}</p>
-          <Link href="/animals" className="link-chip">
-            Retry catalog
-          </Link>
-        </section>
-      ) : result.animals.length ? (
-        <section className="route-grid" aria-label="Animal results">
-          {result.animals.map((animal) => (
-            <AnimalCard key={animal.id} animal={animal} />
-          ))}
-        </section>
-      ) : (
-        <section className="empty-state">
-          <p className="eyebrow">No results</p>
-          <h2 className="panel-title">No animals match those filters.</h2>
-          <p className="panel-copy">
-            Try a different status or remove the type filter to widen the public
-            catalog.
+    <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto", padding: "var(--space-7) var(--space-6)" }}>
+      <div style={{ marginBottom: "var(--space-6)" }}>
+        <p className="ci-label" style={{ color: "var(--color-accent)" }}>Adoption Catalog</p>
+        <h1 className="ci-h1" style={{ marginTop: "var(--space-2)" }}>Meet our animals.</h1>
+        {totalCount !== undefined && (
+          <p className="ci-body" style={{ marginTop: "var(--space-2)" }}>
+            {totalCount} {totalCount === 1 ? "animal" : "animals"} available
           </p>
-          <Link href="/animals" className="link-chip">
-            Clear filters
-          </Link>
-        </section>
-      )}
+        )}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "var(--space-7)", alignItems: "start" }}>
+        <aside style={{ position: "sticky", top: "calc(var(--space-7) + 1rem)" }}>
+          <AnimalFilters status={status} type={type} />
+        </aside>
+
+        <div>
+          {result.kind === "error" ? (
+            <div className="ci-card" style={{ padding: "var(--space-6)", textAlign: "center" }}>
+              <p className="ci-label" style={{ marginBottom: "var(--space-2)" }}>Catalog error</p>
+              <h2 className="ci-h3" style={{ marginBottom: "var(--space-3)" }}>Animal data is not available.</h2>
+              <p className="ci-body" style={{ marginBottom: "var(--space-4)" }}>{result.message}</p>
+              <Link href="/animals" className="ci-btn ci-btn--primary">Retry catalog</Link>
+            </div>
+          ) : result.animals.length > 0 ? (
+            <div className="ci-animal-grid">
+              {result.animals.map((animal) => (
+                <AnimalCard key={animal.id} animal={animal} />
+              ))}
+            </div>
+          ) : (
+            <div className="ci-card" style={{ padding: "var(--space-6)", textAlign: "center" }}>
+              <p className="ci-label" style={{ marginBottom: "var(--space-2)" }}>No results</p>
+              <h2 className="ci-h3" style={{ marginBottom: "var(--space-3)" }}>No animals match those filters.</h2>
+              <p className="ci-body" style={{ marginBottom: "var(--space-4)" }}>
+                Try a different status or remove the type filter to widen the public catalog.
+              </p>
+              <Link href="/animals" className="ci-btn ci-btn--ghost">Clear filters</Link>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

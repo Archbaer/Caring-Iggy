@@ -7,27 +7,44 @@ type AnimalCardProps = {
   animal: AnimalSummaryView;
 };
 
+function statusToBadge(status: string): string {
+  switch (status) {
+    case "AVAILABLE":
+      return "available";
+    case "PENDING":
+      return "pending";
+    case "ADOPTED":
+      return "adopted";
+    case "WITHDRAWN":
+    case "NOT_AVAILABLE":
+      return "muted";
+    default:
+      return "muted";
+  }
+}
+
 export function AnimalCard({ animal }: AnimalCardProps) {
   return (
-    <article className="route-card animal-card">
-      <div className="animal-card-media">
+    <article className="ci-card">
+      <div className="ci-card__media">
         <AnimalImage
           imageUrl={animal.imageUrl}
           name={animal.name}
           animalType={animal.animalType}
           variant="card"
         />
+        <div className="ci-card__badge">
+          <span className={`ci-badge ci-badge--${statusToBadge(animal.status)}`}>{animal.statusLabel}</span>
+        </div>
       </div>
-
-      <span className="status-badge">{animal.statusLabel}</span>
-      <h2 className="route-card-title">{animal.name}</h2>
-      <p className="route-card-copy">
-        {animal.breed} · {animal.animalType}
-      </p>
-      <div className="route-actions">
-        <Link href={`/animals/${animal.id}`} className="link-chip">
-          View profile
-        </Link>
+      <div className="ci-card__body">
+        <h2 className="ci-card__name">{animal.name}</h2>
+        <p className="ci-card__meta">{animal.breed} · {animal.animalType}</p>
+        <div className="ci-card__actions">
+          <Link href={`/animals/${animal.id}`} className="ci-btn ci-btn--ghost-sm">
+            View profile
+          </Link>
+        </div>
       </div>
     </article>
   );
