@@ -2,7 +2,14 @@ import type { NextConfig } from "next";
 
 const remoteProtocol = (protocol: string) => protocol.replace(/:$/, "") as "http" | "https";
 
-function makePatterns(source?: string): Parameters<typeof NextConfig>[0]["images"]["remotePatterns"] {
+interface RemotePattern {
+  protocol: "http" | "https";
+  hostname: string;
+  port?: string;
+  pathname: string;
+}
+
+function makePatterns(source?: string): RemotePattern[] {
   if (!source) return [];
 
   try {
