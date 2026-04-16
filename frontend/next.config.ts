@@ -20,6 +20,7 @@ const explicitRemotePatterns = [
   new URL("http://127.0.0.1:8081/**"),
   new URL("http://animal-service:8081/**"),
   ...toRemotePattern(process.env.ANIMAL_SERVICE_URL),
+  new URL("https://images.unsplash.com"),
 ].filter(
   (pattern, index, patterns) =>
     patterns.findIndex(
