@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +19,8 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class PreviousOwnerRepository {
+
+    private static final String[] GENERATED_ID_COLUMN = {"id"};
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -68,7 +69,7 @@ public class PreviousOwnerRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, GENERATED_ID_COLUMN);
             ps.setString(1, owner.getName());
             ps.setString(2, owner.getTelephone());
             ps.setString(3, owner.getEmail());
