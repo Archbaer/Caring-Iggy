@@ -37,7 +37,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
     <div className="page-shell">
       <section className="page-hero">
         <p className="eyebrow">Public auth route</p>
-        <h1 className="page-title">Welcome back to your adoption workspace.</h1>
+        <h1 className="page-title" style={{ marginBottom: "var(--space-4)" }}>Welcome back to your adoption workspace.</h1>
         <p className="page-copy">
           Sign in with an existing account to continue browsing animals, return to
           your adopter dashboard, or resume administrator follow-up work.

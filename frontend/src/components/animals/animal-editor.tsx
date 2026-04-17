@@ -217,194 +217,273 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
 
   return (
     <div className="page-shell">
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Authorized {roleCopy}</p>
-        <h3 className="panel-title">Update this animal</h3>
-        <p className="panel-copy">
-          This client shell lazy-loads for {roleCopy} accounts only. Mutations still go through protected BFF routes with server-side role and CSRF checks.
-        </p>
+      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
+        <section className="panel dashboard-form-panel">
+          <p className="eyebrow">Authorized {roleCopy}</p>
+          <h3 className="panel-title">Update this animal</h3>
+          <p className="panel-copy">
+            This client shell lazy-loads for {roleCopy} accounts only. Mutations still go through protected BFF routes with server-side role and CSRF checks.
+          </p>
 
-        <form className="dashboard-form" onSubmit={handleUpdateSubmit}>
-          <div className="auth-grid">
-            <label className="auth-field">
-              <span className="auth-label">Name</span>
-              <input className="auth-input" value={updateForm.name} onChange={(event) => setUpdateForm((current) => ({ ...current, name: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Animal type</span>
-              <input className="auth-input" value={updateForm.animalType} onChange={(event) => setUpdateForm((current) => ({ ...current, animalType: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Breed</span>
-              <input className="auth-input" value={updateForm.breed} onChange={(event) => setUpdateForm((current) => ({ ...current, breed: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Status</span>
-              <select className="auth-input" value={updateForm.status} onChange={(event) => setUpdateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Gender</span>
-              <select className="auth-input" value={updateForm.gender} onChange={(event) => setUpdateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
-                <option value="">Unspecified</option>
-                {GENDER_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Size</span>
-              <select className="auth-input" value={updateForm.size} onChange={(event) => setUpdateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
-                <option value="">Unspecified</option>
-                {SIZE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Date of birth</span>
-              <input type="date" className="auth-input" value={updateForm.dateOfBirth} onChange={(event) => setUpdateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Intake date</span>
-              <input type="date" className="auth-input" value={updateForm.intakeDate} onChange={(event) => setUpdateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Temperament</span>
-              <input className="auth-input" value={updateForm.temperament} onChange={(event) => setUpdateForm((current) => ({ ...current, temperament: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Image URL</span>
-              <input className="auth-input" value={updateForm.imageUrl} onChange={(event) => setUpdateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Previous owner ID</span>
-              <input className="auth-input" value={updateForm.previousOwnerId} onChange={(event) => setUpdateForm((current) => ({ ...current, previousOwnerId: event.target.value }))} />
-            </label>
-          </div>
+          <form className="dashboard-form" onSubmit={handleUpdateSubmit}>
+            <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Name</span>
+                    <input className="auth-input" value={updateForm.name} onChange={(event) => setUpdateForm((current) => ({ ...current, name: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Animal type</span>
+                    <input className="auth-input" value={updateForm.animalType} onChange={(event) => setUpdateForm((current) => ({ ...current, animalType: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
 
-          <label className="auth-field">
-            <span className="auth-label">Description</span>
-            <textarea className="dashboard-textarea" rows={4} value={updateForm.description} onChange={(event) => setUpdateForm((current) => ({ ...current, description: event.target.value }))} />
-          </label>
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Breed</span>
+                    <input className="auth-input" value={updateForm.breed} onChange={(event) => setUpdateForm((current) => ({ ...current, breed: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Status</span>
+                    <select className="auth-input" value={updateForm.status} onChange={(event) => setUpdateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
+                      {STATUS_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
 
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Gender</span>
+                    <select className="auth-input" value={updateForm.gender} onChange={(event) => setUpdateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
+                      <option value="">Unspecified</option>
+                      {GENDER_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Size</span>
+                    <select className="auth-input" value={updateForm.size} onChange={(event) => setUpdateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
+                      <option value="">Unspecified</option>
+                      {SIZE_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Date of birth</span>
+                    <input type="date" className="auth-input" value={updateForm.dateOfBirth} onChange={(event) => setUpdateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Intake date</span>
+                    <input type="date" className="auth-input" value={updateForm.intakeDate} onChange={(event) => setUpdateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Temperament</span>
+                    <input className="auth-input" value={updateForm.temperament} onChange={(event) => setUpdateForm((current) => ({ ...current, temperament: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Image URL</span>
+                    <input className="auth-input" value={updateForm.imageUrl} onChange={(event) => setUpdateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Previous owner ID</span>
+                    <input className="auth-input" value={updateForm.previousOwnerId} onChange={(event) => setUpdateForm((current) => ({ ...current, previousOwnerId: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <label className="auth-field">
+              <span className="auth-label">Description</span>
+              <textarea className="dashboard-textarea" rows={4} value={updateForm.description} onChange={(event) => setUpdateForm((current) => ({ ...current, description: event.target.value }))} />
+            </label>
+
+            <div className="auth-actions" style={{ justifyContent: "center" }}>
+              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
+                {isUpdating ? "Saving..." : "Save animal changes"}
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
+        <section className="panel dashboard-form-panel">
+          <p className="eyebrow">Authorized {roleCopy}</p>
+          <h3 className="panel-title">Create a new animal</h3>
+          <p className="panel-copy">
+            This is a shell for authenticated staff creation flows. It sends only to the protected Next.js BFF, never from the browser directly to animal-service.
+          </p>
+
+          <form className="dashboard-form" onSubmit={handleCreateSubmit}>
+            <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Name</span>
+                    <input className="auth-input" value={createForm.name} onChange={(event) => setCreateForm((current) => ({ ...current, name: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Animal type</span>
+                    <input className="auth-input" value={createForm.animalType} onChange={(event) => setCreateForm((current) => ({ ...current, animalType: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Breed</span>
+                    <input className="auth-input" value={createForm.breed} onChange={(event) => setCreateForm((current) => ({ ...current, breed: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Status</span>
+                    <select className="auth-input" value={createForm.status} onChange={(event) => setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
+                      {STATUS_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Gender</span>
+                    <select className="auth-input" value={createForm.gender} onChange={(event) => setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
+                      <option value="">Unspecified</option>
+                      {GENDER_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Size</span>
+                    <select className="auth-input" value={createForm.size} onChange={(event) => setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
+                      <option value="">Unspecified</option>
+                      {SIZE_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Date of birth</span>
+                    <input type="date" className="auth-input" value={createForm.dateOfBirth} onChange={(event) => setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Intake date</span>
+                    <input type="date" className="auth-input" value={createForm.intakeDate} onChange={(event) => setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Temperament</span>
+                    <input className="auth-input" value={createForm.temperament} onChange={(event) => setCreateForm((current) => ({ ...current, temperament: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Image URL</span>
+                    <input className="auth-input" value={createForm.imageUrl} onChange={(event) => setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Previous owner name</span>
+                    <input className="auth-input" value={createForm.previousOwnerName} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Previous owner telephone</span>
+                    <input className="auth-input" value={createForm.previousOwnerTelephone} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <label className="auth-field">
+                    <span className="auth-label">Previous owner email</span>
+                    <input className="auth-input" value={createForm.previousOwnerEmail} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))} />
+                  </label>
+                  <label className="auth-field">
+                    <span className="auth-label">Previous owner address</span>
+                    <input className="auth-input" value={createForm.previousOwnerAddress} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))} />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <label className="auth-field">
+              <span className="auth-label">Description</span>
+              <textarea className="dashboard-textarea" rows={4} value={createForm.description} onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))} />
+            </label>
+
+            <div className="auth-actions" style={{ justifyContent: "center" }}>
+              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
+                {isCreating ? "Creating..." : "Create animal record"}
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
+        <section className="panel dashboard-form-panel">
+          <p className="eyebrow">Danger zone</p>
+          <h3 className="panel-title">Delete this animal</h3>
+          <p className="panel-copy">
+            Deletion remains server-authorized. Lazy loading improves page weight only; it is not the authorization boundary.
+          </p>
           <div className="auth-actions">
-            <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
-              {isUpdating ? "Saving..." : "Save animal changes"}
+            <button type="button" className="dashboard-action-button" disabled={isUpdating || isDeleting || isCreating} onClick={() => { void handleDelete(); }}>
+              {isDeleting ? "Deleting..." : "Delete animal record"}
             </button>
           </div>
-        </form>
-      </section>
-
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Authorized {roleCopy}</p>
-        <h3 className="panel-title">Create a new animal</h3>
-        <p className="panel-copy">
-          This is a shell for authenticated staff creation flows. It sends only to the protected Next.js BFF, never from the browser directly to animal-service.
-        </p>
-
-        <form className="dashboard-form" onSubmit={handleCreateSubmit}>
-          <div className="auth-grid">
-            <label className="auth-field">
-              <span className="auth-label">Name</span>
-              <input className="auth-input" value={createForm.name} onChange={(event) => setCreateForm((current) => ({ ...current, name: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Animal type</span>
-              <input className="auth-input" value={createForm.animalType} onChange={(event) => setCreateForm((current) => ({ ...current, animalType: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Breed</span>
-              <input className="auth-input" value={createForm.breed} onChange={(event) => setCreateForm((current) => ({ ...current, breed: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Status</span>
-              <select className="auth-input" value={createForm.status} onChange={(event) => setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Gender</span>
-              <select className="auth-input" value={createForm.gender} onChange={(event) => setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
-                <option value="">Unspecified</option>
-                {GENDER_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Size</span>
-              <select className="auth-input" value={createForm.size} onChange={(event) => setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
-                <option value="">Unspecified</option>
-                {SIZE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Date of birth</span>
-              <input type="date" className="auth-input" value={createForm.dateOfBirth} onChange={(event) => setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Intake date</span>
-              <input type="date" className="auth-input" value={createForm.intakeDate} onChange={(event) => setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Temperament</span>
-              <input className="auth-input" value={createForm.temperament} onChange={(event) => setCreateForm((current) => ({ ...current, temperament: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Image URL</span>
-              <input className="auth-input" value={createForm.imageUrl} onChange={(event) => setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Previous owner name</span>
-              <input className="auth-input" value={createForm.previousOwnerName} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Previous owner telephone</span>
-              <input className="auth-input" value={createForm.previousOwnerTelephone} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Previous owner email</span>
-              <input className="auth-input" value={createForm.previousOwnerEmail} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))} />
-            </label>
-            <label className="auth-field">
-              <span className="auth-label">Previous owner address</span>
-              <input className="auth-input" value={createForm.previousOwnerAddress} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))} />
-            </label>
-          </div>
-
-          <label className="auth-field">
-            <span className="auth-label">Description</span>
-            <textarea className="dashboard-textarea" rows={4} value={createForm.description} onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))} />
-          </label>
-
-          <div className="auth-actions">
-            <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
-              {isCreating ? "Creating..." : "Create animal record"}
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Danger zone</p>
-        <h3 className="panel-title">Delete this animal</h3>
-        <p className="panel-copy">
-          Deletion remains server-authorized. Lazy loading improves page weight only; it is not the authorization boundary.
-        </p>
-        <div className="auth-actions">
-          <button type="button" className="dashboard-action-button" disabled={isUpdating || isDeleting || isCreating} onClick={() => { void handleDelete(); }}>
-            {isDeleting ? "Deleting..." : "Delete animal record"}
-          </button>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {errorMessage ? (
         <p className="auth-error-banner" aria-live="polite" role="status">

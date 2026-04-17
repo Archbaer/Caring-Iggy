@@ -202,7 +202,7 @@ export default async function Home() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }}>
             <div>
               <p className="ci-section__eyebrow">Our commitment</p>
-              <h2 className="ci-section__title" style={{ marginBottom: "var(--space-5)" }}>Every animal deserves care.</h2>
+              <h2 className="ci-section__title" style={{ marginBottom: "var(--space-4)" }}>Every animal deserves care.</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
                 {values.map((value, i) => (
                   <div key={value.title} className={`ci-enter ci-enter--${i + 1}`}>
@@ -211,7 +211,7 @@ export default async function Home() {
                   </div>
                 ))}
               </div>
-              <a href="/about" style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-5)", fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-primary)" }}>
+              <a href="/about" style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-4)", fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-primary)" }}>
                 Learn about us
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -219,10 +219,8 @@ export default async function Home() {
                 </svg>
               </a>
             </div>
-            <div style={{ aspectRatio: "4/5", borderRadius: "var(--radius-xl)", overflow: "hidden", boxShadow: "var(--shadow-xl)", background: "var(--color-surface-warm)" }}>
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-ink-faint)" }}>
-                Editorial photo
-              </div>
+            <div style={{ aspectRatio: "4/5", borderRadius: "var(--radius-xl)", overflow: "hidden", boxShadow: "var(--shadow-xl)", background: "linear-gradient(135deg, var(--color-primary-pale) 0%, var(--color-accent-pale) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "var(--color-primary)", opacity: 0.4 }}>Shelter photo</span>
             </div>
           </div>
         </div>
