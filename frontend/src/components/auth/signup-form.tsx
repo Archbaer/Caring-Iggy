@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, signup } from "@/lib/api/auth";
-import { resolveAuthenticatedRedirectForRole } from "@/lib/auth/role-check";
+import { defaultRouteForRole } from "@/lib/auth/role-check";
 import type { SignupRequest } from "@/lib/types";
 
 const EMPTY_FIELD_ERRORS: Record<keyof SignupRequest, string[]> = {
@@ -67,7 +67,7 @@ export function SignupForm() {
       const result = await signup(fields, token);
       csrfTokenRef.current = result.csrfToken;
       router.replace(
-        resolveAuthenticatedRedirectForRole(result.user.role, searchParams.get("redirect")),
+        defaultRouteForRole(result.user.role),
       );
       router.refresh();
     } catch (error) {
