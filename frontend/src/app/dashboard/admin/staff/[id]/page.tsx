@@ -23,23 +23,23 @@ export default async function AdminStaffDetailPage({ params }: PageProps) {
 
   if (result.kind === "error") {
     return (
-      <div className="page-shell">
-        <section className="page-hero">
-          <p className="eyebrow">Admin route</p>
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
           <h1 className="page-title">Staff record unavailable</h1>
           <p className="page-copy">The protected staff detail route could not be loaded.</p>
         </section>
 
-        <nav className="breadcrumb">
-          <a href="/dashboard/admin/staff" className="link-chip">
+        <nav className="flex items-center gap-2">
+          <a href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
             ← Staff
           </a>
         </nav>
 
-        <section className="empty-state">
-          <p className="eyebrow">Detail error</p>
-          <h2 className="panel-title">We couldn&apos;t load this employee record.</h2>
-          <p className="panel-copy">{result.message}</p>
+        <section className="flex flex-col gap-3 py-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Detail error</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">We couldn&apos;t load this employee record.</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
         </section>
       </div>
     );

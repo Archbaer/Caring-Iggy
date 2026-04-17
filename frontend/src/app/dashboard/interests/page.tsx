@@ -16,19 +16,19 @@ export default async function DashboardInterestsPage() {
 
   if (result.kind === "error") {
     return (
-      <div className="page-shell">
-        <section className="page-hero">
-          <p className="eyebrow">Protected route</p>
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
           <h1 className="page-title">Interested animals</h1>
           <p className="page-copy">We couldn&apos;t load your interested animal list.</p>
         </section>
 
         <DashboardSectionNav currentPath="/dashboard/interests" />
 
-        <section className="empty-state">
-          <p className="eyebrow">Interests error</p>
-          <h2 className="panel-title">Try loading your interested animals again.</h2>
-          <p className="panel-copy">{result.message}</p>
+        <section className="flex flex-col gap-3 py-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Interests error</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Try loading your interested animals again.</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
           <ActionLink href="/dashboard/interests" variant="chip">
             Retry interests
           </ActionLink>
@@ -42,17 +42,17 @@ export default async function DashboardInterestsPage() {
   ).length;
 
   return (
-    <div className="page-shell">
-      <section className="page-hero">
-        <div className="dashboard-hero-copy">
-          <p className="eyebrow">Protected route</p>
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
           <h1 className="page-title">Interested animals</h1>
           <p className="page-copy">
             Save up to {MAX_INTERESTS} animal profiles, review their real current adoption status, and keep your shortlist current without inventing approval or rejection states.
           </p>
         </div>
 
-        <p className="link-chip">{availableSavedCount} of {MAX_INTERESTS} available animals saved.</p>
+        <p className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">{availableSavedCount} of {MAX_INTERESTS} available animals saved.</p>
       </section>
 
       <DashboardSectionNav currentPath="/dashboard/interests" />

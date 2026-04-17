@@ -18,29 +18,29 @@ export function InterestStatusList({
 }: InterestStatusListProps) {
   if (animals.length === 0) {
     return (
-      <div className="dashboard-empty-copy">
-        <h3 className="dashboard-subtitle">{emptyTitle}</h3>
-        <p className="panel-copy">{emptyCopy}</p>
+      <div className="flex flex-col gap-2 py-4 text-center">
+        <h3 className="text-base font-medium text-[var(--color-ink)]">{emptyTitle}</h3>
+        <p className="text-sm text-[var(--color-ink-soft)]">{emptyCopy}</p>
       </div>
     );
   }
 
   return (
-    <ul className="dashboard-interest-list">
+    <ul className="flex flex-col gap-3">
       {animals.map((animal) => (
-        <li key={animal.id} className="dashboard-interest-item">
-          <div className="dashboard-interest-head">
+        <li key={animal.id} className="flex flex-col gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="dashboard-subtitle">{animal.name}</h3>
-              <p className="panel-copy">
+              <h3 className="text-base font-medium text-[var(--color-ink)]">{animal.name}</h3>
+              <p className="text-sm text-[var(--color-ink-soft)]">
                 {animal.breed} · {animal.animalType}
               </p>
             </div>
-            <span className="status-badge">{animal.statusLabel}</span>
+            <span className="ci-badge">{animal.statusLabel}</span>
             {onRemove ? (
               <button
                 type="button"
-                className="dashboard-action-button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                 disabled={pendingAnimalId === animal.id}
                 onClick={() => {
                   onRemove(animal.id);
@@ -50,7 +50,7 @@ export function InterestStatusList({
               </button>
             ) : null}
           </div>
-          <p className="panel-copy">{toInterestStatusSummary(animal.status)}</p>
+          <p className="text-sm text-[var(--color-ink-soft)]">{toInterestStatusSummary(animal.status)}</p>
         </li>
       ))}
     </ul>

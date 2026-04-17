@@ -100,69 +100,69 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
   }
 
   return (
-    <article className="panel dashboard-form-panel">
-      <p className="eyebrow">Edit</p>
-      <h2 className="panel-title">Update adopter record</h2>
+    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+      <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Edit</p>
+      <h2 className="text-lg font-semibold text-[var(--color-ink)]">Update adopter record</h2>
 
-      <form className="dashboard-form" onSubmit={handleSubmit}>
-        <label className="auth-field" htmlFor="adopter-name">
-          <span className="auth-label">Name</span>
+      <form className="grid gap-6" onSubmit={handleSubmit}>
+        <label className="flex flex-col gap-1.5" htmlFor="adopter-name">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
           <input
             id="adopter-name"
             name="name"
             type="text"
             autoComplete="name"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.name}
             onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="adopter-telephone">
-          <span className="auth-label">Telephone</span>
+        <label className="flex flex-col gap-1.5" htmlFor="adopter-telephone">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Telephone</span>
           <input
             id="adopter-telephone"
             name="telephone"
             type="tel"
             autoComplete="tel"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.telephone}
             onChange={(e) => setFields((f) => ({ ...f, telephone: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="adopter-email">
-          <span className="auth-label">Email</span>
+        <label className="flex flex-col gap-1.5" htmlFor="adopter-email">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Email</span>
           <input
             id="adopter-email"
             name="email"
             type="email"
             autoComplete="email"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.email}
             onChange={(e) => setFields((f) => ({ ...f, email: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="adopter-address">
-          <span className="auth-label">Address</span>
+        <label className="flex flex-col gap-1.5" htmlFor="adopter-address">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Address</span>
           <input
             id="adopter-address"
             name="address"
             type="text"
             autoComplete="street-address"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.address}
             onChange={(e) => setFields((f) => ({ ...f, address: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="adopter-status">
-          <span className="auth-label">Status</span>
+        <label className="flex flex-col gap-1.5" htmlFor="adopter-status">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Status</span>
           <select
             id="adopter-status"
             name="status"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.status}
             onChange={(e) => setFields((f) => ({ ...f, status: e.target.value }))}
           >
@@ -175,18 +175,18 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
         </label>
 
         {errorMessage ? (
-          <p className="auth-error-banner" aria-live="polite" role="status">
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
             {errorMessage}
           </p>
         ) : null}
 
-        <div className="auth-actions">
-          <button type="submit" className="auth-submit" disabled={isPending}>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button type="submit" className="ci-btn ci-btn--primary" disabled={isPending}>
             {isPending ? "Saving..." : "Save changes"}
           </button>
           <button
             type="button"
-            className="auth-submit secondary"
+            className="ci-btn ci-btn--secondary secondary"
             onClick={onCancel}
             disabled={isPending}
           >
