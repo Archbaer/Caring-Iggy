@@ -46,7 +46,7 @@ export default async function AdminAdopterDetailPage({ params }: PageProps) {
     );
   }
 
-  return <AdminAdopterDetailClient adopter={result.adopter} onUpdate={() => {}} />;
+  return <AdminAdopterDetailClient adopter={result.adopter} />;
 }
 
 async function loadAdminAdopterDetail(

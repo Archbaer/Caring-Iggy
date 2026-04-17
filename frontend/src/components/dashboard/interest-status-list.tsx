@@ -37,10 +37,7 @@ export function InterestStatusList({
               </p>
             </div>
             <span className="status-badge">{animal.statusLabel}</span>
-          </div>
-          <p className="panel-copy">{toInterestStatusSummary(animal.status)}</p>
-          {onRemove ? (
-            <div className="dashboard-inline-actions">
+            {onRemove ? (
               <button
                 type="button"
                 className="dashboard-action-button"
@@ -51,8 +48,9 @@ export function InterestStatusList({
               >
                 {pendingAnimalId === animal.id ? "Saving..." : "Remove"}
               </button>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
+          <p className="panel-copy">{toInterestStatusSummary(animal.status)}</p>
         </li>
       ))}
     </ul>
