@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
@@ -10,11 +11,10 @@ import { StaffEditPanel } from "@/components/admin/staff-edit-panel";
 
 type Props = {
   employee: AdminEmployeeDetail;
-  onUpdate: (updated: AdminEmployeeDetail) => void;
-  onDelete: () => void;
 };
 
-export function AdminStaffDetailClient({ employee, onUpdate, onDelete }: Props) {
+export function AdminStaffDetailClient({ employee }: Props) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(employee);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -25,7 +25,7 @@ export function AdminStaffDetailClient({ employee, onUpdate, onDelete }: Props) 
   function handleSuccess(updated: AdminEmployeeDetail) {
     setCurrentEmployee(updated);
     setEditing(false);
-    onUpdate(updated);
+    router.refresh();
   }
 
   function handleCancel() {
@@ -57,7 +57,7 @@ export function AdminStaffDetailClient({ employee, onUpdate, onDelete }: Props) 
         throw new Error(error.message ?? "Delete failed.");
       }
 
-      onDelete();
+      router.push("/dashboard/admin/staff");
     } catch (error) {
       setDeleteError(error instanceof Error ? error.message : "Delete failed. Please try again.");
     } finally {

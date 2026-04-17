@@ -1,16 +1,98 @@
+import { redirect } from "next/navigation";
+
 import { DashboardSectionNav } from "@/components/dashboard/dashboard-section-nav";
 import { InterestStatusList } from "@/components/dashboard/interest-status-list";
 import { ActionLink } from "@/components/ui/action-link";
 import { Card } from "@/components/ui/card";
 import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalForView } from "@/lib/api/animals";
-import { getRequiredRoleSession } from "@/lib/auth/server-session";
+import { LOGIN_ROUTE } from "@/lib/auth/role-check";
+import { getCurrentSession } from "@/lib/auth/server-session";
 import { MAX_INTERESTS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const session = await getRequiredRoleSession("ADOPTER");
+  const session = await getCurrentSession();
+
+  if (!session) {
+    redirect(`${LOGIN_ROUTE}?redirect=/dashboard`);
+  }
+
+  if (session.role !== "ADOPTER") {
+    return (
+      <div className="page-shell">
+        <section className="page-hero dashboard-hero">
+          <div className="dashboard-hero-copy">
+            <p className="eyebrow">Staff workspace</p>
+            <h1 className="page-title">Team dashboard</h1>
+            <p className="page-copy">
+              Manage animal records and open administrative workspaces.
+            </p>
+          </div>
+        </section>
+
+        <section className="route-grid">
+          <Card variant="route">
+            <p className="eyebrow">Animal records</p>
+            <h2 className="route-card-title">Manage animals</h2>
+            <p className="route-card-copy">
+              Browse animal profiles and open update/delete controls.
+            </p>
+            <div className="route-actions">
+              <ActionLink href="/animals" variant="chip">
+                Manage animals
+              </ActionLink>
+            </div>
+          </Card>
+
+          <Card variant="route">
+            <p className="eyebrow">Animal records</p>
+            <h2 className="route-card-title">Add animal</h2>
+            <p className="route-card-copy">
+              Create a new animal profile in the shelter catalog.
+            </p>
+            <div className="route-actions">
+              <ActionLink href="/dashboard/admin/animals/new" variant="chip">
+                Add animal
+              </ActionLink>
+            </div>
+          </Card>
+
+          {session.role === "ADMIN" ? (
+            <>
+              <Card variant="route">
+                <p className="eyebrow">Adopter records</p>
+                <h2 className="route-card-title">Adopter management</h2>
+                <p className="route-card-copy">
+                  View and manage adopter profiles and interest history.
+                </p>
+                <div className="route-actions">
+                  <ActionLink href="/dashboard/admin/adopters" variant="chip">
+                    Adopter records
+                  </ActionLink>
+                </div>
+              </Card>
+
+              <Card variant="route">
+                <p className="eyebrow">Employee records</p>
+                <h2 className="route-card-title">Staff management</h2>
+                <p className="route-card-copy">
+                  Open employee directory and edit administrator access.
+                </p>
+                <div className="route-actions">
+                  <ActionLink href="/dashboard/admin/staff" variant="chip">
+                    Staff records
+                  </ActionLink>
+                </div>
+              </Card>
+            </>
+          ) : null}
+        </section>
+      </div>
+    );
+  }
+
   const result = session.profileId
     ? await loadDashboardData(session.profileId)
     : { kind: "error" as const, message: "Your adopter profile is not linked to this account yet." };

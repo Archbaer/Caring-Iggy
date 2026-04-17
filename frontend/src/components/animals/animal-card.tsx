@@ -5,6 +5,7 @@ import type { AnimalSummaryView } from "@/lib/api/animals";
 
 type AnimalCardProps = {
   animal: AnimalSummaryView;
+  enterIndex?: number;
 };
 
 function statusToBadge(status: string): string {
@@ -23,25 +24,69 @@ function statusToBadge(status: string): string {
   }
 }
 
-export function AnimalCard({ animal }: AnimalCardProps) {
+export function AnimalCard({ animal, enterIndex }: AnimalCardProps) {
+  const staggerClass = enterIndex !== undefined ? `delay-${(enterIndex % 5) + 1}` : "";
+
   return (
-    <article className="ci-card ci-enter">
-      <div className="ci-card__media">
+    <article
+      className={`
+        group relative overflow-hidden rounded-2xl border border-[var(--color-border)]
+        bg-[var(--color-surface)] shadow-sm
+        transition-all duration-300 ease-out
+        hover:shadow-xl hover:-translate-y-1.5 hover:border-[var(--color-accent)]
+        hover:bg-[var(--color-surface-warm)]
+        ci-card-spring
+        ${staggerClass}
+      `}
+    >
+      {/* Image */}
+      <Link
+        href={`/animals/${animal.id}`}
+        className="ci-card__media relative block overflow-hidden aspect-[4/3]"
+      >
         <AnimalImage
           imageUrl={animal.imageUrl}
           name={animal.name}
           animalType={animal.animalType}
           variant="card"
         />
-        <div className="ci-card__badge">
-          <span className={`ci-badge ci-badge--${statusToBadge(animal.status)}`}>{animal.statusLabel}</span>
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)]/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Badge */}
+        <div className="ci-card__badge absolute top-3 right-3">
+          <span
+            className={`
+              ci-badge ci-badge--${statusToBadge(animal.status)}
+              backdrop-blur-sm
+            `}
+          >
+            {animal.statusLabel}
+          </span>
         </div>
-      </div>
-      <div className="ci-card__body">
-        <h2 className="ci-card__name">{animal.name}</h2>
-        <p className="ci-card__meta">{animal.breed} · {animal.animalType}</p>
+      </Link>
+
+      {/* Body */}
+      <div className="ci-card__body p-5">
+        <Link href={`/animals/${animal.id}`} className="block group/link">
+          <h2 className="ci-card__name font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-1 transition-colors duration-200 group-hover/link:text-[var(--color-primary)]">
+            {animal.name}
+          </h2>
+        </Link>
+        <p className="ci-card__meta text-sm text-[var(--color-ink-soft)] mb-4">
+          {animal.breed} · {animal.animalType}
+        </p>
         <div className="ci-card__actions">
-          <Link href={`/animals/${animal.id}`} className="ci-btn ci-btn--ghost-sm">
+          <Link
+            href={`/animals/${animal.id}`}
+            className="
+              ci-btn ci-btn--ghost-sm
+              border border-[var(--color-border)] bg-[var(--color-surface)]
+              text-[var(--color-ink-soft)]
+              hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)]
+              active:scale-95
+              transition-all duration-200
+            "
+          >
             View profile
           </Link>
         </div>

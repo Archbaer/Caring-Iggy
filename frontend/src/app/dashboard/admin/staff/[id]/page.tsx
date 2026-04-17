@@ -48,8 +48,6 @@ export default async function AdminStaffDetailPage({ params }: PageProps) {
   return (
     <AdminStaffDetailClient
       employee={result.employee}
-      onUpdate={() => {}}
-      onDelete={() => {}}
     />
   );
 }
