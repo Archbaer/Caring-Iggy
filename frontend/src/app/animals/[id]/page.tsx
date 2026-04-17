@@ -55,9 +55,9 @@ function statusToBadge(status: string): string {
 
 function DetailPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="ci-card" style={{ padding: "var(--space-5)" }}>
+    <div className="ci-card" style={{ padding: "var(--space-4)" }}>
       <p className="ci-label" style={{ marginBottom: "var(--space-3)" }}>{title}</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>{children}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>{children}</div>
     </div>
   );
 }
@@ -148,7 +148,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(16rem, 1fr))", gap: "var(--space-5)", marginBottom: "var(--space-7)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))", gap: "var(--space-5)", marginBottom: "var(--space-7)" }}>
         <DetailPanel title="Details">
           <DetailItem label="Breed" value={animal.breed} />
           <DetailItem label="Type" value={animal.animalType} />

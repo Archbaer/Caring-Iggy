@@ -19,7 +19,7 @@
   /* Base surfaces */
   --color-canvas:        #F9F7F4;
   --color-surface:       #FFFFFF;
-  --color-surface-warm:  #F3EFE9;
+  --color-surface-warm:  color-mix(in srgb, var(--color-canvas) 96%, var(--color-accent-pale) 4%);
 
   /* Text */
   --color-ink:           #1C1917;
@@ -549,10 +549,18 @@ a {
   box-shadow: var(--shadow-sm);
 }
 
-.page-hero,
 .panel,
 .empty-state {
   padding: var(--space-6);
+}
+
+.page-hero {
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-warm) 100%);
+  padding: var(--space-8) var(--space-6);
+}
+
+.panel {
+  border-radius: var(--radius-xl);
 }
 
 .eyebrow {
@@ -724,8 +732,8 @@ a {
 }
 
 .ci-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .ci-card__media {
@@ -1063,6 +1071,15 @@ a {
   text-decoration: none;
   border: none;
   line-height: 1;
+}
+
+.ci-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 24%, transparent 76%);
+  outline-offset: 2px;
+}
+
+.ci-btn:active {
+  transform: scale(0.97);
 }
 
 .ci-btn--primary {

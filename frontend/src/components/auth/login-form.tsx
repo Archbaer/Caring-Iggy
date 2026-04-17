@@ -47,7 +47,7 @@ export function LoginForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = await refreshCsrfToken();
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");

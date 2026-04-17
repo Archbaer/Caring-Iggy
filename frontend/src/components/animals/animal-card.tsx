@@ -5,6 +5,7 @@ import type { AnimalSummaryView } from "@/lib/api/animals";
 
 type AnimalCardProps = {
   animal: AnimalSummaryView;
+  enterIndex?: number;
 };
 
 function statusToBadge(status: string): string {
@@ -23,9 +24,11 @@ function statusToBadge(status: string): string {
   }
 }
 
-export function AnimalCard({ animal }: AnimalCardProps) {
+export function AnimalCard({ animal, enterIndex }: AnimalCardProps) {
+  const staggerClass = enterIndex !== undefined ? `ci-enter--${(enterIndex % 5) + 1}` : "";
+
   return (
-    <article className="ci-card ci-enter">
+    <article className={`ci-card ci-enter ${staggerClass}`}>
       <div className="ci-card__media">
         <AnimalImage
           imageUrl={animal.imageUrl}

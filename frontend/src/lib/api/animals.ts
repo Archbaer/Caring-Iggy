@@ -58,6 +58,8 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
   const url = new URL(serviceUrl("ANIMAL", "/api/animals"));
   if (params?.status) url.searchParams.set("status", params.status);
   if (params?.type) url.searchParams.set("type", params.type);
+  if (params?.sex) url.searchParams.set("sex", params.sex);
+  if (params?.size) url.searchParams.set("size", params.size);
 
   const res = await fetch(url.toString(), { cache: "no-store" });
   if (!res.ok) {

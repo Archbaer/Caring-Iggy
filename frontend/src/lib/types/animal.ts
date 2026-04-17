@@ -89,4 +89,6 @@ export interface AnimalUpdateRequest {
 export interface AnimalListParams {
   status?: AnimalStatusCode;
   type?: string;
+  sex?: string;
+  size?: string;
 }

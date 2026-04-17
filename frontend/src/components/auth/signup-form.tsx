@@ -52,7 +52,7 @@ export function SignupForm() {
   }, []);
 
   async function submitSignup() {
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = await refreshCsrfToken();
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");

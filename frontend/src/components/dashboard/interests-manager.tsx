@@ -36,8 +36,15 @@ export function InterestsManager({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [pendingAnimalId, setPendingAnimalId] = useState<string | null>(null);
 
+  // Sync selectedIds when raw prop changes (after API refresh)
   useEffect(() => {
-    setSelectedIds(Array.from(new Set(dedupedCurrent.map((a) => a.id))));
+    const freshIds = Array.from(new Set(dedupedCurrent.map((a) => a.id)));
+    setSelectedIds((prev) => {
+      if (prev.length === freshIds.length && prev.every((id) => freshIds.includes(id))) {
+        return prev;
+      }
+      return freshIds;
+    });
   }, [dedupedCurrent]);
 
   useEffect(() => {
@@ -151,7 +158,7 @@ export function InterestsManager({
   );
 
   async function updateInterests(nextIds: string[], animalId: string) {
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = await refreshCsrfToken();
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
