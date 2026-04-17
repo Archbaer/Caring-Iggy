@@ -31,9 +31,9 @@
   --color-primary-deep:  #5C7E60;
   --color-primary-pale:  #EEF3EE;
 
-  /* Secondary — Dusty Rose / Terracotta */
-  --color-accent:        #C4856A;
-  --color-accent-deep:   #A86848;
+  /* Secondary — Warm Terracotta (lighter) */
+  --color-accent:        #D9A084;
+  --color-accent-deep:   #B87A5A;
   --color-accent-pale:   #F5EBE6;
 
   /* Neutrals */
