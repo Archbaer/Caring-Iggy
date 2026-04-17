@@ -83,157 +83,261 @@ export default async function Home() {
 
   return (
     <>
-      <section className="ci-hero">
-        <div className="ci-hero__copy">
-          <p className="ci-hero__eyebrow">San Francisco Animal Shelter</p>
-          <h1 className="ci-hero__title">Every animal deserves a home.</h1>
-          <p className="ci-hero__copy">
-            Caring Iggy connects adopted animals with loving families through a transparent,
-            guided adoption process. Browse our current residents, learn their stories,
-            and take the first step toward welcoming a new companion.
-          </p>
-          <div className="ci-hero__actions">
-            <a href="/animals" className="ci-btn ci-btn--primary ci-btn--lg">Meet our animals</a>
-            <a href="/about" className="ci-btn ci-btn--ghost ci-btn--lg">Learn about us</a>
+      {/* ─── Hero ───────────────────────────────────────────────────────── */}
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-[var(--color-canvas)]">
+        {/* Warm atmospheric background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-pale)] via-[var(--color-canvas)] to-[var(--color-primary-pale)] opacity-60" />
+        <div className="absolute -top-40 -right-40 w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-[var(--color-accent-pale)] to-transparent opacity-50 blur-3xl" />
+        <div className="absolute -bottom-40 -left-20 w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[var(--color-primary-pale)] to-transparent opacity-40 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Copy */}
+          <div className="ci-hero-reveal">
+            <p className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-accent-pale)]/60 text-[var(--color-accent)] text-xs font-[family-name:var(--font-mono)] uppercase tracking-[0.12em]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
+              San Francisco Animal Shelter
+            </p>
+            <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-medium leading-[1.0] tracking-[-0.03em] text-[var(--color-ink)] mb-6">
+              Every animal deserves a home.
+            </h1>
+            <p className="text-lg text-[var(--color-ink-soft)] leading-relaxed max-w-[48ch] mb-10">
+              Caring Iggy connects adopted animals with loving families through a transparent,
+              guided adoption process. Browse our current residents, learn their stories,
+              and take the first step toward welcoming a new companion.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="/animals"
+                className="ci-btn ci-btn--primary ci-btn--lg rounded-full px-8 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+              >
+                Meet our animals
+              </Link>
+              <Link
+                href="/about"
+                className="ci-btn ci-btn--ghost ci-btn--lg rounded-full px-8 py-4 text-base font-semibold border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+              >
+                Learn about us
+              </Link>
+            </div>
           </div>
+
+          {/* Hero image */}
+          {featuredAnimals[0] && featuredAnimals[0].imageUrl ? (
+            <div className="ci-hero-image-reveal relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5]">
+                <Image
+                  src={featuredAnimals[0].imageUrl}
+                  alt={featuredAnimals[0].name}
+                  fill
+                  sizes="(max-width: 1024px) 90vw, 50vw"
+                  style={{ objectFit: "cover" }}
+                  priority
+                />
+                {/* Warm overlay at bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)]/20 via-transparent to-transparent" />
+              </div>
+              {/* Decorative accent card */}
+              <div className="absolute -bottom-5 -left-5 lg:-left-8 bg-[var(--color-surface)] rounded-2xl shadow-xl p-4 border border-[var(--color-border)]">
+                <p className="text-xs font-[family-name:var(--font-mono)] uppercase tracking-[0.1em] text-[var(--color-accent)] mb-1">
+                  Currently available
+                </p>
+                <p className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)]">
+                  {featuredAnimals.length}+ animals
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="ci-hero-image-reveal relative">
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)] flex items-center justify-center">
+                <span className="font-[family-name:var(--font-display)] text-5xl text-[var(--color-primary)] opacity-30">
+                  CI
+                </span>
+              </div>
+            </div>
+          )}
         </div>
-        {featuredAnimals[0] && featuredAnimals[0].imageUrl && (
-          <div className="ci-hero__image">
-            <Image
-              src={featuredAnimals[0].imageUrl}
-              alt={featuredAnimals[0].name}
-              width={600}
-              height={750}
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-        )}
       </section>
 
-      <div className="ci-trust-bar">
-        <div className="ci-trust-bar__inner">
+      {/* ─── Trust Bar ──────────────────────────────────────────────────── */}
+      <div className="ci-trust-bar-reveal bg-[var(--color-surface-warm)] border-t border-b border-[var(--color-border)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-5 flex flex-col sm:flex-row flex-wrap gap-6 sm:gap-10 justify-between items-start sm:items-center">
           {trustPoints.map((point, i) => (
-            <div key={point.title} className={`ci-trust-item ci-enter ci-enter--${i + 1}`}>
-              <div className="ci-trust-item__icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <div key={point.title} className={`flex items-start gap-3 delay-${i + 1}`}>
+              <div className="mt-0.5 flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
               <div>
-                <p style={{ fontWeight: 600, color: "var(--color-ink)", margin: 0, marginBottom: "0.25rem" }}>{point.title}</p>
-                <p style={{ fontSize: "0.875rem", color: "var(--color-ink-soft)", margin: 0 }}>{point.copy}</p>
+                <p className="text-sm font-bold text-[var(--color-ink)] mb-0.5">{point.title}</p>
+                <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">{point.copy}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <section className="ci-section">
-        <div className="ci-section__inner">
-          <div className="ci-section__header ci-enter">
-            <p className="ci-section__eyebrow">Currently available</p>
-            <h2 className="ci-section__title">Animals looking for homes.</h2>
-            <p className="ci-section__copy">These animals are ready for adoption now. Browse their profiles to learn more about their personality and needs.</p>
+      {/* ─── Featured Animals ────────────────────────────────────────────── */}
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto">
+          <div className="mb-12 delay-1">
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+              Currently available
+            </p>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-4">
+              Animals looking for homes.
+            </h2>
+            <p className="text-base text-[var(--color-ink-soft)] leading-relaxed max-w-[55ch]">
+              These animals are ready for adoption now. Browse their profiles to learn more about their personality and needs.
+            </p>
           </div>
 
           {featuredAnimals.length > 0 ? (
-            <div className="ci-animal-grid ci-enter ci-enter--1" style={{ marginBottom: "var(--space-6)" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 delay-2">
               {featuredAnimals.map((animal) => (
                 <AnimalCard key={animal.id} animal={animal} />
               ))}
             </div>
           ) : (
-            <div className="ci-card" style={{ padding: "var(--space-6)", textAlign: "center", marginBottom: "var(--space-6)" }}>
-              <p className="ci-label" style={{ marginBottom: "var(--space-2)" }}>No animals available</p>
-              <h3 className="ci-h3" style={{ marginBottom: "var(--space-3)" }}>Check back soon.</h3>
-              <p className="ci-body">New animals arrive regularly.</p>
+            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+              <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink-faint)] mb-2">No animals available</p>
+              <h3 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">Check back soon.</h3>
+              <p className="text-[var(--color-ink-soft)]">New animals arrive regularly.</p>
             </div>
           )}
 
-          <div style={{ textAlign: "center" }}>
-            <a href="/animals" className="ci-btn ci-btn--primary ci-btn--lg">View all available animals</a>
+          <div className="mt-12 flex justify-center">
+            <Link href="/animals" className="ci-btn ci-btn--primary ci-btn--lg rounded-full px-10 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+              View all available animals
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="ci-section ci-section--warm">
-        <div className="ci-section__inner">
-          <div className="ci-section__header">
-            <p className="ci-section__eyebrow">Our approach</p>
-            <h2 className="ci-section__title">How adoption works.</h2>
-            <p className="ci-section__copy">We take time to make the right match — for you and for the animal.</p>
+      {/* ─── How Adoption Works ──────────────────────────────────────────── */}
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-surface-warm)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto">
+          <div className="mb-14">
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+              Our approach
+            </p>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-4">
+              How adoption works.
+            </h2>
+            <p className="text-base text-[var(--color-ink-soft)] leading-relaxed max-w-[55ch]">
+              We take time to make the right match — for you and for the animal.
+            </p>
           </div>
 
-          <div className="ci-steps">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10">
             {processSteps.map((step, index) => (
-              <div key={step.title} className={`ci-enter ci-enter--${index + 1}`}>
-                <p className="ci-step__number">0{index + 1}</p>
-                <h3 className="ci-step__title">{step.title}</h3>
-                <p className="ci-step__copy">{step.copy}</p>
+              <div key={step.title} className={`relative pl-8 delay-${index + 1}`}>
+                <span className="absolute -left-1 top-0 font-[family-name:var(--font-display)] text-7xl font-medium text-[var(--color-primary-pale)] leading-none select-none">
+                  0{index + 1}
+                </span>
+                <div className="relative pt-10">
+                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-[var(--color-ink-soft)] leading-relaxed">{step.copy}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="ci-section">
-        <div className="ci-section__inner">
-          <div className="ci-section__header" style={{ textAlign: "center" }}>
-            <p className="ci-section__eyebrow">Happy tails</p>
-            <h2 className="ci-section__title">Families who found their companion.</h2>
+      {/* ─── Testimonials ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto">
+          <div className="mb-14 text-center">
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+              Happy tails
+            </p>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
+              Families who found their companion.
+            </h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-6)" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <div key={t.adopter} className={`ci-card ci-enter ci-enter--${i + 1}`} style={{ padding: "var(--space-5)" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "1.125rem", fontStyle: "italic", color: "var(--color-ink-soft)", lineHeight: 1.6, marginBottom: "var(--space-4)" }}>
+              <div key={t.adopter} className={`
+                rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6
+                shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300
+                delay-${i + 1}
+              `}>
+                <p className="font-[family-name:var(--font-display)] text-lg italic text-[var(--color-ink)] leading-relaxed mb-4">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <p style={{ fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{t.adopter}</p>
-                <p style={{ fontSize: "0.875rem", color: "var(--color-ink-faint)", margin: 0 }}>Adopted {t.animal}</p>
+                <p className="font-semibold text-sm text-[var(--color-ink)]">{t.adopter}</p>
+                <p className="text-xs text-[var(--color-ink-faint)]">Adopted {t.animal}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="ci-section ci-section--warm">
-        <div className="ci-section__inner">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }}>
-            <div>
-              <p className="ci-section__eyebrow">Our commitment</p>
-              <h2 className="ci-section__title" style={{ marginBottom: "var(--space-4)" }}>Every animal deserves care.</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-                {values.map((value, i) => (
-                  <div key={value.title} className={`ci-enter ci-enter--${i + 1}`}>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 500, color: "var(--color-ink)", marginBottom: "var(--space-1)" }}>{value.title}</p>
-                    <p className="ci-body">{value.copy}</p>
-                  </div>
-                ))}
-              </div>
-              <a href="/about" style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-4)", fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-primary)" }}>
-                Learn about us
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </a>
+      {/* ─── Values Band ─────────────────────────────────────────────────── */}
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-surface-warm)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+              Our commitment
+            </p>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.1] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
+              Every animal deserves care.
+            </h2>
+            <div className="space-y-6">
+              {values.map((value, i) => (
+                <div key={value.title} className={`delay-${i + 1}`}>
+                  <p className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-1">
+                    {value.title}
+                  </p>
+                  <p className="text-[var(--color-ink-soft)] leading-relaxed">{value.copy}</p>
+                </div>
+              ))}
             </div>
-            <div style={{ aspectRatio: "4/5", borderRadius: "var(--radius-xl)", overflow: "hidden", boxShadow: "var(--shadow-xl)", background: "linear-gradient(135deg, var(--color-primary-pale) 0%, var(--color-accent-pale) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "var(--color-primary)", opacity: 0.4 }}>Shelter photo</span>
+            <Link href="/about" className="mt-8 inline-flex items-center gap-2 font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-deep)] transition-colors duration-200 group">
+              Learn about us
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform duration-200">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
+          </div>
+
+          <div className="relative h-72 sm:h-80 lg:h-96 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] to-[var(--color-accent-pale)]">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl text-[var(--color-primary)] opacity-20">
+                CI
+              </span>
             </div>
+            {/* Decorative circles */}
+            <div className="absolute top-8 right-8 w-24 h-24 rounded-full bg-[var(--color-surface)]/20" />
+            <div className="absolute bottom-10 left-10 w-16 h-16 rounded-full bg-[var(--color-accent)]/20" />
           </div>
         </div>
       </section>
 
-      <div className="ci-cta-band">
-        <h2 className="ci-cta-band__title">Ready to meet your new companion?</h2>
-        <p className="ci-cta-band__subtitle">Browse our animals and take the first step toward welcoming a new friend.</p>
-        <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "center", flexWrap: "wrap" }}>
-          <a href="/animals" className="ci-btn ci-btn--white ci-btn--lg">Browse animals</a>
-          <a href="/about" className="ci-btn ci-btn--ghost ci-btn--lg" style={{ borderColor: "rgba(255,255,255,0.5)", color: "white" }}>Learn about us</a>
+      {/* ─── CTA Band ────────────────────────────────────────────────────── */}
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary)]">
+        <div className="max-w-[var(--max-width-wide)] mx-auto text-center">
+          <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-white mb-5">
+            Ready to meet your new companion?
+          </h2>
+          <p className="text-base text-white/75 max-w-[50ch] mx-auto mb-10">
+            Browse our animals and take the first step toward welcoming a new friend.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/animals" className="ci-btn ci-btn--white ci-btn--lg rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+              Browse animals
+            </Link>
+            <Link href="/about" className="ci-btn ci-btn--lg rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+              Learn about us
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

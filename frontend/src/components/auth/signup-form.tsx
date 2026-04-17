@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, signup } from "@/lib/api/auth";
-import { resolveAuthenticatedRedirect } from "@/lib/auth/role-check";
-import type { BffError, SignupRequest } from "@/lib/types";
+import { resolveAuthenticatedRedirectForRole } from "@/lib/auth/role-check";
+import type { SignupRequest } from "@/lib/types";
 
 const EMPTY_FIELD_ERRORS: Record<keyof SignupRequest, string[]> = {
   firstName: [],
@@ -19,6 +19,7 @@ const EMPTY_FIELD_ERRORS: Record<keyof SignupRequest, string[]> = {
 export function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const csrfTokenRef = useRef<string | null>(null);
   const [fields, setFields] = useState<SignupRequest>({
     firstName: "",
     lastName: "",
@@ -27,7 +28,6 @@ export function SignupForm() {
     password: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<keyof SignupRequest, string[]>>(EMPTY_FIELD_ERRORS);
-  const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -37,7 +37,7 @@ export function SignupForm() {
     void fetchAuthSession()
       .then((session) => {
         if (!cancelled) {
-          setCsrfToken(session.csrfToken);
+          csrfTokenRef.current = session.csrfToken;
         }
       })
       .catch(() => {
@@ -52,7 +52,7 @@ export function SignupForm() {
   }, []);
 
   async function submitSignup() {
-    const token = await refreshCsrfToken();
+    const token = csrfTokenRef.current ?? (await refreshCsrfToken());
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -65,18 +65,9 @@ export function SignupForm() {
 
     try {
       const result = await signup(fields, token);
-      setCsrfToken(result.csrfToken);
+      csrfTokenRef.current = result.csrfToken;
       router.replace(
-        resolveAuthenticatedRedirect(
-          {
-            accountId: result.user.accountId,
-            role: result.user.role,
-            profileId: result.user.profileId ?? null,
-            issuedAt: 0,
-            expiresAt: Number.MAX_SAFE_INTEGER,
-          },
-          searchParams.get("redirect"),
-        ),
+        resolveAuthenticatedRedirectForRole(result.user.role, searchParams.get("redirect")),
       );
       router.refresh();
     } catch (error) {
@@ -87,7 +78,7 @@ export function SignupForm() {
         const nextToken = await refreshCsrfToken();
 
         if (nextToken) {
-          setCsrfToken(nextToken);
+          csrfTokenRef.current = nextToken;
         }
       }
     } finally {
@@ -101,15 +92,19 @@ export function SignupForm() {
   }
 
   return (
-    <article className="panel auth-panel">
-      <p className="eyebrow">Adopter account</p>
-      <h2 className="panel-title">Create your login</h2>
-      <p className="panel-copy">
-        This public form is limited to adopter registration and posts only to the frontend auth BFF.
+    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
+      <p className="mb-1 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+        Adopter account
+      </p>
+      <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+        Create your login
+      </h2>
+      <p className="text-sm text-[var(--color-ink-soft)] mb-6 leading-relaxed">
+        This form is limited to adopter registration and posts only to the frontend auth BFF.
       </p>
 
-      <form className="auth-form" method="post" onSubmit={handleSubmit}>
-        <div className="auth-grid">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             id="signup-first-name"
             label="First name"
@@ -117,11 +112,8 @@ export function SignupForm() {
             value={fields.firstName}
             autoComplete="given-name"
             errors={fieldErrors.firstName}
-            onChange={(value) => {
-              setFields((current) => ({ ...current, firstName: value }));
-            }}
+            onChange={(value) => setFields((f) => ({ ...f, firstName: value }))}
           />
-
           <FormField
             id="signup-last-name"
             label="Last name"
@@ -129,9 +121,7 @@ export function SignupForm() {
             value={fields.lastName}
             autoComplete="family-name"
             errors={fieldErrors.lastName}
-            onChange={(value) => {
-              setFields((current) => ({ ...current, lastName: value }));
-            }}
+            onChange={(value) => setFields((f) => ({ ...f, lastName: value }))}
           />
         </div>
 
@@ -143,9 +133,7 @@ export function SignupForm() {
           value={fields.email}
           autoComplete="email"
           errors={fieldErrors.email}
-          onChange={(value) => {
-            setFields((current) => ({ ...current, email: value }));
-          }}
+          onChange={(value) => setFields((f) => ({ ...f, email: value }))}
         />
 
         <FormField
@@ -156,9 +144,7 @@ export function SignupForm() {
           value={fields.telephone}
           autoComplete="tel"
           errors={fieldErrors.telephone}
-          onChange={(value) => {
-            setFields((current) => ({ ...current, telephone: value }));
-          }}
+          onChange={(value) => setFields((f) => ({ ...f, telephone: value }))}
         />
 
         <FormField
@@ -169,27 +155,27 @@ export function SignupForm() {
           value={fields.password}
           autoComplete="new-password"
           errors={fieldErrors.password}
-          onChange={(value) => {
-            setFields((current) => ({ ...current, password: value }));
-          }}
+          onChange={(value) => setFields((f) => ({ ...f, password: value }))}
         />
 
-        {errorMessage ? (
-          <p className="auth-error-banner" aria-live="polite" role="status">
+        {errorMessage && (
+          <p className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger-bg)] px-4 py-3 text-sm text-[var(--color-danger)]" aria-live="polite" role="status">
             {errorMessage}
           </p>
-        ) : null}
+        )}
 
-        <div className="auth-actions">
+        <div className="flex flex-wrap items-center gap-3 pt-1">
           <button
             type="submit"
-            className="auth-submit"
             disabled={isPending}
+            className="ci-btn ci-btn--primary rounded-full px-8 py-3 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] disabled:opacity-70 disabled:cursor-wait disabled:transform-none transition-all duration-200"
           >
             {isPending ? "Creating account..." : "Create adopter account"}
           </button>
-
-          <Link href="/login" className="secondary-link auth-secondary-link">
+          <Link
+            href="/login"
+            className="rounded-full border border-[var(--color-border)] bg-transparent px-6 py-3 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] transition-all duration-200"
+          >
             Already have an account?
           </Link>
         </div>
@@ -200,8 +186,7 @@ export function SignupForm() {
   async function refreshCsrfToken() {
     try {
       const session = await fetchAuthSession();
-      setCsrfToken(session.csrfToken);
-
+      csrfTokenRef.current = session.csrfToken;
       return session.csrfToken;
     } catch {
       return null;
@@ -233,28 +218,36 @@ function FormField({
   const errorId = `${id}-error`;
 
   return (
-    <label className="auth-field" htmlFor={id}>
-      <span className="auth-label">{label}</span>
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-bold text-[var(--color-ink)]">
+        {label}
+      </label>
       <input
         id={id}
         name={name}
         type={type}
         autoComplete={autoComplete}
-        className="auth-input"
+        className={`
+          w-full appearance-none rounded-xl border bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3
+          placeholder-[var(--color-ink-faint)]
+          focus:outline-none focus:ring-2 transition-all duration-200
+          ${errors.length > 0
+            ? "border-[var(--color-danger)]/50 focus:border-[var(--color-danger)] focus:ring-[var(--color-danger)]/20"
+            : "border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-[var(--color-accent)]/20"
+          }
+        `}
         value={value}
         aria-invalid={errors.length > 0}
         aria-describedby={errors.length > 0 ? errorId : undefined}
-        onChange={(event) => {
-          onChange(event.target.value);
-        }}
+        onChange={(event) => onChange(event.target.value)}
         required
       />
-      {errors.length > 0 ? (
-        <span id={errorId} className="auth-field-error">
+      {errors.length > 0 && (
+        <span id={errorId} className="text-xs text-[var(--color-danger)]">
           {errors[0]}
         </span>
-      ) : null}
-    </label>
+      )}
+    </div>
   );
 }
 
@@ -263,17 +256,19 @@ function toDisplayMessage(error: unknown): string {
     return "Registration is temporarily unavailable. Please try again shortly.";
   }
 
-  const responseError = error.responseError;
+  const { code, status } = error.responseError;
 
-  if (responseError.code === "VALIDATION_ERROR") {
+  if (code === "VALIDATION_ERROR") {
     return "Check the highlighted fields and try again.";
   }
-
-  if (responseError.code === "FORBIDDEN") {
+  if (code === "FORBIDDEN") {
     return "Your security check expired. Refresh the page and try again.";
   }
+  if (status >= 500 || code === "UPSTREAM_UNAVAILABLE") {
+    return "Registration is temporarily unavailable. Please try again shortly.";
+  }
 
-  return sanitizeMessage(responseError);
+  return "We couldn't complete that registration request. Please review the form and try again.";
 }
 
 function readFieldErrors(error: unknown): Record<keyof SignupRequest, string[]> {
@@ -294,32 +289,16 @@ function toGenericFieldErrors(
   messages: string[] | undefined,
   field: keyof SignupRequest,
 ): string[] {
-  if (!messages || messages.length === 0) {
-    return [];
-  }
-
+  if (!messages || messages.length === 0) return [];
   return [genericFieldMessage(field)];
 }
 
 function genericFieldMessage(field: keyof SignupRequest): string {
   switch (field) {
-    case "firstName":
-      return "Enter a valid first name.";
-    case "lastName":
-      return "Enter a valid last name.";
-    case "email":
-      return "Enter a valid email address.";
-    case "telephone":
-      return "Enter a valid telephone number.";
-    case "password":
-      return "Enter a valid password.";
+    case "firstName": return "Enter a valid first name.";
+    case "lastName":  return "Enter a valid last name.";
+    case "email":     return "Enter a valid email address.";
+    case "telephone": return "Enter a valid telephone number.";
+    case "password":  return "Enter a valid password.";
   }
-}
-
-function sanitizeMessage(error: BffError): string {
-  if (error.status >= 500 || error.code === "UPSTREAM_UNAVAILABLE") {
-    return "Registration is temporarily unavailable. Please try again shortly.";
-  }
-
-  return "We couldn't complete that registration request. Please review the form and try again.";
 }
