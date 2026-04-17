@@ -55,9 +55,9 @@ function statusToBadge(status: string): string {
 
 function DetailPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="ci-card" style={{ padding: "var(--space-4)" }}>
-      <p className="ci-label" style={{ marginBottom: "var(--space-3)" }}>{title}</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>{children}</div>
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-4">
+      <p className="ci-label mb-3">{title}</p>
+      <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
 }
@@ -65,7 +65,7 @@ function DetailPanel({ title, children }: { title: string; children: ReactNode }
 function DetailItem({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)" }}>
+    <div className="flex justify-between gap-3">
       <span className="ci-body-sm" style={{ color: "var(--color-ink-faint)" }}>{label}</span>
       <span className="ci-body-sm" style={{ color: "var(--color-ink)" }}>{value}</span>
     </div>
@@ -83,11 +83,11 @@ export default async function AnimalDetailPage({ params }: PageProps) {
 
   if (result.kind === "error") {
     return (
-      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto", padding: "var(--space-8) var(--space-6)" }}>
-        <div className="ci-card" style={{ padding: "var(--space-6)", textAlign: "center" }}>
-          <p className="ci-label" style={{ marginBottom: "var(--space-2)" }}>Profile error</p>
-          <h1 className="ci-h1" style={{ marginBottom: "var(--space-3)" }}>Animal profile unavailable.</h1>
-          <p className="ci-body" style={{ marginBottom: "var(--space-4)" }}>{result.message}</p>
+      <div className="max-w-[var(--max-width-content)] mx-auto px-6 py-8">
+        <div className="ci-card p-6 text-center">
+          <p className="ci-label mb-2">Profile error</p>
+          <h1 className="ci-h1 mb-3">Animal profile unavailable.</h1>
+          <p className="ci-body mb-4">{result.message}</p>
           <Link href="/animals" className="ci-btn ci-btn--primary">Back to animals</Link>
         </div>
       </div>
@@ -104,51 +104,49 @@ export default async function AnimalDetailPage({ params }: PageProps) {
     : undefined;
 
   return (
-    <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto", padding: "var(--space-8) var(--space-6)" }}>
-      <Link href="/animals" className="ci-btn ci-btn--ghost-sm" style={{ marginBottom: "var(--space-5)", display: "inline-flex" }}>
+    <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-8 pb-8">
+      <Link href="/animals" className="ci-btn ci-btn--ghost-sm inline-flex mb-5">
         Back to animals
       </Link>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-7)", marginBottom: "var(--space-7)", alignItems: "start" }}>
-        <div className="ci-card" style={{ overflow: "hidden" }}>
-          <div style={{ aspectRatio: "4/5" }}>
-            <AnimalImage
-              imageUrl={animal.imageUrl}
-              name={animal.name}
-              animalType={animal.animalType}
-              variant="detail"
-            />
-          </div>
+      <div className="grid gap-7 mb-7 items-start" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] shadow-xl">
+          <AnimalImage
+            imageUrl={animal.imageUrl}
+            name={animal.name}
+            animalType={animal.animalType}
+            variant="detail"
+          />
         </div>
 
         <div>
-          <span className={`ci-badge ci-badge--${statusToBadge(animal.status)}`} style={{ marginBottom: "var(--space-3)", display: "inline-flex" }}>
+          <span className={`ci-badge ci-badge--${statusToBadge(animal.status)} inline-flex mb-3`}>
             {animal.statusLabel}
           </span>
-          <h1 className="ci-h1" style={{ marginBottom: "var(--space-3)" }}>{animal.name}</h1>
+          <h1 className="ci-h1 mb-3">{animal.name}</h1>
           <p className="ci-body-lg">{animal.breed} · {animal.animalType}{animal.age ? ` · ${animal.age} years old` : ""}</p>
 
           {animal.temperament && (
-            <p style={{ marginTop: "var(--space-4)", fontFamily: "var(--font-body)", fontSize: "0.9375rem", color: "var(--color-ink-soft)", fontStyle: "italic" }}>
+            <p className="mt-4 italic" style={{ fontFamily: "var(--font-body)", fontSize: "0.9375rem", color: "var(--color-ink-soft)" }}>
               &ldquo;{animal.temperament}&rdquo;
             </p>
           )}
 
-          <div style={{ marginTop: "var(--space-6)", display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+          <div className="mt-6 flex gap-3 flex-wrap">
             <button className="ci-btn ci-btn--accent ci-btn--lg">I&apos;m interested in {animal.name}</button>
             <button className="ci-btn ci-btn--ghost ci-btn--lg">Save for later</button>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: "65ch", marginBottom: "var(--space-7)" }}>
-        <h2 className="ci-h3" style={{ marginBottom: "var(--space-3)" }}>About {animal.name}</h2>
+      <div className="max-w-[65ch] mb-7">
+        <h2 className="ci-h3 mb-3">About {animal.name}</h2>
         <p className="ci-body-lg">
           {animal.description?.trim() || `A biography has not been published for ${animal.name} yet. Contact us to learn more.`}
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))", gap: "var(--space-5)", marginBottom: "var(--space-7)" }}>
+      <div className="grid gap-5 mb-7" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}>
         <DetailPanel title="Details">
           <DetailItem label="Breed" value={animal.breed} />
           <DetailItem label="Type" value={animal.animalType} />
