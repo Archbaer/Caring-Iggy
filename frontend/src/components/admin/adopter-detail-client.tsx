@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { AdminAdopterDetail } from "@/lib/api/admin";
@@ -8,17 +9,17 @@ import { AdopterEditPanel } from "@/components/admin/adopter-edit-panel";
 
 type Props = {
   adopter: AdminAdopterDetail;
-  onUpdate: (updated: AdminAdopterDetail) => void;
 };
 
-export function AdminAdopterDetailClient({ adopter, onUpdate }: Props) {
+export function AdminAdopterDetailClient({ adopter }: Props) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [currentAdopter, setCurrentAdopter] = useState(adopter);
 
   function handleSuccess(updated: AdminAdopterDetail) {
     setCurrentAdopter(updated);
     setEditing(false);
-    onUpdate(updated);
+    router.refresh();
   }
 
   function handleCancel() {

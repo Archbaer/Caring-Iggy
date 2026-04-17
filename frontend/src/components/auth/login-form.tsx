@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, login } from "@/lib/api/auth";
-import { resolveAuthenticatedRedirect } from "@/lib/auth/role-check";
-import type { BffError } from "@/lib/types";
+import { resolveAuthenticatedRedirectForRole } from "@/lib/auth/role-check";
 
 type LoginFields = {
   email: string;
@@ -16,11 +15,11 @@ type LoginFields = {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const csrfTokenRef = useRef<string | null>(null);
   const [fields, setFields] = useState<LoginFields>({
     email: "",
     password: "",
   });
-  const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -30,7 +29,7 @@ export function LoginForm() {
     void fetchAuthSession()
       .then((session) => {
         if (!cancelled) {
-          setCsrfToken(session.csrfToken);
+          csrfTokenRef.current = session.csrfToken;
         }
       })
       .catch(() => {
@@ -47,7 +46,7 @@ export function LoginForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = csrfTokenRef.current ?? (await refreshCsrfToken());
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -59,18 +58,9 @@ export function LoginForm() {
 
     try {
       const result = await login(fields, token);
-      setCsrfToken(result.csrfToken);
+      csrfTokenRef.current = result.csrfToken;
       router.replace(
-        resolveAuthenticatedRedirect(
-          {
-            accountId: result.user.accountId,
-            role: result.user.role,
-            profileId: result.user.profileId ?? null,
-            issuedAt: 0,
-            expiresAt: Number.MAX_SAFE_INTEGER,
-          },
-          searchParams.get("redirect"),
-        ),
+        resolveAuthenticatedRedirectForRole(result.user.role, searchParams.get("redirect")),
       );
       router.refresh();
     } catch (error) {
@@ -80,7 +70,7 @@ export function LoginForm() {
         const nextToken = await refreshCsrfToken();
 
         if (nextToken) {
-          setCsrfToken(nextToken);
+          csrfTokenRef.current = nextToken;
         }
       }
     } finally {
@@ -89,63 +79,73 @@ export function LoginForm() {
   }
 
   return (
-    <article className="panel auth-panel">
-      <p className="eyebrow">Existing account</p>
-      <h2 className="panel-title">Sign in</h2>
-      <p className="panel-copy">
+    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
+      <p className="mb-1 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+        Existing account
+      </p>
+      <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+        Sign in
+      </h2>
+      <p className="text-sm text-[var(--color-ink-soft)] mb-6 leading-relaxed">
         Use the email and password tied to your Caring Iggy account.
       </p>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-field" htmlFor="login-email">
-          <span className="auth-label">Email</span>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Email */}
+        <div className="space-y-2">
+          <label htmlFor="login-email" className="block text-sm font-bold text-[var(--color-ink)]">
+            Email
+          </label>
           <input
             id="login-email"
             name="email"
             type="email"
             autoComplete="email"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.email}
-            onChange={(event) => {
-              setFields((current) => ({ ...current, email: event.target.value }));
-            }}
+            onChange={(event) => setFields((f) => ({ ...f, email: event.target.value }))}
             required
           />
-        </label>
+        </div>
 
-        <label className="auth-field" htmlFor="login-password">
-          <span className="auth-label">Password</span>
+        {/* Password */}
+        <div className="space-y-2">
+          <label htmlFor="login-password" className="block text-sm font-bold text-[var(--color-ink)]">
+            Password
+          </label>
           <input
             id="login-password"
             name="password"
             type="password"
             autoComplete="current-password"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.password}
-            onChange={(event) => {
-              setFields((current) => ({ ...current, password: event.target.value }));
-            }}
+            onChange={(event) => setFields((f) => ({ ...f, password: event.target.value }))}
             required
           />
-        </label>
+        </div>
 
-        {errorMessage ? (
-          <p className="auth-error-banner" aria-live="polite" role="status">
+        {/* Error */}
+        {errorMessage && (
+          <p className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger-bg)] px-4 py-3 text-sm text-[var(--color-danger)]" aria-live="polite" role="status">
             {errorMessage}
           </p>
-        ) : null}
+        )}
 
-        <div className="auth-actions">
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-3 pt-1">
           <button
             type="submit"
-            className="auth-submit"
             disabled={isPending}
+            className="ci-btn ci-btn--primary rounded-full px-8 py-3 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] disabled:opacity-70 disabled:cursor-wait disabled:transform-none transition-all duration-200"
           >
             {isPending ? "Signing in..." : "Sign in"}
           </button>
-
-          <Link href="/signup" className="secondary-link auth-secondary-link">
-            Need an adopter account?
+          <Link
+            href="/signup"
+            className="rounded-full border border-[var(--color-border)] bg-transparent px-6 py-3 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] transition-all duration-200"
+          >
+            Need an account?
           </Link>
         </div>
       </form>
@@ -155,8 +155,7 @@ export function LoginForm() {
   async function refreshCsrfToken() {
     try {
       const session = await fetchAuthSession();
-      setCsrfToken(session.csrfToken);
-
+      csrfTokenRef.current = session.csrfToken;
       return session.csrfToken;
     } catch {
       return null;
@@ -169,25 +168,18 @@ function toDisplayMessage(error: unknown): string {
     return "Authentication is temporarily unavailable. Please try again shortly.";
   }
 
-  const responseError = error.responseError;
+  const { code, status } = error.responseError;
 
-  if (responseError.code === "UNAUTHORIZED") {
+  if (code === "UNAUTHORIZED") {
     return "That email and password combination was not recognized.";
   }
-
-  if (responseError.code === "VALIDATION_ERROR") {
+  if (code === "VALIDATION_ERROR") {
     return "Check your email and password, then try again.";
   }
-
-  if (responseError.code === "FORBIDDEN") {
+  if (code === "FORBIDDEN") {
     return "Your security check expired. Refresh the page and try again.";
   }
-
-  return sanitizeMessage(responseError);
-}
-
-function sanitizeMessage(error: BffError): string {
-  if (error.status >= 500 || error.code === "UPSTREAM_UNAVAILABLE") {
+  if (status >= 500 || code === "UPSTREAM_UNAVAILABLE") {
     return "Authentication is temporarily unavailable. Please try again shortly.";
   }
 

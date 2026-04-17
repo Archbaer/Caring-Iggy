@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
-  createAnimalFromEditor,
   deleteAnimalFromEditor,
   AnimalEditorApiError,
   updateAnimalFromEditor,
@@ -38,13 +37,6 @@ type EditorFormState = {
   previousOwnerId: string;
 };
 
-type CreateFormState = Omit<EditorFormState, "previousOwnerId"> & {
-  previousOwnerName: string;
-  previousOwnerTelephone: string;
-  previousOwnerEmail: string;
-  previousOwnerAddress: string;
-};
-
 const STATUS_OPTIONS: AnimalStatusCode[] = [
   "AVAILABLE",
   "PENDING",
@@ -57,11 +49,9 @@ const SIZE_OPTIONS: AnimalSize[] = ["SMALL", "MEDIUM", "LARGE"];
 
 export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
   const router = useRouter();
-  const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const [, setCsrfToken] = useState<string | null>(null);
   const [updateForm, setUpdateForm] = useState<EditorFormState>(() => toUpdateForm(animal));
-  const [createForm, setCreateForm] = useState<CreateFormState>(() => createEmptyForm());
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -95,9 +85,9 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     [userRole],
   );
 
-  async function handleUpdateSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleUpdateSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = await refreshCsrfToken();
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -129,7 +119,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
       );
 
       setSuccessMessage("Animal record updated.");
-      router.refresh();
+      setTimeout(() => { router.push("/animals"); }, 1200);
     } catch (error) {
       await handleMutationError(error);
     } finally {
@@ -137,64 +127,8 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     }
   }
 
-  async function handleCreateSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const token = csrfToken ?? (await refreshCsrfToken());
-
-    if (!token) {
-      setErrorMessage("Security checks could not be prepared. Refresh and try again.");
-      return;
-    }
-
-    setIsCreating(true);
-    setErrorMessage(null);
-    setSuccessMessage(null);
-
-    try {
-      const createdAnimal = await createAnimalFromEditor(
-        {
-          name: createForm.name.trim(),
-          ...(createForm.animalType.trim() ? { animalType: createForm.animalType.trim() } : {}),
-          ...(createForm.breed.trim() ? { breed: createForm.breed.trim() } : {}),
-          status: createForm.status,
-          ...(createForm.gender ? { gender: createForm.gender } : {}),
-          ...(createForm.size ? { size: createForm.size } : {}),
-          ...(createForm.dateOfBirth ? { dateOfBirth: createForm.dateOfBirth } : {}),
-          ...(createForm.intakeDate ? { intakeDate: createForm.intakeDate } : {}),
-          ...(createForm.temperament.trim() ? { temperament: createForm.temperament.trim() } : {}),
-          ...(createForm.description.trim() ? { description: createForm.description.trim() } : {}),
-          ...(createForm.imageUrl.trim() ? { imageUrl: createForm.imageUrl.trim() } : {}),
-          ...(createForm.previousOwnerName.trim() && createForm.previousOwnerTelephone.trim()
-            ? {
-                previousOwner: {
-                  name: createForm.previousOwnerName.trim(),
-                  telephone: createForm.previousOwnerTelephone.trim(),
-                  ...(createForm.previousOwnerEmail.trim()
-                    ? { email: createForm.previousOwnerEmail.trim() }
-                    : {}),
-                  ...(createForm.previousOwnerAddress.trim()
-                    ? { address: createForm.previousOwnerAddress.trim() }
-                    : {}),
-                },
-              }
-            : {}),
-        },
-        token,
-      );
-
-      setCreateForm(createEmptyForm());
-      setSuccessMessage("Animal record created.");
-      router.push(`/animals/${createdAnimal.id}`);
-      router.refresh();
-    } catch (error) {
-      await handleMutationError(error);
-    } finally {
-      setIsCreating(false);
-    }
-  }
-
   async function handleDelete() {
-    const token = csrfToken ?? (await refreshCsrfToken());
+    const token = await refreshCsrfToken();
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -327,143 +261,8 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
             </label>
 
             <div className="auth-actions" style={{ justifyContent: "center" }}>
-              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
+              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting}>
                 {isUpdating ? "Saving..." : "Save animal changes"}
-              </button>
-            </div>
-          </form>
-        </section>
-      </div>
-
-      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
-        <section className="panel dashboard-form-panel">
-          <p className="eyebrow">Authorized {roleCopy}</p>
-          <h3 className="panel-title">Create a new animal</h3>
-          <p className="panel-copy">
-            This is a shell for authenticated staff creation flows. It sends only to the protected Next.js BFF, never from the browser directly to animal-service.
-          </p>
-
-          <form className="dashboard-form" onSubmit={handleCreateSubmit}>
-            <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Name</span>
-                    <input className="auth-input" value={createForm.name} onChange={(event) => setCreateForm((current) => ({ ...current, name: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Animal type</span>
-                    <input className="auth-input" value={createForm.animalType} onChange={(event) => setCreateForm((current) => ({ ...current, animalType: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Breed</span>
-                    <input className="auth-input" value={createForm.breed} onChange={(event) => setCreateForm((current) => ({ ...current, breed: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Status</span>
-                    <select className="auth-input" value={createForm.status} onChange={(event) => setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
-                      {STATUS_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Gender</span>
-                    <select className="auth-input" value={createForm.gender} onChange={(event) => setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
-                      <option value="">Unspecified</option>
-                      {GENDER_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Size</span>
-                    <select className="auth-input" value={createForm.size} onChange={(event) => setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
-                      <option value="">Unspecified</option>
-                      {SIZE_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Date of birth</span>
-                    <input type="date" className="auth-input" value={createForm.dateOfBirth} onChange={(event) => setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Intake date</span>
-                    <input type="date" className="auth-input" value={createForm.intakeDate} onChange={(event) => setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Temperament</span>
-                    <input className="auth-input" value={createForm.temperament} onChange={(event) => setCreateForm((current) => ({ ...current, temperament: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Image URL</span>
-                    <input className="auth-input" value={createForm.imageUrl} onChange={(event) => setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Previous owner name</span>
-                    <input className="auth-input" value={createForm.previousOwnerName} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Previous owner telephone</span>
-                    <input className="auth-input" value={createForm.previousOwnerTelephone} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Previous owner email</span>
-                    <input className="auth-input" value={createForm.previousOwnerEmail} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Previous owner address</span>
-                    <input className="auth-input" value={createForm.previousOwnerAddress} onChange={(event) => setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <label className="auth-field">
-              <span className="auth-label">Description</span>
-              <textarea className="dashboard-textarea" rows={4} value={createForm.description} onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))} />
-            </label>
-
-            <div className="auth-actions" style={{ justifyContent: "center" }}>
-              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting || isCreating}>
-                {isCreating ? "Creating..." : "Create animal record"}
               </button>
             </div>
           </form>
@@ -478,7 +277,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
             Deletion remains server-authorized. Lazy loading improves page weight only; it is not the authorization boundary.
           </p>
           <div className="auth-actions">
-            <button type="button" className="dashboard-action-button" disabled={isUpdating || isDeleting || isCreating} onClick={() => { void handleDelete(); }}>
+            <button type="button" className="dashboard-action-button" disabled={isUpdating || isDeleting} onClick={() => { void handleDelete(); }}>
               {isDeleting ? "Deleting..." : "Delete animal record"}
             </button>
           </div>
@@ -536,26 +335,6 @@ function toUpdateForm(animal: AnimalDetailView): EditorFormState {
     description: animal.description ?? "",
     imageUrl: animal.imageUrl ?? "",
     previousOwnerId: animal.previousOwner?.id ?? "",
-  };
-}
-
-function createEmptyForm(): CreateFormState {
-  return {
-    name: "",
-    animalType: "",
-    breed: "",
-    status: "AVAILABLE",
-    gender: "",
-    size: "",
-    dateOfBirth: "",
-    intakeDate: "",
-    temperament: "",
-    description: "",
-    imageUrl: "",
-    previousOwnerName: "",
-    previousOwnerTelephone: "",
-    previousOwnerEmail: "",
-    previousOwnerAddress: "",
   };
 }
 
