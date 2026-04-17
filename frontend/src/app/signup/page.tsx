@@ -37,7 +37,7 @@ export default async function SignupPage({ searchParams }: PageProps) {
     <div className="page-shell">
       <section className="page-hero">
         <p className="eyebrow">Public auth route</p>
-        <h1 className="page-title">Start an adopter account with calm, clear next steps.</h1>
+        <h1 className="page-title" style={{ marginBottom: "var(--space-4)" }}>Start an adopter account with calm, clear next steps.</h1>
         <p className="page-copy">
           Public registration is reserved for adopters only. Staff and admin
           accounts stay in separate provisioned flows so this route remains a

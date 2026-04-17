@@ -100,6 +100,30 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build and Push adopter-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          dockerfile: adopter-service/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service:${{ steps.meta.outputs.VERSION }}
+            ${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and Push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          dockerfile: Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE_PREFIX }}-frontend:${{ steps.meta.outputs.VERSION }}
+            ${{ env.DOCKER_IMAGE_PREFIX }}-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Create deployment summary
         run: |
           echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
@@ -110,3 +134,5 @@ jobs:
           echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-user-service\`" >> $GITHUB_STEP_SUMMARY
           echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-matching-service\`" >> $GITHUB_STEP_SUMMARY
           echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-reporting-service\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-frontend\`" >> $GITHUB_STEP_SUMMARY

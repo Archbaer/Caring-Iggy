@@ -67,7 +67,9 @@ export function InterestsManager({
   const selectedAnimals = Array.from(new Set(selectedIds))
     .map((animalId) => animalsById.get(animalId))
     .filter((animal): animal is AnimalSummaryView => Boolean(animal));
-  const availableAnimals = dedupedCatalog.filter((animal) => !selectedIds.includes(animal.id));
+  const availableAnimals = dedupedCatalog.filter(
+    (animal) => !selectedIds.includes(animal.id) && animal.status === "AVAILABLE",
+  );
   const capReached = selectedIds.length >= MAX_INTERESTS;
 
   return (
@@ -83,33 +85,14 @@ export function InterestsManager({
           animals={selectedAnimals}
           emptyTitle="No interested animals yet"
           emptyCopy="Add up to three animal profiles to keep them visible here while matching stays offline."
+          pendingAnimalId={pendingAnimalId}
+          onRemove={(animalId) => {
+            void updateInterests(
+              selectedIds.filter((selectedId) => selectedId !== animalId),
+              animalId,
+            );
+          }}
         />
-
-        {selectedAnimals.length > 0 ? (
-          <div className="dashboard-action-list">
-            {selectedAnimals.map((animal) => (
-              <div key={animal.id} className="dashboard-inline-card">
-                <div>
-                  <h3 className="dashboard-subtitle">{animal.name}</h3>
-                  <p className="panel-copy">{animal.statusLabel}</p>
-                </div>
-                <button
-                  type="button"
-                  className="dashboard-action-button"
-                  disabled={pendingAnimalId === animal.id}
-                  onClick={() => {
-                    void updateInterests(
-                      selectedIds.filter((selectedId) => selectedId !== animal.id),
-                      animal.id,
-                    );
-                  }}
-                >
-                  {pendingAnimalId === animal.id ? "Saving..." : "Remove"}
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : null}
       </section>
 
       <section className="panel dashboard-form-panel">

@@ -5,12 +5,16 @@ type InterestStatusListProps = {
   animals: AnimalSummaryView[];
   emptyTitle: string;
   emptyCopy: string;
+  onRemove?: (animalId: string) => void;
+  pendingAnimalId?: string | null;
 };
 
 export function InterestStatusList({
   animals,
   emptyTitle,
   emptyCopy,
+  onRemove,
+  pendingAnimalId,
 }: InterestStatusListProps) {
   if (animals.length === 0) {
     return (
@@ -35,6 +39,20 @@ export function InterestStatusList({
             <span className="status-badge">{animal.statusLabel}</span>
           </div>
           <p className="panel-copy">{toInterestStatusSummary(animal.status)}</p>
+          {onRemove ? (
+            <div className="dashboard-inline-actions">
+              <button
+                type="button"
+                className="dashboard-action-button"
+                disabled={pendingAnimalId === animal.id}
+                onClick={() => {
+                  onRemove(animal.id);
+                }}
+              >
+                {pendingAnimalId === animal.id ? "Saving..." : "Remove"}
+              </button>
+            </div>
+          ) : null}
         </li>
       ))}
     </ul>

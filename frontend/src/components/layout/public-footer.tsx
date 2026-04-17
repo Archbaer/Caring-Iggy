@@ -4,8 +4,8 @@ import { defaultRouteForRole } from "@/lib/auth/role-check";
 const quickLinks = [
   { href: "/animals", label: "Browse Animals" },
   { href: "/about", label: "About Us" },
-  { href: "#", label: "Donate" },
-  { href: "#", label: "Volunteer" },
+  { href: "/donate", label: "Donate" },
+  { href: "#", label: "Volunteer (coming soon)" },
   { href: "/login", label: "Sign In" },
   { href: "/signup", label: "Create Account" },
 ];
@@ -86,8 +86,8 @@ export async function PublicFooter() {
         <div>
           <p className="ci-footer__nav-title">Quick Links</p>
           <ul className="ci-footer__nav-list">
-            {quickLinks.map((link) => (
-              <li key={link.href}>
+            {quickLinks.map((link, i) => (
+              <li key={`quick-${i}`}>
                 <a href={link.href}>{link.label}</a>
               </li>
             ))}

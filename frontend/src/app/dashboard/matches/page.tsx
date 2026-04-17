@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { ActionLink } from "@/components/ui/action-link";
-import { Card } from "@/components/ui/card";
+import { PublicFooter } from "@/components/layout/public-footer";
 import { LOGIN_ROUTE } from "@/lib/auth/role-check";
 import { getCurrentSession } from "@/lib/auth/server-session";
 
@@ -13,33 +12,34 @@ export default async function DashboardMatchesPage() {
   }
 
   return (
-    <div className="page-shell">
-      <Card as="section" variant="hero">
-        <p className="eyebrow">Protected route</p>
-        <h1 className="page-title">Matching is not enabled in this release.</h1>
-        <p className="page-copy">
-          Your dashboard access remains protected, but live matching stays off in
-          this release and no matching requests are executed yet.
-        </p>
-      </Card>
+    <>
+      <div className="page-shell">
+        <section
+          className="panel"
+          style={{ maxWidth: "var(--max-width-content)", margin: "0 auto", textAlign: "center" }}
+        >
+          <p className="eyebrow">Coming soon</p>
+          <h1 className="ci-h2" style={{ marginBottom: "var(--space-4)" }}>Matching is coming.</h1>
+          <p
+            className="ci-body-lg"
+            style={{
+              color: "var(--color-ink-soft)",
+              marginBottom: "var(--space-5)",
+              maxWidth: "64ch",
+              marginInline: "auto",
+            }}
+          >
+            Our matching feature is being built with care. When it arrives, you&apos;ll be able to
+            see animal-adopter matches curated by our staff.
+          </p>
+          <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "center" }}>
+            <a href="/dashboard" className="ci-btn ci-btn--primary">Back to dashboard</a>
+            <a href="/animals" className="ci-btn ci-btn--ghost">Browse animals</a>
+          </div>
+        </section>
+      </div>
 
-      <Card as="section">
-        <p className="eyebrow">Coming soon</p>
-        <h2 className="panel-title">This page intentionally shows no live results.</h2>
-        <p className="panel-copy">
-          We are keeping `/dashboard/matches` visible now so the protected route map
-          stays stable, with no live matching API requests, no placeholder match
-          cards, and no implied approvals that do not exist yet.
-        </p>
-        <div className="footer-actions">
-          <ActionLink href="/dashboard" variant="secondary">
-            Return to dashboard
-          </ActionLink>
-          <ActionLink href="/animals" variant="chip">
-            Browse available animals
-          </ActionLink>
-        </div>
-      </Card>
-    </div>
+      <PublicFooter />
+    </>
   );
 }

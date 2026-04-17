@@ -37,9 +37,13 @@ export default async function DashboardInterestsPage() {
     );
   }
 
+  const availableSavedCount = result.currentAnimals.filter(
+    (animal) => animal.status === "AVAILABLE",
+  ).length;
+
   return (
     <div className="page-shell">
-      <section className="page-hero dashboard-hero">
+      <section className="page-hero">
         <div className="dashboard-hero-copy">
           <p className="eyebrow">Protected route</p>
           <h1 className="page-title">Interested animals</h1>
@@ -48,12 +52,7 @@ export default async function DashboardInterestsPage() {
           </p>
         </div>
 
-        <div className="dashboard-hero-note">
-          <p className="eyebrow">Interest cap</p>
-          <p className="panel-copy">
-            {result.currentAnimals.length} of {MAX_INTERESTS} interested animals saved.
-          </p>
-        </div>
+        <p className="link-chip">{availableSavedCount} of {MAX_INTERESTS} available animals saved.</p>
       </section>
 
       <DashboardSectionNav currentPath="/dashboard/interests" />
