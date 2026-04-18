@@ -1,6 +1,7 @@
 import { DashboardSectionNav } from "@/components/dashboard/dashboard-section-nav";
 import { PreferencesForm } from "@/components/dashboard/preferences-form";
 import { ActionLink } from "@/components/ui/action-link";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalsForView } from "@/lib/api/animals";
 import { getRequiredRoleSession } from "@/lib/auth/server-session";
@@ -18,6 +19,12 @@ async function loadPreferencesData(profileId: string): Promise<PreferencesData> 
       fetchAdopterProfile(profileId),
       fetchAnimalsForView().catch(() => []),
     ]);
+    if (!profile) {
+      return {
+        kind: "error",
+        message: "Your adopter profile is not linked to this account yet.",
+      };
+    }
 
     return {
       kind: "success",
@@ -47,10 +54,14 @@ export default async function DashboardPreferencesPage() {
   if (result.kind === "error") {
     return (
       <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
-          <h1 className="page-title">Preferences</h1>
-          <p className="page-copy">We couldn&apos;t load your saved adopter preferences.</p>
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8">
+          <Eyebrow>Protected route</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+            Preferences
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            We couldn&apos;t load your saved adopter preferences.
+          </p>
         </section>
 
         <DashboardSectionNav currentPath="/dashboard/preferences" />
@@ -69,11 +80,13 @@ export default async function DashboardPreferencesPage() {
 
   return (
     <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8 grid grid-cols-[1.35fr_0.9fr] gap-5 items-start">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 grid grid-cols-[1.35fr_0.9fr] gap-5 items-start animate-fade-up">
         <div className="flex flex-col gap-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
-          <h1 className="page-title">Preferences</h1>
-          <p className="page-copy">
+          <Eyebrow>Protected route</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+            Preferences
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
             Tell our team what kind of animal you are looking for — species, breed, age, and anything else that matters to your household.
           </p>
         </div>
