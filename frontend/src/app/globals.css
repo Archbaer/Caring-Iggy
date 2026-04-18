@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
 /* =============================================================================
+   ⚠️  DEPRECATION NOTICE
+   =============================================================================
+   All .ci-* classes below are DEPRECATED and will be removed after migration.
+   Use the new component library (components/ui/) instead:
+   - Button component for all buttons
+   - Card component for all cards
+   - Badge component for all badges
+   - Eyebrow component for all eyebrow labels
+   - .animate-fade-up + .delay-* classes for entrance animations
+   ============================================================================= */
+
+/* =============================================================================
    SECTION 1: @theme (Tailwind v4)
    ============================================================================= */
 
@@ -54,6 +66,17 @@
   --shadow-lg:   0 16px 40px rgba(44, 36, 32, 0.10), 0 6px 12px rgba(44, 36, 32, 0.04);
   --shadow-xl:   0 28px 60px rgba(44, 36, 32, 0.12), 0 10px 20px rgba(44, 36, 32, 0.06);
 
+  /* Card spacing scale — organic naturalist feel */
+  --space-card-sm:  0.75rem;   /* 12px — chip actions */
+  --space-card-md:  1.25rem;   /* 20px — route cards, filter groups */
+  --space-card-lg:  1.5rem;    /* 24px — dashboard panels, animal cards */
+  --space-card-xl:  2rem;       /* 32px — hero panels */
+  --gap-card-items: 0.875rem;  /* 14px — between card internals */
+
+  /* Card shadows — layered, organic depth */
+  --shadow-card:        0 2px 12px rgba(44, 36, 32, 0.07), 0 1px 3px rgba(44, 36, 32, 0.04);
+  --shadow-card-hover:  0 8px 28px rgba(44, 36, 32, 0.11), 0 2px 8px rgba(44, 36, 32, 0.05);
+
   /* Border radius — slightly softer */
   --radius-sm:   0.5rem;
   --radius-md:   0.875rem;
@@ -66,11 +89,24 @@
   --max-width-wide:   90rem;
   --max-width-text:   65ch;
   --page-sticky-offset: calc(var(--space-5) + 4rem);
+  --layout-header-height: 4rem;
 
   /* Typography */
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
   --font-mono:    'DM Mono', monospace;
+
+  /* Admin dashboard */
+  --color-admin-sage-circle:   var(--color-primary-pale);
+  --color-admin-terra-circle: var(--color-accent-pale);
+  --color-admin-amber-circle:  var(--color-warning-bg);
+
+  /* Canvas gradients */
+  --gradient-admin-canvas: linear-gradient(
+    135deg,
+    var(--color-surface-warm) 0%,
+    color-mix(in srgb, var(--color-primary-pale) 40%, var(--color-surface)) 100%
+  );
 }
 
 /* =============================================================================
@@ -96,6 +132,17 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Grain texture overlay — subtle paper/organic feel */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* =============================================================================
@@ -716,13 +763,13 @@ a {
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .ci-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .ci-card__media {
@@ -739,7 +786,7 @@ a {
 }
 
 .ci-card:hover .ci-card__media img {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
 .ci-card__badge {
@@ -749,18 +796,19 @@ a {
 }
 
 .ci-card__body {
-  padding: var(--space-5);
+  padding: var(--space-card-lg);
   display: grid;
-  gap: var(--space-2);
+  gap: var(--gap-card-items);
 }
 
 .ci-card__name {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 500;
   color: var(--color-ink);
   margin: 0;
   letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .ci-card__meta {
@@ -768,6 +816,7 @@ a {
   font-size: 0.875rem;
   color: var(--color-ink-soft);
   margin: 0;
+  line-height: 1.5;
 }
 
 .ci-card__trait {
@@ -1458,7 +1507,7 @@ a {
 .ci-animal-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-card-lg);
 }
 
 @media (max-width: 900px) {
@@ -1677,15 +1726,9 @@ a {
    ============================================================================= */
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes fade-up-delay-1 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-up-delay-2 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-up-delay-3 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-up-delay-4 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-up-delay-5 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
 @keyframes hero-reveal {
   from { opacity: 0; transform: translateY(32px) scale(0.98); }
@@ -1709,23 +1752,23 @@ a {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes delay-1 { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes delay-2 { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes delay-3 { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes delay-4 { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes delay-5 { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-.delay-1 { animation: delay-1 500ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both; }
-.delay-2 { animation: delay-2 500ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
-.delay-3 { animation: delay-3 500ms cubic-bezier(0.22, 1, 0.36, 1) 240ms both; }
-.delay-4 { animation: delay-4 500ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both; }
-.delay-5 { animation: delay-5 500ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both; }
-
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
+/* New entrance animation system — use .animate-fade-up + .delay-* classes */
+.animate-fade-up {
+  animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.delay-1 { animation-delay: 80ms; }
+.delay-2 { animation-delay: 160ms; }
+.delay-3 { animation-delay: 240ms; }
+.delay-4 { animation-delay: 320ms; }
+.delay-5 { animation-delay: 400ms; }
+.delay-6 { animation-delay: 480ms; }
+
+/* @deprecated — use Button/Badge/Card components instead */
 .ci-skeleton {
   background: linear-gradient(90deg, var(--color-surface-warm) 25%, var(--color-border) 50%, var(--color-surface-warm) 75%);
   background-size: 200% 100%;
@@ -1733,33 +1776,32 @@ a {
   border-radius: var(--radius-md);
 }
 
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
+/* @deprecated — kept for migration; use .animate-fade-up */
 .ci-enter {
   animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+.ci-enter--1 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both; }
+.ci-enter--2 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
+.ci-enter--3 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 240ms both; }
+.ci-enter--4 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both; }
+.ci-enter--5 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both; }
 
-.ci-enter--1 { animation: fade-up-delay-1 600ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both; }
-.ci-enter--2 { animation: fade-up-delay-2 600ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
-.ci-enter--3 { animation: fade-up-delay-3 600ms cubic-bezier(0.22, 1, 0.36, 1) 240ms both; }
-.ci-enter--4 { animation: fade-up-delay-4 600ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both; }
-.ci-enter--5 { animation: fade-up-delay-5 600ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both; }
-
+/* @deprecated — kept for migration; use .animate-fade-up */
 .ci-hero-reveal {
   animation: hero-reveal 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* @deprecated — kept for migration; use .animate-fade-up.delay-2 */
 .ci-hero-image-reveal {
   animation: hero-image-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
 }
 
+/* @deprecated — kept for migration; use .animate-fade-up */
 .ci-trust-bar-reveal {
   animation: trust-bar-reveal 500ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
 }
 
+/* @deprecated — kept for migration; use .animate-fade-up */
 .ci-card-spring {
   animation: card-spring-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
@@ -2591,6 +2633,112 @@ a {
    SECTION 30: Utility
    ============================================================================= */
 
+/* =============================================================================
+   SECTION 25B: Admin Dashboard
+   ============================================================================= */
+
+.ci-admin-canvas {
+  min-height: 100vh;
+  background: var(--gradient-admin-canvas);
+  padding: var(--space-8) var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .ci-admin-canvas {
+    padding: var(--space-6) var(--space-5);
+  }
+}
+
+.ci-admin-header {
+  max-width: var(--max-width-content);
+  margin: 0 auto var(--space-8);
+}
+
+.ci-stat-card-grid {
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .ci-stat-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ci-stat-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stat card icon badge circle */
+.ci-stat-icon-badge {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Staff card */
+.ci-staff-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.ci-staff-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+
+.ci-staff-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  background: var(--color-primary-pale);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Admin page header panel */
+.ci-admin-page-header {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6) var(--space-5);
+  margin-bottom: var(--space-5);
+  max-width: var(--max-width-content);
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Staff card grid */
+.ci-staff-grid {
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ci-card:hover {
     transform: none;
@@ -2606,5 +2754,13 @@ a {
 
   .ci-skeleton {
     animation: none;
+  }
+
+  /* New animation system — instant for reduced motion */
+  .animate-fade-up {
+    animation: none;
+  }
+  .animate-fade-up[class*="delay-"] {
+    animation-delay: 0ms;
   }
 }
