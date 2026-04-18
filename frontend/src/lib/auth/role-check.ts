@@ -5,7 +5,7 @@ export const SIGNUP_ROUTE = "/signup";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const ADMIN_ROUTE_PREFIX = "/dashboard/admin";
 export const ADMIN_DEFAULT_ROUTE = "/dashboard/admin/adopters";
-export const STAFF_DEFAULT_ROUTE = "/animals";
+export const STAFF_DEFAULT_ROUTE = "/dashboard";
 
 export type PathAccessDecision =
   | { action: "allow" }
@@ -79,6 +79,9 @@ export function evaluatePathAccess(
   }
 
   if (isAdminManagementPath(pathname) && !hasAnyRole(session, ["ADMIN"])) {
+    if (pathname === "/dashboard/admin/animals/new") {
+      return { action: "allow" };
+    }
     return { action: "redirect", destination: defaultRouteForRole(session.role) };
   }
 

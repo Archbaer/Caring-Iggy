@@ -9,9 +9,9 @@ type ActionLinkProps = {
 };
 
 const variantClassNames: Record<NonNullable<ActionLinkProps["variant"]>, string> = {
-  primary: "primary-link",
-  secondary: "secondary-link",
-  chip: "link-chip",
+  primary: "inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] hover:underline",
+  secondary: "inline-flex items-center gap-1 text-sm font-medium text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]",
+  chip: "inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]",
 };
 
 export function ActionLink({

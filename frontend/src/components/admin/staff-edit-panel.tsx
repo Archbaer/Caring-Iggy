@@ -94,43 +94,43 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
   }
 
   return (
-    <article className="panel dashboard-form-panel">
-      <p className="eyebrow">Edit</p>
-      <h2 className="panel-title">Update staff record</h2>
+    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+      <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Edit</p>
+      <h2 className="text-lg font-semibold text-[var(--color-ink)]">Update staff record</h2>
 
-      <form className="dashboard-form" onSubmit={handleSubmit}>
-        <label className="auth-field" htmlFor="staff-name">
-          <span className="auth-label">Name</span>
+      <form className="grid gap-6" onSubmit={handleSubmit}>
+        <label className="flex flex-col gap-1.5" htmlFor="staff-name">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
           <input
             id="staff-name"
             name="name"
             type="text"
             autoComplete="name"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.name}
             onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="staff-telephone">
-          <span className="auth-label">Telephone</span>
+        <label className="flex flex-col gap-1.5" htmlFor="staff-telephone">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Telephone</span>
           <input
             id="staff-telephone"
             name="telephone"
             type="tel"
             autoComplete="tel"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.telephone}
             onChange={(e) => setFields((f) => ({ ...f, telephone: e.target.value }))}
           />
         </label>
 
-        <label className="auth-field" htmlFor="staff-role">
-          <span className="auth-label">Role</span>
+        <label className="flex flex-col gap-1.5" htmlFor="staff-role">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Role</span>
           <select
             id="staff-role"
             name="role"
-            className="auth-input"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
             value={fields.role}
             onChange={(e) =>
               setFields((f) => ({ ...f, role: e.target.value as "STAFF" | "ADMIN" }))
@@ -145,18 +145,18 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
         </label>
 
         {errorMessage ? (
-          <p className="auth-error-banner" aria-live="polite" role="status">
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
             {errorMessage}
           </p>
         ) : null}
 
-        <div className="auth-actions">
-          <button type="submit" className="auth-submit" disabled={isPending}>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button type="submit" className="ci-btn ci-btn--primary" disabled={isPending}>
             {isPending ? "Saving..." : "Save changes"}
           </button>
           <button
             type="button"
-            className="auth-submit secondary"
+            className="ci-btn ci-btn--secondary secondary"
             onClick={onCancel}
             disabled={isPending}
           >

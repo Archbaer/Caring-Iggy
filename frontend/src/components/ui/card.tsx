@@ -8,9 +8,9 @@ type CardProps = {
 };
 
 const variantClassNames: Record<NonNullable<CardProps["variant"]>, string> = {
-  panel: "panel",
-  route: "route-card",
-  hero: "page-hero",
+  panel: "rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6",
+  route: "rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-5 grid gap-3",
+  hero: "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8",
 };
 
 export function Card({

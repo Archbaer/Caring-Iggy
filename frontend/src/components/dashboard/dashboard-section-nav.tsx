@@ -13,13 +13,13 @@ type DashboardSectionNavProps = {
 
 export function DashboardSectionNav({ currentPath }: DashboardSectionNavProps) {
   return (
-    <nav className="dashboard-nav" aria-label="Dashboard sections">
+    <nav className="flex flex-wrap gap-2" aria-label="Dashboard sections">
       {dashboardLinks.map((link) => (
         <ActionLink
           key={link.href}
           href={link.href}
           variant="chip"
-          className={link.href === currentPath ? "dashboard-nav-link is-active" : "dashboard-nav-link"}
+          className={link.href === currentPath ? "is-active" : ""}
         >
           {link.label}
         </ActionLink>

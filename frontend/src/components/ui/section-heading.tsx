@@ -11,13 +11,13 @@ export function SectionHeading({
   copy,
   className,
 }: SectionHeadingProps) {
-  const classes = ["section-heading", className].filter(Boolean).join(" ");
+  const classes = ["flex flex-col gap-2", className].filter(Boolean).join(" ");
 
   return (
     <header className={classes}>
-      <p className="eyebrow">{eyebrow}</p>
-      <h2 className="section-title">{title}</h2>
-      <p className="section-copy">{copy}</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">{eyebrow}</p>
+      <h2 className="text-2xl font-bold text-[var(--color-ink)]">{title}</h2>
+      <p className="text-base text-[var(--color-ink-soft)]">{copy}</p>
     </header>
   );
 }

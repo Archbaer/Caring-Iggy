@@ -29,26 +29,26 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
   const preferenceEntries = Object.entries(currentAdopter.preferences);
 
   return (
-    <div className="page-shell">
-      <section className="page-hero">
-        <p className="eyebrow">Admin route</p>
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
         <h1 className="page-title">{currentAdopter.name}</h1>
         <p className="page-copy">
-          <span className="status-badge">{currentAdopter.status}</span>
+          <span className="ci-badge">{currentAdopter.status}</span>
         </p>
       </section>
 
-      <nav className="breadcrumb">
-        <a href="/dashboard/admin/adopters" className="link-chip">
+      <nav className="flex items-center gap-2">
+        <a href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
           ← Adopters
         </a>
       </nav>
 
-      <section className="panel-grid">
-        <article className="panel">
-          <p className="eyebrow">Contact</p>
-          <h2 className="panel-title">Adopter profile</h2>
-          <ul className="detail-list">
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4">
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Contact</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Adopter profile</h2>
+          <ul className="flex flex-col gap-2 text-sm">
             <li>
               <strong>Email:</strong> {currentAdopter.email}
             </li>
@@ -64,11 +64,11 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
           </ul>
         </article>
 
-        <article className="panel">
-          <p className="eyebrow">Preferences</p>
-          <h2 className="panel-title">Saved adopter preferences</h2>
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Preferences</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Saved adopter preferences</h2>
           {preferenceEntries.length > 0 ? (
-            <ul className="detail-list">
+            <ul className="flex flex-col gap-2 text-sm">
               {preferenceEntries.map(([key, value]) => (
                 <li key={key}>
                   <strong>{key}:</strong> {formatPreferenceValue(value)}
@@ -76,15 +76,15 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
               ))}
             </ul>
           ) : (
-            <p className="panel-copy">No preferences are stored for this adopter yet.</p>
+            <p className="text-sm text-[var(--color-ink-soft)]">No preferences are stored for this adopter yet.</p>
           )}
         </article>
 
-        <article className="panel">
-          <p className="eyebrow">History</p>
-          <h2 className="panel-title">Adoption history</h2>
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">History</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Adoption history</h2>
           {currentAdopter.history.length > 0 ? (
-            <ul className="detail-list">
+            <ul className="flex flex-col gap-2 text-sm">
               {currentAdopter.history.map((entry) => (
                 <li key={entry.id}>
                   <strong>{entry.animalName ?? entry.animalId}:</strong>{" "}
@@ -95,7 +95,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
               ))}
             </ul>
           ) : (
-            <p className="panel-copy">No adoption history entries are available for this adopter.</p>
+            <p className="text-sm text-[var(--color-ink-soft)]">No adoption history entries are available for this adopter.</p>
           )}
         </article>
 
@@ -106,13 +106,13 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
             onSuccess={handleSuccess}
           />
         ) : (
-          <article className="panel dashboard-form-panel">
-            <p className="eyebrow">Actions</p>
-            <h2 className="panel-title">Manage this record</h2>
-            <div className="auth-actions">
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
+            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Manage this record</h2>
+            <div className="flex flex-wrap gap-3 items-center">
               <button
                 type="button"
-                className="auth-submit"
+                className="ci-btn ci-btn--primary"
                 onClick={() => setEditing(true)}
               >
                 Edit adopter

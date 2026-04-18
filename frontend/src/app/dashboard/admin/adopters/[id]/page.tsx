@@ -24,23 +24,23 @@ export default async function AdminAdopterDetailPage({ params }: PageProps) {
 
   if (result.kind === "error") {
     return (
-      <div className="page-shell">
-        <section className="page-hero">
-          <p className="eyebrow">Admin route</p>
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
           <h1 className="page-title">Adopter record unavailable</h1>
           <p className="page-copy">The protected adopter detail route could not be loaded.</p>
         </section>
 
-        <nav className="breadcrumb">
+        <nav className="flex items-center gap-2">
           <ActionLink href="/dashboard/admin/adopters" variant="chip">
             ← Adopters
           </ActionLink>
         </nav>
 
-        <section className="empty-state">
-          <p className="eyebrow">Detail error</p>
-          <h2 className="panel-title">We couldn&apos;t load this adopter record.</h2>
-          <p className="panel-copy">{result.message}</p>
+        <section className="flex flex-col gap-3 py-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Detail error</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">We couldn&apos;t load this adopter record.</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
         </section>
       </div>
     );

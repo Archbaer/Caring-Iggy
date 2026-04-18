@@ -66,26 +66,26 @@ export function AdminStaffDetailClient({ employee }: Props) {
   }
 
   return (
-    <div className="page-shell">
-      <section className="page-hero">
-        <p className="eyebrow">Admin route</p>
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
         <h1 className="page-title">{currentEmployee.name}</h1>
         <p className="page-copy">
-          <span className="status-badge">{currentEmployee.role}</span>
+          <span className="ci-badge">{currentEmployee.role}</span>
         </p>
       </section>
 
-      <nav className="breadcrumb">
-        <a href="/dashboard/admin/staff" className="link-chip">
+      <nav className="flex items-center gap-2">
+        <a href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
           ← Staff
         </a>
       </nav>
 
-      <section className="panel-grid">
-        <article className="panel">
-          <p className="eyebrow">Identity</p>
-          <h2 className="panel-title">Account metadata</h2>
-          <ul className="detail-list">
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4">
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Identity</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Account metadata</h2>
+          <ul className="flex flex-col gap-2 text-sm">
             <li>
               <strong>Email:</strong> {currentEmployee.email}
             </li>
@@ -111,13 +111,13 @@ export function AdminStaffDetailClient({ employee }: Props) {
             onSuccess={handleSuccess}
           />
         ) : (
-          <article className="panel dashboard-form-panel">
-            <p className="eyebrow">Actions</p>
-            <h2 className="panel-title">Manage this record</h2>
-            <div className="auth-actions">
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
+            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Manage this record</h2>
+            <div className="flex flex-wrap gap-3 items-center">
               <button
                 type="button"
-                className="auth-submit"
+                className="ci-btn ci-btn--primary"
                 onClick={() => setEditing(true)}
               >
                 Edit staff
@@ -126,9 +126,9 @@ export function AdminStaffDetailClient({ employee }: Props) {
           </article>
         )}
 
-        <article className="panel dashboard-form-panel">
-          <p className="eyebrow">Danger zone</p>
-          <h2 className="panel-title">Delete this staff record</h2>
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Danger zone</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Delete this staff record</h2>
           {deleteConfirm ? (
             <form
               onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -136,22 +136,22 @@ export function AdminStaffDetailClient({ employee }: Props) {
                 void handleDelete();
               }}
             >
-              <p className="panel-copy">
+              <p className="text-sm text-[var(--color-ink-soft)]">
                 Are you sure you want to delete <strong>{currentEmployee.name}</strong>? This action
                 cannot be undone.
               </p>
               {deleteError ? (
-                <p className="auth-error-banner" aria-live="polite" role="status">
+                <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
                   {deleteError}
                 </p>
               ) : null}
-              <div className="auth-actions">
-                <button type="submit" className="auth-submit danger" disabled={isDeleting}>
+              <div className="flex flex-wrap gap-3 items-center">
+                <button type="submit" className="ci-btn ci-btn--primary danger" disabled={isDeleting}>
                   {isDeleting ? "Deleting..." : "Confirm deletion"}
                 </button>
                 <button
                   type="button"
-                  className="auth-submit secondary"
+                  className="ci-btn ci-btn--secondary secondary"
                   onClick={() => setDeleteConfirm(false)}
                   disabled={isDeleting}
                 >
@@ -160,10 +160,10 @@ export function AdminStaffDetailClient({ employee }: Props) {
               </div>
             </form>
           ) : (
-            <div className="auth-actions">
+            <div className="flex flex-wrap gap-3 items-center">
               <button
                 type="button"
-                className="auth-submit danger"
+                className="ci-btn ci-btn--primary danger"
                 onClick={() => setDeleteConfirm(true)}
               >
                 Delete staff
