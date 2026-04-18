@@ -34,8 +34,12 @@ export class AdopterServiceError extends Error {
   }
 }
 
-export async function fetchAdopterProfile(adopterId: string): Promise<AdopterProfile> {
+export async function fetchAdopterProfile(adopterId: string): Promise<AdopterProfile | null> {
   const res = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`));
+
+  if (res.status === 404) {
+    return null;
+  }
 
   if (!res.ok) {
     throw new AdopterServiceError(
