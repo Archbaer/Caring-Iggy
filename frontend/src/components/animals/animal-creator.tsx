@@ -2,7 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import {
   AnimalEditorApiError,
   createAnimalFromEditor,
@@ -147,15 +151,28 @@ export function AnimalCreator() {
   }
 
   return (
-    <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Authorized staff</p>
-        <h3 className="panel-title">Create a new animal</h3>
-        <p className="panel-copy">
-          This is a shell for authenticated staff creation flows. It sends only
-          to the protected Next.js BFF, never from the browser directly to
-          animal-service.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-6">
+          <Button
+            onClick={() => router.push("/animals")}
+            variant="ghost"
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Animals
+          </Button>
+
+          <Eyebrow className="mb-3">Staff workspace</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold text-gray-900 mb-2">
+            Add New Animal
+          </h1>
+          <p className="text-gray-600">
+            Register a new animal in the shelter catalog
+          </p>
+        </div>
+
+        <Card variant="panel" className="p-0 overflow-hidden">
 
         <form className="dashboard-form" onSubmit={handleCreateSubmit}>
           <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
@@ -443,7 +460,8 @@ export function AnimalCreator() {
             </button>
           </div>
         </form>
-      </section>
+        </Card>
+      </div>
 
       {errorMessage ? (
         <p className="auth-error-banner" aria-live="polite" role="status">
