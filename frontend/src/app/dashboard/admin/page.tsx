@@ -1,8 +1,8 @@
 import { getRequiredRoleGroupSession } from "@/lib/auth/server-session";
 import { fetchAdminAdopters } from "@/lib/api/admin";
 import { fetchAnimals } from "@/lib/api/animals";
+import { ActionLink } from "@/components/ui/action-link";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 
 export const dynamic = "force-dynamic";
@@ -19,53 +19,64 @@ export default async function AdminDashboardPage() {
   const animalCount = animalsResult.length;
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto px-6 py-8">
-      <Eyebrow className="mb-2">Admin workspace</Eyebrow>
-      <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-8 tracking-[-0.02em] leading-[1.05]">
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-8">
+      <Eyebrow className="mb-3">Admin workspace</Eyebrow>
+      <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl font-medium text-[var(--color-ink)] mb-10 tracking-[-0.02em] leading-[1.05]">
         Dashboard
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <Card variant="hero" className="p-8 flex flex-col gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Adopters stat card */}
+        <Card variant="hero" className="p-8 sm:p-10 flex flex-col gap-8 animate-fade-up">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] mb-2">Total adopters</p>
-            <p className="font-[family-name:var(--font-display)] text-7xl font-medium text-[var(--color-ink)] tracking-[-0.03em] leading-[1]">
+            <Eyebrow className="mb-3">People</Eyebrow>
+            <p className="font-[family-name:var(--font-display)] text-8xl sm:text-9xl font-medium text-[var(--color-ink)] tracking-[-0.04em] leading-[0.9]">
               {adopterCount}
             </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-              {adopterCount === 1
-                ? "1 registered adopter account"
-                : `${adopterCount} registered adopter accounts`}
+            <p className="mt-3 text-lg font-medium text-[var(--color-ink)]">
+              {adopterCount === 1 ? "Registered adopter" : "Registered adopters"}
             </p>
-            <Button as="a" href="/dashboard/admin/adopters" variant="primary" size="md">
-              View all adopters
-            </Button>
+            <p className="mt-1 text-sm text-[var(--color-ink-soft)] leading-relaxed">
+              {adopterCount === 0
+                ? "No adopter accounts yet"
+                : `${adopterCount} adopter${adopterCount === 1 ? "" : "s"} in the system`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <ActionLink href="/dashboard/admin/adopters" variant="chip">
+              View adopters
+            </ActionLink>
+            <ActionLink href="/dashboard/admin/staff" variant="chip">
+              Manage staff
+            </ActionLink>
           </div>
         </Card>
 
-        <Card variant="hero" className="p-8 flex flex-col gap-6">
+        {/* Animals stat card */}
+        <Card variant="hero" className="p-8 sm:p-10 flex flex-col gap-8 animate-fade-up delay-1">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] mb-2">Total animals</p>
-            <p className="font-[family-name:var(--font-display)] text-7xl font-medium text-[var(--color-ink)] tracking-[-0.03em] leading-[1]">
+            <Eyebrow className="mb-3">Animals</Eyebrow>
+            <p className="font-[family-name:var(--font-display)] text-8xl sm:text-9xl font-medium text-[var(--color-ink)] tracking-[-0.04em] leading-[0.9]">
               {animalCount}
             </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-              {animalCount === 1
-                ? "1 animal in the catalog"
-                : `${animalCount} animals in the catalog`}
+            <p className="mt-3 text-lg font-medium text-[var(--color-ink)]">
+              {animalCount === 1 ? "Animal in catalog" : "Animals in catalog"}
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Button as="a" href="/animals" variant="ghost" size="md">
-                View catalog
-              </Button>
-              <Button as="a" href="/animals/new" variant="primary" size="md">
-                Add animal
-              </Button>
-            </div>
+            <p className="mt-1 text-sm text-[var(--color-ink-soft)] leading-relaxed">
+              {animalCount === 0
+                ? "No animals in the catalog yet"
+                : `${animalCount} animal${animalCount === 1 ? "" : "s"} across all statuses`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <ActionLink href="/animals" variant="chip">
+              View catalog
+            </ActionLink>
+            <ActionLink href="/animals/new" variant="chip">
+              Add animal
+            </ActionLink>
           </div>
         </Card>
       </div>
