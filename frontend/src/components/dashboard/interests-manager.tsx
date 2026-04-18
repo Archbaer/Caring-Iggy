@@ -80,11 +80,11 @@ export function InterestsManager({
   const capReached = selectedIds.length >= MAX_INTERESTS;
 
   return (
-    <div className="dashboard-stack">
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Current list</p>
-        <h2 className="panel-title">Interested animals</h2>
-        <p className="panel-copy">
+    <div className="flex flex-col gap-6">
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Current list</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Interested animals</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">
           You can keep up to {MAX_INTERESTS} interested animals in this release. The limit is enforced in the UI and the protected BFF.
         </p>
 
@@ -102,31 +102,31 @@ export function InterestsManager({
         />
       </section>
 
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Catalog</p>
-        <h2 className="panel-title">Add from the animal list</h2>
-        <p className="panel-copy">
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Catalog</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Add from the animal list</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">
           Browse public profiles and save up to {MAX_INTERESTS}. If the cap is full, remove one before adding another.
         </p>
 
         {availableAnimals.length > 0 ? (
-          <div className="dashboard-action-list">
+          <div className="flex flex-col gap-3">
             {availableAnimals.map((animal) => (
-              <div key={animal.id} className="dashboard-inline-card">
+              <div key={animal.id} className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                 <div>
-                  <h3 className="dashboard-subtitle">{animal.name}</h3>
-                  <p className="panel-copy">
+                  <h3 className="text-base font-medium text-[var(--color-ink)]">{animal.name}</h3>
+                  <p className="text-sm text-[var(--color-ink-soft)]">
                     {animal.breed} · {animal.animalType} · {animal.statusLabel}
                   </p>
                 </div>
 
-                <div className="dashboard-inline-actions">
-                  <Link href={`/animals/${animal.id}`} className="link-chip">
+                <div className="flex items-center gap-2">
+                  <Link href={`/animals/${animal.id}`} className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
                     View profile
                   </Link>
                   <button
                     type="button"
-                    className="dashboard-action-button"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                     disabled={capReached || pendingAnimalId === animal.id}
                     onClick={() => {
                       void updateInterests([...selectedIds, animal.id], animal.id);
@@ -139,18 +139,18 @@ export function InterestsManager({
             ))}
           </div>
         ) : (
-          <p className="panel-copy">No additional animal profiles are available to add right now.</p>
+          <p className="text-sm text-[var(--color-ink-soft)]">No additional animal profiles are available to add right now.</p>
         )}
       </section>
 
       {errorMessage ? (
-        <p className="auth-error-banner" aria-live="polite" role="status">
+        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="dashboard-success-banner" aria-live="polite" role="status">
+        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}

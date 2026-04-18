@@ -46,19 +46,19 @@ export default async function DashboardPreferencesPage() {
 
   if (result.kind === "error") {
     return (
-      <div className="page-shell">
-        <section className="page-hero">
-          <p className="eyebrow">Protected route</p>
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
           <h1 className="page-title">Preferences</h1>
           <p className="page-copy">We couldn&apos;t load your saved adopter preferences.</p>
         </section>
 
         <DashboardSectionNav currentPath="/dashboard/preferences" />
 
-        <section className="empty-state">
-          <p className="eyebrow">Preferences error</p>
-          <h2 className="panel-title">Try loading your preferences again.</h2>
-          <p className="panel-copy">{result.message}</p>
+        <section className="flex flex-col gap-3 py-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Preferences error</p>
+          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Try loading your preferences again.</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
           <ActionLink href="/dashboard/preferences" variant="chip">
             Retry preferences
           </ActionLink>
@@ -68,19 +68,19 @@ export default async function DashboardPreferencesPage() {
   }
 
   return (
-    <div className="page-shell">
-      <section className="page-hero dashboard-hero">
-        <div className="dashboard-hero-copy">
-          <p className="eyebrow">Protected route</p>
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8 grid grid-cols-[1.35fr_0.9fr] gap-5 items-start">
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Protected route</p>
           <h1 className="page-title">Preferences</h1>
           <p className="page-copy">
             Tell our team what kind of animal you are looking for — species, breed, age, and anything else that matters to your household.
           </p>
         </div>
 
-        <div className="dashboard-hero-note">
-          <p className="eyebrow">Current summary</p>
-          <p className="panel-copy">
+        <div className="flex flex-col gap-1 text-sm text-[var(--color-ink-soft)]">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Current summary</p>
+          <p className="text-sm text-[var(--color-ink-soft)]">
             {result.profile.preferences.preferredAnimalTypes.length > 0
               ? `Saved: ${result.profile.preferences.preferredAnimalTypes.join(", ")}`
               : "No preferences saved yet."}

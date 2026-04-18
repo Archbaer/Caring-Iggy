@@ -112,21 +112,21 @@ export function PreferencesForm({
   }
 
   return (
-    <form className="dashboard-form" onSubmit={handleSubmit}>
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Animal types</p>
-        <h2 className="panel-title">Preferred profiles</h2>
-        <p className="panel-copy">
+    <form className="grid gap-6" onSubmit={handleSubmit}>
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Animal types</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred profiles</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">
           Select the species you are most interested in adopting.
         </p>
 
         {sortedTypes.length > 0 ? (
-          <div className="dashboard-checkbox-grid">
+          <div className="grid grid-cols-[repeat(auto_fit,minmax(8rem,1fr))] gap-2">
             {sortedTypes.map((animalType) => {
               const checked = selectedTypes.includes(animalType);
 
               return (
-                <label key={animalType} className="dashboard-checkbox-chip">
+                <label key={animalType} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
                   <input
                     type="checkbox"
                     checked={checked}
@@ -144,28 +144,28 @@ export function PreferencesForm({
             })}
           </div>
         ) : (
-          <p className="panel-copy">Animal type options will appear here when the catalog is available.</p>
+          <p className="text-sm text-[var(--color-ink-soft)]">Animal type options will appear here when the catalog is available.</p>
         )}
 
         {fieldErrors.preferredAnimalTypes[0] ? (
-          <p className="auth-field-error">{fieldErrors.preferredAnimalTypes[0]}</p>
+          <p className="text-sm text-red-600">{fieldErrors.preferredAnimalTypes[0]}</p>
         ) : null}
       </section>
 
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Breeds</p>
-        <h2 className="panel-title">Preferred breeds</h2>
-        <p className="panel-copy">
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Breeds</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred breeds</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">
           Select any specific breeds you are interested in. Leave all unchecked to see all breeds.
         </p>
 
         {availableBreeds.length > 0 ? (
-          <div className="dashboard-checkbox-grid">
+          <div className="grid grid-cols-[repeat(auto_fit,minmax(8rem,1fr))] gap-2">
             {availableBreeds.map((breed) => {
               const checked = selectedBreeds.includes(breed);
 
               return (
-                <label key={breed} className="dashboard-checkbox-chip">
+                <label key={breed} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
                   <input
                     type="checkbox"
                     checked={checked}
@@ -183,22 +183,22 @@ export function PreferencesForm({
             })}
           </div>
         ) : (
-          <p className="panel-copy">No breed options available right now.</p>
+          <p className="text-sm text-[var(--color-ink-soft)]">No breed options available right now.</p>
         )}
       </section>
 
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Age range</p>
-        <h2 className="panel-title">Preferred age window</h2>
-        <div className="auth-grid">
-          <label className="auth-field" htmlFor="preference-min-age">
-            <span className="auth-label">Minimum age</span>
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Age range</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred age window</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <label className="flex flex-col gap-1.5" htmlFor="preference-min-age">
+            <span className="text-sm font-medium text-[var(--color-ink)]">Minimum age</span>
             <input
               id="preference-min-age"
               type="number"
               min="0"
               step="1"
-              className="auth-input"
+              className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
               value={minAge}
               aria-invalid={fieldErrors.minAge.length > 0}
               onChange={(event) => {
@@ -206,18 +206,18 @@ export function PreferencesForm({
               }}
             />
             {fieldErrors.minAge[0] ? (
-              <span className="auth-field-error">{fieldErrors.minAge[0]}</span>
+              <span className="text-sm text-red-600">{fieldErrors.minAge[0]}</span>
             ) : null}
           </label>
 
-          <label className="auth-field" htmlFor="preference-max-age">
-            <span className="auth-label">Maximum age</span>
+          <label className="flex flex-col gap-1.5" htmlFor="preference-max-age">
+            <span className="text-sm font-medium text-[var(--color-ink)]">Maximum age</span>
             <input
               id="preference-max-age"
               type="number"
               min="0"
               step="1"
-              className="auth-input"
+              className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
               value={maxAge}
               aria-invalid={fieldErrors.maxAge.length > 0}
               onChange={(event) => {
@@ -225,23 +225,23 @@ export function PreferencesForm({
               }}
             />
             {fieldErrors.maxAge[0] ? (
-              <span className="auth-field-error">{fieldErrors.maxAge[0]}</span>
+              <span className="text-sm text-red-600">{fieldErrors.maxAge[0]}</span>
             ) : null}
           </label>
         </div>
       </section>
 
-      <section className="panel dashboard-form-panel">
-        <p className="eyebrow">Additional context</p>
-        <h2 className="panel-title">Tell us about your home</h2>
-        <p className="panel-copy">
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Additional context</p>
+        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Tell us about your home</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">
           Include relevant details about your living situation, schedule, other pets, and what you are looking for in a companion. The more specific you are, the better we can match you.
         </p>
-        <label className="auth-field" htmlFor="preference-notes">
-          <span className="auth-label">Additional notes <span className="auth-label-hint">(max 500 characters)</span></span>
+        <label className="flex flex-col gap-1.5" htmlFor="preference-notes">
+          <span className="text-sm font-medium text-[var(--color-ink)]">Additional notes <span className="text-xs text-[var(--color-ink-soft)]">(max 500 characters)</span></span>
           <textarea
             id="preference-notes"
-            className="dashboard-textarea"
+            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200 resize-none"
             rows={5}
             maxLength={500}
             value={notes}
@@ -251,31 +251,31 @@ export function PreferencesForm({
             }}
             placeholder="e.g. I have a large backyard, no other pets, work from home, looking for a calm dog around 2–5 years old..."
           />
-          <div className="auth-field-footer">
-            <span className="auth-char-count" aria-live="polite">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[var(--color-ink-soft)]" aria-live="polite">
               {notes.length}/500
             </span>
             {fieldErrors.notes[0] ? (
-              <span className="auth-field-error">{fieldErrors.notes[0]}</span>
+              <span className="text-sm text-red-600">{fieldErrors.notes[0]}</span>
             ) : null}
           </div>
         </label>
       </section>
 
       {errorMessage ? (
-        <p className="auth-error-banner" aria-live="polite" role="status">
+        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="dashboard-success-banner" aria-live="polite" role="status">
+        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}
 
-      <div className="auth-actions">
-        <button type="submit" className="auth-submit" disabled={isPending}>
+      <div className="flex flex-wrap gap-3 items-center">
+        <button type="submit" className="ci-btn ci-btn--primary" disabled={isPending}>
           {isPending ? "Saving..." : "Save preferences"}
         </button>
       </div>

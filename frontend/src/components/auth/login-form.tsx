@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, login } from "@/lib/api/auth";
-import { resolveAuthenticatedRedirectForRole } from "@/lib/auth/role-check";
+import { defaultRouteForRole } from "@/lib/auth/role-check";
 
 type LoginFields = {
   email: string;
@@ -60,7 +60,7 @@ export function LoginForm() {
       const result = await login(fields, token);
       csrfTokenRef.current = result.csrfToken;
       router.replace(
-        resolveAuthenticatedRedirectForRole(result.user.role, searchParams.get("redirect")),
+        defaultRouteForRole(result.user.role),
       );
       router.refresh();
     } catch (error) {

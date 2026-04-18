@@ -6,6 +6,7 @@ import type { AnimalSummaryView } from "@/lib/api/animals";
 type AnimalCardProps = {
   animal: AnimalSummaryView;
   enterIndex?: number;
+  canEdit?: boolean;
 };
 
 function statusToBadge(status: string): string {
@@ -24,7 +25,7 @@ function statusToBadge(status: string): string {
   }
 }
 
-export function AnimalCard({ animal, enterIndex }: AnimalCardProps) {
+export function AnimalCard({ animal, enterIndex, canEdit }: AnimalCardProps) {
   const staggerClass = enterIndex !== undefined ? `delay-${(enterIndex % 5) + 1}` : "";
 
   return (
@@ -75,7 +76,7 @@ export function AnimalCard({ animal, enterIndex }: AnimalCardProps) {
         <p className="ci-card__meta text-sm text-[var(--color-ink-soft)] mb-4">
           {animal.breed} · {animal.animalType}
         </p>
-        <div className="ci-card__actions">
+        <div className="ci-card__actions flex gap-2">
           <Link
             href={`/animals/${animal.id}`}
             className="
@@ -89,6 +90,14 @@ export function AnimalCard({ animal, enterIndex }: AnimalCardProps) {
           >
             View profile
           </Link>
+          {canEdit && (
+            <Link
+              href={`/animals/${animal.id}/edit`}
+              className="ci-btn ci-btn--ghost-sm"
+            >
+              Edit
+            </Link>
+          )}
         </div>
       </div>
     </article>
