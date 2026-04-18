@@ -152,18 +152,18 @@ services:
       dockerfile: Dockerfile
     container_name: caring-iggy-frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
       USER_SERVICE_URL: ${USER_SERVICE_URL:-http://user-service:8085}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
-    depends_on:
-      animal-service:
-        condition: service_healthy
-      user-service:
-        condition: service_healthy
-      adopter-service:
-        condition: service_healthy
+    volumes:
+      - ../frontend/src:/app/src:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres-animals-data:

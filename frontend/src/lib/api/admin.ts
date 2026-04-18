@@ -1,7 +1,10 @@
 import type { BffError } from "@/lib/types";
+import { cookies } from "next/headers";
 
 import { fetchAnimal } from "@/lib/api/animals";
 import { serviceUrl } from "@/lib/api/client";
+import { serializeBackendSessionCookie } from "@/lib/auth/server";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
 interface BackendAdopterDto {
   id: string;
@@ -121,8 +124,15 @@ export class AdminApiError extends Error {
 }
 
 export async function fetchAdminAdopters(): Promise<AdminAdopterSummary[]> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("ADOPTER", "/api/adopters"), {
+    credentials: "same-origin",
     cache: "no-store",
+    headers: sessionToken
+      ? { cookie: serializeBackendSessionCookie(sessionToken) }
+      : {},
   });
 
   if (!response.ok) {
@@ -139,10 +149,20 @@ export async function fetchAdminAdopters(): Promise<AdminAdopterSummary[]> {
 export async function fetchAdminAdopterDetail(
   adopterId: string,
 ): Promise<AdminAdopterDetail> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+  const cookieHeader = sessionToken ? `${SESSION_COOKIE_NAME}=${sessionToken}` : null;
+
   const [profileResponse, historyResponse] = await Promise.all([
-    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), { cache: "no-store" }),
-    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}/history`), {
+    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
+      credentials: "same-origin",
       cache: "no-store",
+      headers: cookieHeader ? { cookie: cookieHeader } : {},
+    }),
+    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}/history`), {
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: cookieHeader ? { cookie: cookieHeader } : {},
     }),
   ]);
 
@@ -177,9 +197,15 @@ export async function fetchAdminAdopterDetail(
 }
 
 export async function fetchAdminEmployees(): Promise<AdminEmployeeSummary[]> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("USER", "/api/employees"), {
     credentials: "same-origin",
     cache: "no-store",
+    headers: sessionToken
+      ? { cookie: serializeBackendSessionCookie(sessionToken) }
+      : {},
   });
 
   if (!response.ok) {
@@ -196,9 +222,15 @@ export async function fetchAdminEmployees(): Promise<AdminEmployeeSummary[]> {
 export async function fetchAdminEmployeeDetail(
   employeeId: string,
 ): Promise<AdminEmployeeDetail> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
     credentials: "same-origin",
     cache: "no-store",
+    headers: sessionToken
+      ? { cookie: serializeBackendSessionCookie(sessionToken) }
+      : {},
   });
 
   if (!response.ok) {
@@ -215,11 +247,17 @@ export async function fetchAdminEmployeeDetail(
 export async function provisionStaff(
   body: ProvisionStaffRequest,
 ): Promise<Pick<AdminEmployeeSummary, "role"> & { accountId?: string; profileId?: string }> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const path = body.role === "ADMIN" ? "/api/auth/provision/admin" : "/api/auth/provision/staff";
   const response = await fetch(serviceUrl("USER", path), {
     credentials: "same-origin",
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(sessionToken ? { cookie: `${SESSION_COOKIE_NAME}=${sessionToken}` } : {}),
+    },
     body: JSON.stringify(body),
   });
 

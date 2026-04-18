@@ -634,7 +634,7 @@ function splitSetCookieHeader(value: string): string[] {
   return cookies;
 }
 
-function serializeBackendSessionCookie(sessionToken: string): string {
+export function serializeBackendSessionCookie(sessionToken: string): string {
   return `${AUTH_BACKEND_SESSION_COOKIE_NAME}=${encodeURIComponent(sessionToken)}`;
 }
 

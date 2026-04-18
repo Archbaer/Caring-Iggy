@@ -1,5 +1,6 @@
 import { ActionLink } from "@/components/ui/action-link";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import {
   fetchAdminEmployees,
   type AdminEmployeeSummary,
@@ -12,66 +13,96 @@ type AdminStaffResult =
   | { kind: "success"; employees: AdminEmployeeSummary[] }
   | { kind: "error"; message: string };
 
+function getRoleBadgeVariant(role: string): "admin" | "staff" | "volunteer" | "muted" {
+  switch (role.toUpperCase()) {
+    case "ADMIN":     return "admin";
+    case "STAFF":     return "staff";
+    case "VOLUNTEER": return "volunteer";
+    default:          return "muted";
+  }
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export default async function AdminStaffPage() {
   await getRequiredRoleSession("ADMIN");
   const result = await loadAdminStaff();
 
-  if (result.kind === "error") {
-    return (
-      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Employee records</p>
-          <h1 className="page-title">Staff management</h1>
-          <p className="page-copy">
-            The employee directory could not be loaded right now. Please try again in a moment.
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-3 py-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Directory error</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">We couldn&apos;t load employee records.</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
-        </section>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Employee records</p>
-        <h1 className="page-title">Staff management</h1>
-        <p className="page-copy">
+    <div className="ci-admin-canvas">
+      {/* Page header */}
+      <div className="ci-admin-page-header animate-fade-up">
+        <Eyebrow className="mb-3">Employee records</Eyebrow>
+        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-2 tracking-[-0.02em] leading-[1.05]">
+          Staff management
+        </h1>
+        <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
           Manage shelter staff and administrator accounts. Create, update, or deactivate employee access.
         </p>
-      </section>
+      </div>
 
-      {result.employees.length > 0 ? (
-        <section className="grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-4">
+      {result.kind === "error" ? (
+        <div className="ci-admin-page-header animate-fade-up delay-1 text-center">
+          <Eyebrow className="mb-3">Directory error</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+            We couldn&apos;t load employee records.
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
+        </div>
+      ) : result.employees.length > 0 ? (
+        <div className="ci-staff-grid animate-fade-up delay-1">
           {result.employees.map((employee) => (
-            <Card key={employee.id} variant="route">
-              <span className="ci-badge">{employee.role}</span>
-              <h2 className="text-lg font-semibold text-[var(--color-ink)]">{employee.name}</h2>
-              <p className="text-sm text-[var(--color-ink-soft)]">
-                {employee.email}
-                {employee.telephone ? ` · ${employee.telephone}` : ""}
-              </p>
-              <div className="flex flex-wrap gap-2">
+            <div key={employee.id} className="ci-staff-card">
+              {/* Role badge */}
+              <Badge variant={getRoleBadgeVariant(employee.role)}>
+                {employee.role}
+              </Badge>
+
+              {/* Avatar + name row */}
+              <div className="flex items-center gap-4">
+                <div className="ci-staff-avatar">
+                  <span className="font-[family-name:var(--font-display)] text-xl text-[var(--color-primary)]">
+                    {getInitials(employee.name)}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] tracking-[-0.02em] truncate">
+                    {employee.name}
+                  </h2>
+                  <p className="text-sm text-[var(--color-ink-soft)] truncate">
+                    {employee.email}
+                  </p>
+                  {employee.telephone && (
+                    <p className="text-xs text-[var(--color-ink-faint)] mt-0.5">
+                      · {employee.telephone}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Action */}
+              <div className="mt-auto pt-2">
                 <ActionLink href={`/dashboard/admin/staff/${employee.id}`} variant="chip">
                   Open record
                 </ActionLink>
               </div>
-            </Card>
+            </div>
           ))}
-        </section>
+        </div>
       ) : (
-        <section className="flex flex-col gap-3 py-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">No employee records</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">No staff accounts yet.</h2>
+        <div className="ci-admin-page-header animate-fade-up delay-1 text-center">
+          <Eyebrow className="mb-3">No employee records</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+            No staff accounts yet.
+          </h2>
           <p className="text-sm text-[var(--color-ink-soft)]">
             Staff and admin accounts will appear here once created.
           </p>
-        </section>
+        </div>
       )}
     </div>
   );
