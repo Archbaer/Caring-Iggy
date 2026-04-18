@@ -178,6 +178,7 @@ export async function fetchAdminAdopterDetail(
 
 export async function fetchAdminEmployees(): Promise<AdminEmployeeSummary[]> {
   const response = await fetch(serviceUrl("USER", "/api/employees"), {
+    credentials: "same-origin",
     cache: "no-store",
   });
 
@@ -196,6 +197,7 @@ export async function fetchAdminEmployeeDetail(
   employeeId: string,
 ): Promise<AdminEmployeeDetail> {
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+    credentials: "same-origin",
     cache: "no-store",
   });
 
@@ -215,6 +217,7 @@ export async function provisionStaff(
 ): Promise<Pick<AdminEmployeeSummary, "role"> & { accountId?: string; profileId?: string }> {
   const path = body.role === "ADMIN" ? "/api/auth/provision/admin" : "/api/auth/provision/staff";
   const response = await fetch(serviceUrl("USER", path), {
+    credentials: "same-origin",
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -261,6 +264,7 @@ export async function updateStaff(
   body: UpdateStaffRequest,
 ): Promise<AdminEmployeeDetail> {
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+    credentials: "same-origin",
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -279,6 +283,7 @@ export async function updateStaff(
 
 export async function deleteStaff(employeeId: string): Promise<void> {
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+    credentials: "same-origin",
     method: "DELETE",
   });
 
