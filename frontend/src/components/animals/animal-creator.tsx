@@ -422,6 +422,8 @@ export function AnimalCreator() {
           </div>
         </div>
         </form>
+        </Card>
+
         {errorMessage ? (
           <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
             {errorMessage}
@@ -433,7 +435,6 @@ export function AnimalCreator() {
             {successMessage}
           </p>
         ) : null}
-        </Card>
       </div>
     </div>
   );
