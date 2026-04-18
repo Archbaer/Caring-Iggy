@@ -406,28 +406,36 @@ export function AnimalCreator() {
               />
             </label>
           </div>
-        </div>
 
-          <div className="auth-actions" style={{ justifyContent: "center" }}>
-            <button type="submit" className="auth-submit" disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create animal record"}
-            </button>
+          <div className="flex gap-4">
+            <Button type="submit" variant="primary" className="flex-1" disabled={isCreating}>
+              {isCreating ? "Creating..." : "Add Animal"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => router.push("/animals")}
+            >
+              Cancel
+            </Button>
           </div>
+        </div>
         </form>
         </Card>
+
+        {errorMessage ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+            {errorMessage}
+          </p>
+        ) : null}
+
+        {successMessage ? (
+          <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
+            {successMessage}
+          </p>
+        ) : null}
       </div>
-
-      {errorMessage ? (
-        <p className="auth-error-banner" aria-live="polite" role="status">
-          {errorMessage}
-        </p>
-      ) : null}
-
-      {successMessage ? (
-        <p className="dashboard-success-banner" aria-live="polite" role="status">
-          {successMessage}
-        </p>
-      ) : null}
     </div>
   );
 
