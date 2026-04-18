@@ -10,6 +10,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalForView } from "@/lib/api/animals";
 import { getCurrentSession } from "@/lib/auth/server-session";
+import { MAX_INTERESTS } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -119,6 +120,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
   const { animal } = result;
   const canEditAnimal = session?.role === "STAFF" || session?.role === "ADMIN";
   const isRegistered = profile?.interests.some((i) => i.animalId === animal.id) ?? false;
+  const isAtCapacity = (profile?.interests.length ?? 0) >= MAX_INTERESTS;
   const editorSlot = canEditAnimal
     ? await renderEditorSlot(animal, session.role === "ADMIN" ? "ADMIN" : "STAFF")
     : undefined;
@@ -167,7 +169,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           )}
 
           <div className="mt-6 flex gap-3 flex-wrap">
-            <RegisterInterestButton animalId={animal.id} animalName={animal.name} isRegistered={isRegistered} />
+            <RegisterInterestButton animalId={animal.id} animalName={animal.name} isRegistered={isRegistered} isAtCapacity={isAtCapacity} />
           </div>
         </div>
       </div>
