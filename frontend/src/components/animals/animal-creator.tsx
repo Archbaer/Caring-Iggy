@@ -175,284 +175,238 @@ export function AnimalCreator() {
         <Card variant="panel" className="p-0 overflow-hidden">
 
         <form className="dashboard-form" onSubmit={handleCreateSubmit}>
-          <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Name</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.name}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        name: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Animal type</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.animalType}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        animalType: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="name">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
+                <input
+                  id="name"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.name}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, name: event.target.value }))
+                  }
+                  required
+                />
+              </label>
             </div>
 
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Breed</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.breed}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        breed: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Status</span>
-                  <select
-                    className="auth-input"
-                    value={createForm.status}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        status: event.target.value as AnimalStatusCode,
-                      }))
-                    }
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="animalType">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Animal type</span>
+                <input
+                  id="animalType"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.animalType}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, animalType: event.target.value }))
+                  }
+                />
+              </label>
             </div>
 
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Gender</span>
-                  <select
-                    className="auth-input"
-                    value={createForm.gender}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        gender: event.target.value as AnimalGender | "",
-                      }))
-                    }
-                  >
-                    <option value="">Unspecified</option>
-                    {GENDER_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Size</span>
-                  <select
-                    className="auth-input"
-                    value={createForm.size}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        size: event.target.value as AnimalSize | "",
-                      }))
-                    }
-                  >
-                    <option value="">Unspecified</option>
-                    {SIZE_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="breed">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Breed</span>
+                <input
+                  id="breed"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.breed}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, breed: event.target.value }))
+                  }
+                />
+              </label>
             </div>
 
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Date of birth</span>
-                  <input
-                    type="date"
-                    className="auth-input"
-                    value={createForm.dateOfBirth}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        dateOfBirth: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Intake date</span>
-                  <input
-                    type="date"
-                    className="auth-input"
-                    value={createForm.intakeDate}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        intakeDate: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="status">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Status</span>
+                <select
+                  id="status"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.status}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))
+                  }
+                >
+                  {STATUS_OPTIONS.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
             </div>
 
-            <div>
-              <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                <label className="auth-field">
-                  <span className="auth-label">Temperament</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.temperament}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        temperament: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="gender">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Gender</span>
+                <select
+                  id="gender"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.gender}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))
+                  }
+                >
+                  <option value="">Unspecified</option>
+                  {GENDER_OPTIONS.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
             </div>
 
-            <div>
-              <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                <label className="auth-field">
-                  <span className="auth-label">Image URL</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.imageUrl}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        imageUrl: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="size">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Size</span>
+                <select
+                  id="size"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.size}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))
+                  }
+                >
+                  <option value="">Unspecified</option>
+                  {SIZE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
             </div>
 
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Previous owner name</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.previousOwnerName}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        previousOwnerName: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Previous owner telephone</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.previousOwnerTelephone}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        previousOwnerTelephone: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="dateOfBirth">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Date of birth</span>
+                <input
+                  id="dateOfBirth"
+                  type="date"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.dateOfBirth}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))
+                  }
+                />
+              </label>
             </div>
 
-            <div>
-              <div
-                className="auth-grid"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <label className="auth-field">
-                  <span className="auth-label">Previous owner email</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.previousOwnerEmail}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        previousOwnerEmail: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="auth-field">
-                  <span className="auth-label">Previous owner address</span>
-                  <input
-                    className="auth-input"
-                    value={createForm.previousOwnerAddress}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        previousOwnerAddress: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="intakeDate">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Intake date</span>
+                <input
+                  id="intakeDate"
+                  type="date"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.intakeDate}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="flex flex-col gap-1.5" htmlFor="temperament">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Temperament</span>
+                <input
+                  id="temperament"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.temperament}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, temperament: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="flex flex-col gap-1.5" htmlFor="imageUrl">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Image URL</span>
+                <input
+                  id="imageUrl"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.imageUrl}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerName">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner name</span>
+                <input
+                  id="previousOwnerName"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.previousOwnerName}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerTelephone">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner telephone</span>
+                <input
+                  id="previousOwnerTelephone"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.previousOwnerTelephone}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerEmail">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner email</span>
+                <input
+                  id="previousOwnerEmail"
+                  type="email"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.previousOwnerEmail}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerAddress">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner address</span>
+                <input
+                  id="previousOwnerAddress"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={createForm.previousOwnerAddress}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))
+                  }
+                />
+              </label>
             </div>
           </div>
 
-          <label className="auth-field">
-            <span className="auth-label">Description</span>
-            <textarea
-              className="dashboard-textarea"
-              rows={4}
-              value={createForm.description}
-              onChange={(event) =>
-                setCreateForm((current) => ({
-                  ...current,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </label>
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="description">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Description</span>
+              <textarea
+                id="description"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200 resize-none"
+                rows={4}
+                value={createForm.description}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, description: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+        </div>
 
           <div className="auth-actions" style={{ justifyContent: "center" }}>
             <button type="submit" className="auth-submit" disabled={isCreating}>
