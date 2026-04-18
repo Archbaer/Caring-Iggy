@@ -29,14 +29,14 @@ export function InterestStatusList({
     <ul className="flex flex-col gap-3">
       {animals.map((animal) => (
         <li key={animal.id} className="flex flex-col gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-medium text-[var(--color-ink)]">{animal.name}</h3>
               <p className="text-sm text-[var(--color-ink-soft)]">
                 {animal.breed} · {animal.animalType}
               </p>
             </div>
-            <span className="ci-badge">{animal.statusLabel}</span>
+            <span className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--color-surface-warm)] text-[var(--color-ink-faint)] px-2.5 py-1 text-xs font-medium min-w-[7rem] flex-shrink-0">{animal.statusLabel}</span>
             {onRemove ? (
               <button
                 type="button"

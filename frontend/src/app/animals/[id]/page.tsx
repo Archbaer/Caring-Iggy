@@ -3,6 +3,11 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AnimalImage } from "@/components/animals/animal-image";
+import { RegisterInterestButton } from "@/components/animals/register-interest-button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalForView } from "@/lib/api/animals";
 import { getCurrentSession } from "@/lib/auth/server-session";
 
@@ -37,7 +42,9 @@ async function loadAnimal(id: string): Promise<AnimalDetailResult> {
   }
 }
 
-function statusToBadge(status: string): string {
+function statusToBadgeVariant(
+  status: string,
+): "available" | "pending" | "adopted" | "muted" {
   switch (status) {
     case "AVAILABLE":
       return "available";
@@ -56,18 +63,24 @@ function statusToBadge(status: string): string {
 function DetailPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-4">
-      <p className="ci-label mb-3">{title}</p>
+      <Eyebrow className="mb-3">{title}</Eyebrow>
       <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
 }
 
-function DetailItem({ label, value }: { label: string; value?: string | null }) {
+function DetailItem({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | null;
+}) {
   if (!value) return null;
   return (
-    <div className="flex justify-between gap-3">
-      <span className="ci-body-sm" style={{ color: "var(--color-ink-faint)" }}>{label}</span>
-      <span className="ci-body-sm" style={{ color: "var(--color-ink)" }}>{value}</span>
+    <div className="flex justify-between gap-3 text-sm">
+      <span className="text-[var(--color-ink-faint)]">{label}</span>
+      <span className="text-[var(--color-ink)] font-medium">{value}</span>
     </div>
   );
 }
@@ -75,7 +88,12 @@ function DetailItem({ label, value }: { label: string; value?: string | null }) 
 export default async function AnimalDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const [result, session] = await Promise.all([loadAnimal(id), getCurrentSession()]);
+  const session = await getCurrentSession();
+
+  const [result, profile] = await Promise.all([
+    loadAnimal(id),
+    session?.profileId ? fetchAdopterProfile(session.profileId) : null,
+  ]);
 
   if (result.kind === "not-found") {
     notFound();
@@ -84,11 +102,15 @@ export default async function AnimalDetailPage({ params }: PageProps) {
   if (result.kind === "error") {
     return (
       <div className="max-w-[var(--max-width-content)] mx-auto px-6 py-8">
-        <div className="ci-card p-6 text-center">
-          <p className="ci-label mb-2">Profile error</p>
-          <h1 className="ci-h1 mb-3">Animal profile unavailable.</h1>
-          <p className="ci-body mb-4">{result.message}</p>
-          <Link href="/animals" className="ci-btn ci-btn--primary">Back to animals</Link>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 text-center">
+          <Eyebrow className="mb-3">Profile error</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-4 tracking-[-0.02em] leading-[1.05]">
+            Animal profile unavailable.
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] mb-5">{result.message}</p>
+          <Button as="a" href="/animals" variant="primary">
+            Back to animals
+          </Button>
         </div>
       </div>
     );
@@ -96,20 +118,24 @@ export default async function AnimalDetailPage({ params }: PageProps) {
 
   const { animal } = result;
   const canEditAnimal = session?.role === "STAFF" || session?.role === "ADMIN";
+  const isRegistered = profile?.interests.some((i) => i.animalId === animal.id) ?? false;
   const editorSlot = canEditAnimal
-    ? await renderEditorSlot(
-        animal,
-        session.role === "ADMIN" ? "ADMIN" : "STAFF",
-      )
+    ? await renderEditorSlot(animal, session.role === "ADMIN" ? "ADMIN" : "STAFF")
     : undefined;
 
   return (
     <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-8 pb-8">
-      <Link href="/animals" className="ci-btn ci-btn--ghost-sm inline-flex mb-5">
+      <Link
+        href="/animals"
+        className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] transition-all duration-200 mb-5"
+      >
         Back to animals
       </Link>
 
-      <div className="grid gap-7 mb-7 items-start" style={{ gridTemplateColumns: "1fr 1fr" }}>
+      <div
+        className="grid gap-7 mb-7 items-start"
+        style={{ gridTemplateColumns: "1fr 1fr" }}
+      >
         <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] shadow-xl">
           <AnimalImage
             imageUrl={animal.imageUrl}
@@ -120,33 +146,46 @@ export default async function AnimalDetailPage({ params }: PageProps) {
         </div>
 
         <div>
-          <span className={`ci-badge ci-badge--${statusToBadge(animal.status)} inline-flex mb-3`}>
+          <Badge
+            variant={statusToBadgeVariant(animal.status)}
+            className="mb-3"
+          >
             {animal.statusLabel}
-          </span>
-          <h1 className="ci-h1 mb-3">{animal.name}</h1>
-          <p className="ci-body-lg">{animal.breed} · {animal.animalType}{animal.age ? ` · ${animal.age} years old` : ""}</p>
+          </Badge>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-3 tracking-[-0.02em] leading-[1.05]">
+            {animal.name}
+          </h1>
+          <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
+            {animal.breed} · {animal.animalType}
+            {animal.age ? ` · ${animal.age} years old` : ""}
+          </p>
 
           {animal.temperament && (
-            <p className="mt-4 italic" style={{ fontFamily: "var(--font-body)", fontSize: "0.9375rem", color: "var(--color-ink-soft)" }}>
+            <p className="mt-4 italic text-base text-[var(--color-ink-soft)] leading-relaxed">
               &ldquo;{animal.temperament}&rdquo;
             </p>
           )}
 
           <div className="mt-6 flex gap-3 flex-wrap">
-            <button className="ci-btn ci-btn--accent ci-btn--lg">I&apos;m interested in {animal.name}</button>
-            <button className="ci-btn ci-btn--ghost ci-btn--lg">Save for later</button>
+            <RegisterInterestButton animalId={animal.id} animalName={animal.name} isRegistered={isRegistered} />
           </div>
         </div>
       </div>
 
       <div className="max-w-[65ch] mb-7">
-        <h2 className="ci-h3 mb-3">About {animal.name}</h2>
-        <p className="ci-body-lg">
-          {animal.description?.trim() || `A biography has not been published for ${animal.name} yet. Contact us to learn more.`}
+        <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-3 tracking-[-0.02em] leading-[1.2]">
+          About {animal.name}
+        </h2>
+        <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
+          {animal.description?.trim() ||
+            `A biography has not been published for ${animal.name} yet. Contact us to learn more.`}
         </p>
       </div>
 
-      <div className="grid gap-5 mb-7" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}>
+      <div
+        className="grid gap-5 mb-7"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}
+      >
         <DetailPanel title="Details">
           <DetailItem label="Breed" value={animal.breed} />
           <DetailItem label="Type" value={animal.animalType} />
@@ -156,7 +195,9 @@ export default async function AnimalDetailPage({ params }: PageProps) {
         </DetailPanel>
         {animal.temperament && (
           <DetailPanel title="Temperament">
-            <p className="ci-body">{animal.temperament}</p>
+            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+              {animal.temperament}
+            </p>
           </DetailPanel>
         )}
       </div>
