@@ -20,6 +20,10 @@ export default async function DashboardPage() {
     redirect(`${LOGIN_ROUTE}?redirect=/dashboard`);
   }
 
+  if (session.role === "ADMIN") {
+    redirect("/dashboard/admin");
+  }
+
   if (session.role !== "ADOPTER") {
     return (
       <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
@@ -66,40 +70,6 @@ export default async function DashboardPage() {
               </ActionLink>
             </div>
           </Card>
-
-          {session.role === "ADMIN" ? (
-            <>
-              <Card variant="route">
-                <Eyebrow>Adopter records</Eyebrow>
-                <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
-                  Adopter management
-                </h2>
-                <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-                  View and manage adopter profiles and interest history.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <ActionLink href="/dashboard/admin/adopters" variant="chip">
-                    Adopter records
-                  </ActionLink>
-                </div>
-              </Card>
-
-              <Card variant="route">
-                <Eyebrow>Employee records</Eyebrow>
-                <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
-                  Staff management
-                </h2>
-                <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-                  Open employee directory and edit administrator access.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <ActionLink href="/dashboard/admin/staff" variant="chip">
-                    Staff records
-                  </ActionLink>
-                </div>
-              </Card>
-            </>
-          ) : null}
         </section>
       </div>
     );
