@@ -2674,15 +2674,30 @@ a {
   }
 }
 
-/* Stat card icon badge circle */
+/* Stat card icon badge circle — subtle 40px */
 .ci-stat-icon-badge {
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+/* Stat card — whole card clickable */
+.ci-stat-card {
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ci-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 /* Staff card */

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
+import { Badge } from "@/components/ui/badge";
+import { HeaderNav } from "./header-nav";
 
 export async function PublicHeader() {
   const session = await getCurrentSession();
@@ -19,7 +21,7 @@ export async function PublicHeader() {
           Caring Iggy
         </Link>
 
-        {/* Nav */}
+        {/* Nav — client component handles active state */}
         <nav className="hidden sm:flex items-center gap-2" aria-label="Primary">
           <Link
             href="/animals"
@@ -44,15 +46,10 @@ export async function PublicHeader() {
 
           {session ? (
             <>
-              <Link
-                href={dashboardLink}
-                className="px-4 py-2 rounded-full text-sm font-medium text-[var(--color-ink-soft)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-all duration-200"
-              >
-                Dashboard
-              </Link>
-              <span className="ci-badge ci-badge--muted text-xs">
+              <HeaderNav dashboardLink={dashboardLink} />
+              <Badge variant="muted">
                 {session.role}
-              </span>
+              </Badge>
               <LogoutButton />
             </>
           ) : (
@@ -65,7 +62,7 @@ export async function PublicHeader() {
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 rounded-full text-sm font-semibold bg-[var(--color-ink)] text-[var(--color-canvas)] hover:bg-[var(--color-primary)] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] transition-all duration-200"
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] transition-all duration-200"
               >
                 Sign up
               </Link>
@@ -73,7 +70,7 @@ export async function PublicHeader() {
           )}
         </nav>
 
-        {/* Mobile menu hint — simplified for now */}
+        {/* Mobile menu hint */}
         <button
           aria-label="Open menu"
           className="sm:hidden p-2 rounded-lg text-[var(--color-ink-soft)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-colors duration-200"
