@@ -10,7 +10,9 @@ type StatCardProps = {
   singular: string;
   plural: string;
   subtext: string;
-  links: Array<{ label: string; href: string }>;
+  href: string;
+  hint: string;
+  twoActions?: { label: string; href: string };
 };
 
 export function StatCard({
@@ -22,14 +24,19 @@ export function StatCard({
   singular,
   plural,
   subtext,
-  links,
+  href,
+  hint,
+  twoActions,
 }: StatCardProps) {
   const label = value === 1 ? singular : plural;
 
   return (
-    <div className="ci-staff-card rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-8 flex flex-col gap-6 animate-fade-up">
-      {/* Header row: icon badge + eyebrow */}
-      <div className="flex items-center gap-3">
+    <Link
+      href={href}
+      className="ci-stat-card group flex flex-col rounded-2xl border border-[var(--color-border)] p-6 gap-4 animate-fade-up"
+    >
+      {/* Centered icon badge */}
+      <div className="flex flex-col items-center gap-3">
         <div className={`ci-stat-icon-badge ${iconBg}`}>
           <span className={iconColor}>{icon}</span>
         </div>
@@ -39,7 +46,7 @@ export function StatCard({
       </div>
 
       {/* Stat number */}
-      <div className="text-center py-2">
+      <div className="text-center">
         <div className="font-[family-name:var(--font-display)] text-7xl font-medium text-[var(--color-ink)] tracking-[-0.04em] leading-[0.9]">
           {value}
         </div>
@@ -51,18 +58,31 @@ export function StatCard({
         </p>
       </div>
 
-      {/* Action links */}
-      <div className="grid grid-cols-2 gap-3 mt-auto">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-center text-xs font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] active:scale-95 transition-all duration-200"
-          >
-            {link.label}
-          </Link>
-        ))}
+      {/* Bottom action hint / dual buttons */}
+      <div className="mt-auto pt-2 border-t border-[var(--color-border)]">
+        {twoActions ? (
+          <div className="flex gap-2">
+            <Link
+              href={twoActions.href}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-center text-xs font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] active:scale-95 transition-all duration-200"
+            >
+              {twoActions.label}
+            </Link>
+            <Link
+              href={href}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-center text-xs font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] active:scale-95 transition-all duration-200"
+            >
+              {hint}
+            </Link>
+          </div>
+        ) : (
+          <p className="text-center text-xs font-medium text-[var(--color-ink-faint)] group-hover:text-[var(--color-accent)] transition-colors duration-200">
+            {hint}
+          </p>
+        )}
       </div>
-    </div>
+    </Link>
   );
 }
