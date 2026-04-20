@@ -4,7 +4,7 @@ export const LOGIN_ROUTE = "/login";
 export const SIGNUP_ROUTE = "/signup";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const ADMIN_ROUTE_PREFIX = "/dashboard/admin";
-export const ADMIN_DEFAULT_ROUTE = "/dashboard/admin/adopters";
+export const ADMIN_DEFAULT_ROUTE = "/dashboard/admin";
 export const STAFF_DEFAULT_ROUTE = "/dashboard";
 
 export type PathAccessDecision =

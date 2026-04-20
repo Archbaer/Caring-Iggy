@@ -1,7 +1,6 @@
-import { Users, Briefcase, PawPrint } from "lucide-react";
-
+import { ActionLink } from "@/components/ui/action-link";
+import { Card } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { StatCard } from "@/components/ui/stat-card";
 import {
   fetchAdminAdopters,
   fetchAdminEmployees,
@@ -25,81 +24,91 @@ export default async function AdminDashboardPage() {
   const animalCount = animalsResult.length;
 
   return (
-    <div className="ci-admin-canvas">
-      {/* Page header — contained in card */}
-      <div className="ci-admin-page-header animate-fade-up">
-        <Eyebrow className="mb-3">Admin workspace</Eyebrow>
-        <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl font-medium text-[var(--color-ink)] mb-2 tracking-[-0.02em] leading-[1.05]">
-          Dashboard
-        </h1>
-        <p className="text-[var(--color-ink-soft)]">
-          Manage your shelter&apos;s adopters, staff, and animals
-        </p>
-      </div>
-
-      {/* Stat cards */}
-      <div className="ci-stat-card-grid">
-        {/* Adopters card — terracotta tint */}
-        <div style={{ backgroundColor: "var(--color-accent-pale)" }}>
-          <StatCard
-            icon={<Users className="h-5 w-5" />}
-            iconBg="bg-[var(--color-accent-pale)]"
-            iconColor="text-[var(--color-accent)]"
-            eyebrow="People"
-            value={adopterCount}
-            singular="Registered adopter"
-            plural="Registered adopters"
-            subtext={
-              adopterCount === 0
-                ? "No adopter accounts yet"
-                : `${adopterCount} adopter${adopterCount === 1 ? "" : "s"} in the system`
-            }
-            href="/dashboard/admin/adopters"
-            hint="View all →"
-          />
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      {/* Hero card — matches staff dashboard hero style */}
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 grid grid-cols-[1.35fr_0.9fr] gap-5 items-start animate-fade-up">
+        <div className="flex flex-col gap-2">
+          <Eyebrow>Admin workspace</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            Manage your shelter&apos;s adopters, staff, and animals
+          </p>
         </div>
 
-        {/* Staff card — sage tint */}
-        <div style={{ backgroundColor: "var(--color-primary-pale)" }}>
-          <StatCard
-            icon={<Briefcase className="h-5 w-5" />}
-            iconBg="bg-[var(--color-primary-pale)]"
-            iconColor="text-[var(--color-primary)]"
-            eyebrow="Team"
-            value={staffCount}
-            singular="Staff member"
-            plural="Staff members"
-            subtext={
-              staffCount === 0
-                ? "No staff accounts yet"
-                : `${staffCount} team member${staffCount === 1 ? "" : "s"} on staff`
-            }
-            href="/dashboard/admin/staff"
-            hint="View all →"
-          />
-        </div>
+        <dl className="grid grid-cols-3 gap-4">
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Adopters</dt>
+            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{adopterCount}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Staff</dt>
+            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{staffCount}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Animals</dt>
+            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{animalCount}</dd>
+          </div>
+        </dl>
+      </section>
 
-        {/* Animals card — amber tint + two actions */}
-        <div style={{ backgroundColor: "var(--color-warning-bg)" }}>
-          <StatCard
-            icon={<PawPrint className="h-5 w-5" />}
-            iconBg="bg-[var(--color-warning-bg)]"
-            iconColor="text-[var(--color-warning)]"
-            eyebrow="Animals"
-            value={animalCount}
-            singular="Animal in catalog"
-            plural="Animals in catalog"
-            subtext={
-              animalCount === 0
-                ? "No animals in the catalog yet"
-                : `${animalCount} animal${animalCount === 1 ? "" : "s"} across all statuses`
-            }
-            href="/animals"
-            hint="View catalog →"
-            twoActions={{ label: "View catalog", href: "/animals" }}
-          />
-        </div>
-      </div>
+      {/* Card grid — matches staff dashboard card grid style */}
+      <section className="my-6 grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 animate-fade-up delay-1">
+        <Card variant="route">
+          <Eyebrow>People</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+            Adopters
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            {adopterCount === 0
+              ? "No adopter accounts yet"
+              : `${adopterCount} adopter${adopterCount === 1 ? "" : "s"} in the system`}
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <ActionLink href="/dashboard/admin/adopters" variant="chip">
+              View adopters
+            </ActionLink>
+          </div>
+        </Card>
+
+        <Card variant="route">
+          <Eyebrow>Team</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+            Staff members
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            {staffCount === 0
+              ? "No staff accounts yet"
+              : `${staffCount} team member${staffCount === 1 ? "" : "s"} on staff`}
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <ActionLink href="/dashboard/admin/staff" variant="chip">
+              View staff
+            </ActionLink>
+          </div>
+        </Card>
+
+        <Card variant="route">
+          <Eyebrow>Animals</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+            Animal catalog
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            {animalCount === 0
+              ? "No animals in the catalog yet"
+              : `${animalCount} animal${animalCount === 1 ? "" : "s"} across all statuses`}
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <ActionLink href="/animals" variant="chip">
+              View catalog
+            </ActionLink>
+            <ActionLink href="/dashboard/admin/animals/new" variant="chip">
+              New entries
+            </ActionLink>
+          </div>
+        </Card>
+      </section>
     </div>
   );
 }
