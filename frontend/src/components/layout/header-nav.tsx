@@ -17,7 +17,7 @@ export function HeaderNav({ dashboardLink }: HeaderNavProps) {
       className={[
         "px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200",
         isOnDashboard
-          ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-[var(--color-canvas)]"
+          ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
           : "border-[var(--color-border)] text-[var(--color-ink-soft)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]",
       ].join(" ")}
     >
