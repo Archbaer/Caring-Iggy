@@ -8,6 +8,9 @@ export interface AdopterPreferences {
   preferredBreeds?: string[];
   maxAge?: number;
   minAge?: number;
+  preferredGenders?: ("MALE" | "FEMALE" | "UNKNOWN")[];
+  preferredSizes?: ("SMALL" | "MEDIUM" | "LARGE")[];
+  preferredTemperaments?: string[];
   /** Additional free-text preferences. */
   notes?: string;
 }

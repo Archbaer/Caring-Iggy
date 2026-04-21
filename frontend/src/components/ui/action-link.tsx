@@ -5,6 +5,7 @@ type ActionLinkProps = {
   href: string;
   children: ReactNode;
   variant?: "primary" | "secondary" | "chip";
+  size?: "sm" | "lg";
   className?: string;
 };
 
@@ -18,9 +19,13 @@ export function ActionLink({
   href,
   children,
   variant = "primary",
+  size,
   className,
 }: ActionLinkProps) {
-  const classes = [variantClassNames[variant], className].filter(Boolean).join(" ");
+  const chipClasses = size === "lg"
+    ? "inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-base font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+    : variantClassNames[variant];
+  const classes = [chipClasses, className].filter(Boolean).join(" ");
 
   return (
     <Link href={href} className={classes}>
