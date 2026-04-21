@@ -55,7 +55,8 @@
   /* Feedback */
   --color-success:       #5C7E60;
   --color-success-bg:    #EEF3EE;
-  --color-danger:        #B85C5C;
+  --color-danger:        #C0392B;
+  --color-danger-deep:   #922B21;
   --color-danger-bg:     #F9EBEB;
   --color-warning:       #A8843A;
   --color-warning-bg:    #FDF5E0;
@@ -1154,6 +1155,29 @@ a {
   background: var(--color-accent-deep);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.ci-btn--danger {
+  background: var(--color-danger);
+  color: white;
+  border-radius: var(--radius-full);
+  border: none;
+}
+
+.ci-btn--danger:hover {
+  background: var(--color-danger-deep);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.ci-btn--danger:active {
+  transform: scale(0.97);
+}
+
+.ci-btn--danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .ci-btn--subtle {
