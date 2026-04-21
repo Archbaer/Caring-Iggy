@@ -103,7 +103,7 @@ export default async function AdminDashboardPage() {
             <ActionLink href="/animals" variant="chip">
               View catalog
             </ActionLink>
-            <ActionLink href="/dashboard/admin/animals/new" variant="chip">
+            <ActionLink href="/dashboard/animals/new" variant="chip">
               New entries
             </ActionLink>
           </div>
