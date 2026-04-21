@@ -249,8 +249,8 @@ export function PreferencesForm({
           )}
         </section>
 
-        <div className="flex flex-col gap-6">
-          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-6 flex-1 items-stretch">
+          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4 flex-1">
             <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Gender</p>
             <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred gender</h2>
             <div className="grid grid-cols-3 gap-2">
@@ -276,7 +276,7 @@ export function PreferencesForm({
             </div>
           </section>
 
-          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4 flex-1">
             <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Size</p>
             <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred size</h2>
             <div className="grid grid-cols-3 gap-2">
