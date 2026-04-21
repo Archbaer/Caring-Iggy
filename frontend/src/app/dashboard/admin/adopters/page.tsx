@@ -1,5 +1,6 @@
 import { ActionLink } from "@/components/ui/action-link";
 import { Card } from "@/components/ui/card";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import {
   fetchAdminAdopters,
   type AdminAdopterSummary,
@@ -19,17 +20,21 @@ export default async function AdminAdoptersPage() {
   if (result.kind === "error") {
     return (
       <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Adopter records</p>
-          <h1 className="page-title">Adopter management</h1>
-          <p className="page-copy">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 animate-fade-up">
+          <Eyebrow>Adopter records</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+            Adopter management
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
             The adopter directory could not be loaded right now. Please try again in a moment.
           </p>
         </section>
 
-        <section className="flex flex-col gap-3 py-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Directory error</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">We couldn&apos;t load adopter records.</h2>
+        <section className="my-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 text-center">
+          <Eyebrow>Directory error</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+            We couldn&apos;t load adopter records.
+          </h2>
           <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
         </section>
       </div>
@@ -38,27 +43,34 @@ export default async function AdminAdoptersPage() {
 
   return (
     <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Adopter records</p>
-        <h1 className="page-title">Adopter management</h1>
-        <p className="page-copy">
-          View and manage adopter profiles, track adoption history, and monitor interested animals across all accounts.
-        </p>
+      {/* Hero header */}
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 animate-fade-up">
+        <div className="flex flex-col gap-2">
+          <Eyebrow>Adopter records</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+            Adopter management
+          </h1>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+            View and manage adopter profiles, track adoption history, and monitor interested animals across all accounts.
+          </p>
+        </div>
       </section>
 
       {result.adopters.length > 0 ? (
-        <section className="grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-4">
+        <section className="my-6 grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 animate-fade-up delay-1">
           {result.adopters.map((adopter) => (
             <Card key={adopter.id} variant="route">
-              <span className="ci-badge">{adopter.status}</span>
-              <h2 className="text-lg font-semibold text-[var(--color-ink)]">{adopter.name}</h2>
-              <p className="text-sm text-[var(--color-ink-soft)]">
+              <Eyebrow>{adopter.status}</Eyebrow>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+                {adopter.name}
+              </h2>
+              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
                 {adopter.email} · {adopter.telephone}
               </p>
-              <p className="text-sm text-[var(--color-ink-soft)]">
-                Interested animals saved: {adopter.interestCount}
+              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed mt-2">
+                Interested animals saved: <span className="font-medium text-[var(--color-ink)]">{adopter.interestCount}</span>
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-4">
                 <ActionLink href={`/dashboard/admin/adopters/${adopter.id}`} variant="chip">
                   Open record
                 </ActionLink>
@@ -67,10 +79,12 @@ export default async function AdminAdoptersPage() {
           ))}
         </section>
       ) : (
-        <section className="flex flex-col gap-3 py-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">No adopter records</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">No adopter profiles yet.</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">
+        <section className="my-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 text-center">
+          <Eyebrow>No adopter records</Eyebrow>
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+            No adopter profiles yet.
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
             Adopter accounts will appear here once registered.
           </p>
         </section>
