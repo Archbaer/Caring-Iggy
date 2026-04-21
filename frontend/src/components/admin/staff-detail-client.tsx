@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState } from "react";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
 import { fetchAuthSession } from "@/lib/api/auth";
@@ -17,9 +17,10 @@ export function AdminStaffDetailClient({ employee }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(employee);
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<"initial" | "confirm">("initial");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmName, setConfirmName] = useState("");
   const csrfTokenRef = useRef<string | null>(null);
 
   function handleSuccess(updated: AdminEmployeeDetail) {
@@ -33,6 +34,11 @@ export function AdminStaffDetailClient({ employee }: Props) {
   }
 
   async function handleDelete() {
+    if (confirmName.trim() !== currentEmployee.name) {
+      setDeleteError("Name does not match. Please type the staff member's name to confirm.");
+      return;
+    }
+
     const token = csrfTokenRef.current ?? (await refreshCsrfTokenImpl());
 
     if (!token) {
@@ -66,112 +72,161 @@ export function AdminStaffDetailClient({ employee }: Props) {
   }
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
-        <h1 className="page-title">{currentEmployee.name}</h1>
-        <p className="page-copy">
-          <span className="ci-badge">{currentEmployee.role}</span>
-        </p>
-      </section>
-
-      <nav className="flex items-center gap-2">
-        <a href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+    <div className="min-h-screen" style={{ background: "var(--gradient-admin-canvas)" }}>
+      {/* Back button — absolute top-left */}
+      <div className="max-w-[var(--max-width-wide)] mx-auto px-6 sm:px-8 pt-6 mb-6">
+        <a
+          href="/dashboard/admin/staff"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+        >
           ← Staff
         </a>
-      </nav>
+      </div>
 
-      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4">
-        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Identity</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Account metadata</h2>
-          <ul className="flex flex-col gap-2 text-sm">
-            <li>
-              <strong>Email:</strong> {currentEmployee.email}
-            </li>
-            <li>
-              <strong>Telephone:</strong> {currentEmployee.telephone ?? "No telephone on file."}
-            </li>
-            <li>
-              <strong>Role:</strong> {currentEmployee.role}
-            </li>
-            <li>
-              <strong>Created:</strong> {currentEmployee.createdAt ?? "Unavailable"}
-            </li>
-            <li>
-              <strong>Updated:</strong> {currentEmployee.updatedAt ?? "Unavailable"}
-            </li>
-          </ul>
-        </article>
+      <div className="max-w-[var(--max-width-wide)] mx-auto px-6 sm:px-8 pb-8">
+        {/* Hero card */}
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 pt-8 mb-6 animate-fade-up">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Employee records</p>
+            <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+              {currentEmployee.name}
+            </h1>
+            <div className="flex items-center gap-3">
+              <span className="ci-badge">{currentEmployee.role}</span>
+              <p className="text-sm text-[var(--color-ink-soft)]">{currentEmployee.email}</p>
+            </div>
+          </div>
+        </section>
 
-        {editing ? (
-          <StaffEditPanel
-            employee={currentEmployee}
-            onCancel={handleCancel}
-            onSuccess={handleSuccess}
-          />
-        ) : (
-          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+        {/* Info + Edit/Actions row */}
+        <section className="grid grid-cols-[1fr_1fr] gap-4 animate-fade-up delay-1">
+          {/* Identity card */}
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Identity</p>
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)]">
+              Account metadata
+            </h2>
+            <ul className="flex flex-col gap-3 text-sm">
+              <li className="flex flex-col gap-0.5">
+                <span className="text-[var(--color-ink-soft)]">Email</span>
+                <span className="font-medium text-[var(--color-ink)]">{currentEmployee.email}</span>
+              </li>
+              <li className="flex flex-col gap-0.5">
+                <span className="text-[var(--color-ink-soft)]">Telephone</span>
+                <span className="font-medium text-[var(--color-ink)]">{currentEmployee.telephone ?? "No telephone on file."}</span>
+              </li>
+              <li className="flex flex-col gap-0.5">
+                <span className="text-[var(--color-ink-soft)]">Role</span>
+                <span className="font-medium text-[var(--color-ink)]">{currentEmployee.role}</span>
+              </li>
+              <li className="flex flex-col gap-0.5">
+                <span className="text-[var(--color-ink-soft)]">Created</span>
+                <span className="font-medium text-[var(--color-ink)]">{currentEmployee.createdAt ?? "Unavailable"}</span>
+              </li>
+              <li className="flex flex-col gap-0.5">
+                <span className="text-[var(--color-ink-soft)]">Updated</span>
+                <span className="font-medium text-[var(--color-ink)]">{currentEmployee.updatedAt ?? "Unavailable"}</span>
+              </li>
+            </ul>
+          </article>
+
+          {/* Edit/Actions card */}
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4">
             <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Manage this record</h2>
-            <div className="flex flex-wrap gap-3 items-center">
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)]">
+              Manage this record
+            </h2>
+
+            {/* Edit expand area */}
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                editing ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              {editing && (
+                <StaffEditPanel
+                  employee={currentEmployee}
+                  onCancel={handleCancel}
+                  onSuccess={handleSuccess}
+                />
+              )}
+            </div>
+
+            {!editing && (
               <button
                 type="button"
-                className="ci-btn ci-btn--primary"
+                className="ci-btn ci-btn--primary w-fit"
                 onClick={() => setEditing(true)}
               >
                 Edit staff
               </button>
-            </div>
+            )}
           </article>
-        )}
+        </section>
 
-        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Danger zone</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Delete this staff record</h2>
-          {deleteConfirm ? (
+        {/* Delete card */}
+        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 mt-4 animate-fade-up delay-2 flex flex-col items-center gap-4 text-center">
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)]">
+            Delete this staff record
+          </h2>
+
+          {deleteStep === "initial" ? (
+            <button
+              type="button"
+              className="ci-btn ci-btn--danger px-8 py-3 text-base font-semibold"
+              onClick={() => setDeleteStep("confirm")}
+            >
+              Delete staff
+            </button>
+          ) : (
             <form
-              onSubmit={(e: FormEvent<HTMLFormElement>) => {
+              onSubmit={(e) => {
                 e.preventDefault();
                 void handleDelete();
               }}
+              className="flex flex-col items-center gap-4 w-full"
             >
               <p className="text-sm text-[var(--color-ink-soft)]">
-                Are you sure you want to delete <strong>{currentEmployee.name}</strong>? This action
-                cannot be undone.
+                Type <strong className="text-[var(--color-ink)]">{currentEmployee.name}</strong> to confirm deletion. This action cannot be undone.
               </p>
+              <input
+                type="text"
+                autoComplete="off"
+                className="w-full max-w-sm appearance-none rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:outline-none focus:ring-2 focus:ring-[var(--color-danger)]/30 transition-all duration-200"
+                placeholder={currentEmployee.name}
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+              />
               {deleteError ? (
-                <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+                <p className="rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-surface)] p-4 text-sm text-[var(--color-danger)]">
                   {deleteError}
                 </p>
               ) : null}
-              <div className="flex flex-wrap gap-3 items-center">
-                <button type="submit" className="ci-btn ci-btn--primary danger" disabled={isDeleting}>
+              <div className="flex flex-wrap gap-3 items-center justify-center">
+                <button
+                  type="submit"
+                  className="ci-btn ci-btn--danger px-8 py-3 text-base font-semibold"
+                  disabled={isDeleting || confirmName.trim() !== currentEmployee.name}
+                >
                   {isDeleting ? "Deleting..." : "Confirm deletion"}
                 </button>
                 <button
                   type="button"
-                  className="ci-btn ci-btn--secondary secondary"
-                  onClick={() => setDeleteConfirm(false)}
+                  className="ci-btn ci-btn--ghost text-sm"
+                  onClick={() => {
+                    setDeleteStep("initial");
+                    setConfirmName("");
+                    setDeleteError(null);
+                  }}
                   disabled={isDeleting}
                 >
                   Cancel
                 </button>
               </div>
             </form>
-          ) : (
-            <div className="flex flex-wrap gap-3 items-center">
-              <button
-                type="button"
-                className="ci-btn ci-btn--primary danger"
-                onClick={() => setDeleteConfirm(true)}
-              >
-                Delete staff
-              </button>
-            </div>
           )}
         </article>
-      </section>
+      </div>
     </div>
   );
 }
