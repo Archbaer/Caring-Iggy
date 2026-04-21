@@ -375,7 +375,7 @@ export function PreferencesForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-3 items-center justify-center">
         <button type="submit" className="ci-btn ci-btn--primary" disabled={isPending}>
           {isPending ? "Saving..." : "Save preferences"}
         </button>
