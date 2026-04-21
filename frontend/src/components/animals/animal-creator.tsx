@@ -1,12 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Eyebrow } from "@/components/ui/eyebrow";
 import {
   AnimalEditorApiError,
   createAnimalFromEditor,
@@ -83,7 +81,7 @@ export function AnimalCreator() {
     };
   }, []);
 
-  async function handleCreateSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleCreateSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const token = await refreshCsrfToken();
 
@@ -151,291 +149,270 @@ export function AnimalCreator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <Button
-            onClick={() => router.push("/animals")}
-            variant="ghost"
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Animals
-          </Button>
+    <div className="max-w-3xl">
+      <Card variant="panel" className="p-0 overflow-hidden">
 
-          <Eyebrow className="mb-3">Staff workspace</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold text-gray-900 mb-2">
-            Add New Animal
-          </h1>
-          <p className="text-gray-600">
-            Register a new animal in the shelter catalog
-          </p>
-        </div>
-
-        <Card variant="panel" className="p-0 overflow-hidden">
-
-        <form className="dashboard-form" onSubmit={handleCreateSubmit}>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="name">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
-                <input
-                  id="name"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.name}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, name: event.target.value }))
-                  }
-                  required
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="animalType">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Animal type</span>
-                <input
-                  id="animalType"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.animalType}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, animalType: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="breed">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Breed</span>
-                <input
-                  id="breed"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.breed}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, breed: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="status">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Status</span>
-                <select
-                  id="status"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.status}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))
-                  }
-                >
-                  {STATUS_OPTIONS.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="gender">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Gender</span>
-                <select
-                  id="gender"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.gender}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))
-                  }
-                >
-                  <option value="">Unspecified</option>
-                  {GENDER_OPTIONS.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="size">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Size</span>
-                <select
-                  id="size"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.size}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))
-                  }
-                >
-                  <option value="">Unspecified</option>
-                  {SIZE_OPTIONS.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="dateOfBirth">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Date of birth</span>
-                <input
-                  id="dateOfBirth"
-                  type="date"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.dateOfBirth}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="intakeDate">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Intake date</span>
-                <input
-                  id="intakeDate"
-                  type="date"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.intakeDate}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="flex flex-col gap-1.5" htmlFor="temperament">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Temperament</span>
-                <input
-                  id="temperament"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.temperament}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, temperament: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="flex flex-col gap-1.5" htmlFor="imageUrl">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Image URL</span>
-                <input
-                  id="imageUrl"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.imageUrl}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerName">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner name</span>
-                <input
-                  id="previousOwnerName"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.previousOwnerName}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerTelephone">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner telephone</span>
-                <input
-                  id="previousOwnerTelephone"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.previousOwnerTelephone}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerEmail">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner email</span>
-                <input
-                  id="previousOwnerEmail"
-                  type="email"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.previousOwnerEmail}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerAddress">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner address</span>
-                <input
-                  id="previousOwnerAddress"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
-                  value={createForm.previousOwnerAddress}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))
-                  }
-                />
-              </label>
-            </div>
+      <form className="dashboard-form" onSubmit={handleCreateSubmit}>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="name">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
+              <input
+                id="name"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.name}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, name: event.target.value }))
+                }
+                required
+              />
+            </label>
           </div>
 
           <div className="space-y-2">
-            <label className="flex flex-col gap-1.5" htmlFor="description">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Description</span>
-              <textarea
-                id="description"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200 resize-none"
-                rows={4}
-                value={createForm.description}
+            <label className="flex flex-col gap-1.5" htmlFor="animalType">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Animal type</span>
+              <input
+                id="animalType"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.animalType}
                 onChange={(event) =>
-                  setCreateForm((current) => ({ ...current, description: event.target.value }))
+                  setCreateForm((current) => ({ ...current, animalType: event.target.value }))
                 }
               />
             </label>
           </div>
 
-          <div className="flex gap-4">
-            <Button type="submit" variant="primary" className="flex-1" disabled={isCreating}>
-              {isCreating ? "Creating..." : "Add Animal"}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1"
-              onClick={() => router.push("/animals")}
-            >
-              Cancel
-            </Button>
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="breed">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Breed</span>
+              <input
+                id="breed"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.breed}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, breed: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="status">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Status</span>
+              <select
+                id="status"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.status}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))
+                }
+              >
+                {STATUS_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="gender">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Gender</span>
+              <select
+                id="gender"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.gender}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))
+                }
+              >
+                <option value="">Unspecified</option>
+                {GENDER_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="size">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Size</span>
+              <select
+                id="size"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.size}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))
+                }
+              >
+                <option value="">Unspecified</option>
+                {SIZE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="dateOfBirth">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Date of birth</span>
+              <input
+                id="dateOfBirth"
+                type="date"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.dateOfBirth}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, dateOfBirth: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="intakeDate">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Intake date</span>
+              <input
+                id="intakeDate"
+                type="date"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.intakeDate}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, intakeDate: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className="flex flex-col gap-1.5" htmlFor="temperament">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Temperament</span>
+              <input
+                id="temperament"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.temperament}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, temperament: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className="flex flex-col gap-1.5" htmlFor="imageUrl">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Image URL</span>
+              <input
+                id="imageUrl"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.imageUrl}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, imageUrl: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerName">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner name</span>
+              <input
+                id="previousOwnerName"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.previousOwnerName}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerTelephone">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner telephone</span>
+              <input
+                id="previousOwnerTelephone"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.previousOwnerTelephone}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerEmail">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner email</span>
+              <input
+                id="previousOwnerEmail"
+                type="email"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.previousOwnerEmail}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))
+                }
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerAddress">
+              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner address</span>
+              <input
+                id="previousOwnerAddress"
+                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                value={createForm.previousOwnerAddress}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))
+                }
+              />
+            </label>
           </div>
         </div>
-        </form>
-        </Card>
 
-        {errorMessage ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
-            {errorMessage}
-          </p>
-        ) : null}
+        <div className="space-y-2">
+          <label className="flex flex-col gap-1.5" htmlFor="description">
+            <span className="text-sm font-medium text-[var(--color-ink)]">Description</span>
+            <textarea
+              id="description"
+              className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200 resize-none"
+              rows={4}
+              value={createForm.description}
+              onChange={(event) =>
+                setCreateForm((current) => ({ ...current, description: event.target.value }))
+              }
+            />
+          </label>
+        </div>
 
-        {successMessage ? (
-          <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
-            {successMessage}
-          </p>
-        ) : null}
+        <div className="flex gap-4">
+          <Button type="submit" variant="primary" className="flex-1" disabled={isCreating}>
+            {isCreating ? "Creating..." : "Add Animal"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="flex-1"
+            onClick={() => router.push("/animals")}
+          >
+            Cancel
+          </Button>
+        </div>
       </div>
+      </form>
+      </Card>
+
+      {errorMessage ? (
+        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+          {errorMessage}
+        </p>
+      ) : null}
+
+      {successMessage ? (
+        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
+          {successMessage}
+        </p>
+      ) : null}
     </div>
   );
 
