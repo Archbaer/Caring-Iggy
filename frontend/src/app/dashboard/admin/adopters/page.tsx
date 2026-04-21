@@ -20,7 +20,17 @@ export default async function AdminAdoptersPage() {
   if (result.kind === "error") {
     return (
       <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 animate-fade-up">
+        {/* Back button */}
+        <div className="mb-6">
+          <a
+            href="/dashboard/admin"
+            className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          >
+            ← Dashboard
+          </a>
+        </div>
+
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 pt-8 animate-fade-up">
           <Eyebrow>Adopter records</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
             Adopter management
@@ -43,8 +53,18 @@ export default async function AdminAdoptersPage() {
 
   return (
     <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      {/* Back button */}
+      <div className="mb-6">
+        <a
+          href="/dashboard/admin"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+        >
+          ← Dashboard
+        </a>
+      </div>
+
       {/* Hero header */}
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 animate-fade-up">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 pt-8 animate-fade-up">
         <div className="flex flex-col gap-2">
           <Eyebrow>Adopter records</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">

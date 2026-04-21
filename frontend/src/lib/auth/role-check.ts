@@ -79,9 +79,6 @@ export function evaluatePathAccess(
   }
 
   if (isAdminManagementPath(pathname) && !hasAnyRole(session, ["ADMIN"])) {
-    if (pathname === "/dashboard/admin/animals/new") {
-      return { action: "allow" };
-    }
     return { action: "redirect", destination: defaultRouteForRole(session.role) };
   }
 
