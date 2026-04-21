@@ -40,33 +40,21 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <section className="my-6 grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 animate-fade-up delay-1">
-          <Card variant="route">
-            <Eyebrow>Animal records</Eyebrow>
+        <section className="my-6 animate-fade-up delay-1">
+          <Card variant="route" className="text-center max-w-sm mx-auto">
+            <Eyebrow>Animals</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
-              Manage animals
+              Animal records
             </h2>
             <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-              Browse animal profiles and open update/delete controls.
+              Browse, manage, and add animal profiles to the shelter catalog.
             </p>
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-2 mt-4 justify-center">
               <ActionLink href="/animals" variant="chip">
                 Manage animals
               </ActionLink>
-            </div>
-          </Card>
-
-          <Card variant="route">
-            <Eyebrow>Animal records</Eyebrow>
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
-              Add animal
-            </h2>
-            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-              Create a new animal profile in the shelter catalog.
-            </p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <ActionLink href="/dashboard/admin/animals/new" variant="chip">
-                Add animal
+              <ActionLink href="/dashboard/animals/new" variant="chip">
+                Add animals
               </ActionLink>
             </div>
           </Card>
