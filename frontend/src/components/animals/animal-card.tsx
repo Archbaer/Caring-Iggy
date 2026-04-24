@@ -41,7 +41,7 @@ export function AnimalCard({
         "group rounded-2xl border border-[var(--color-border)]",
         "bg-[var(--color-surface)] shadow-[var(--shadow-card)]",
         "overflow-hidden flex flex-col",
-        "transition-all duration-300",
+        "transition-shadow duration-300",
         "hover:-translate-y-1.5 hover:shadow-[var(--shadow-card-hover)]",
         "hover:border-[var(--color-accent)]/60",
         "hover:border-l-2 hover:border-l-[var(--color-accent)]",
