@@ -119,12 +119,12 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <dl className="grid grid-cols-3 gap-4">
+        <dl className="grid grid-cols-2 gap-4">
           <div>
             <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Name</dt>
             <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{profile.name}</dd>
           </div>
-          <div>
+          <div className="text-center">
             <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Interested</dt>
             <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">
               {profile.interests.length} / {MAX_INTERESTS}
