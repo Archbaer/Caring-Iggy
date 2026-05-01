@@ -55,8 +55,8 @@ jobs:
       - name: Build and Push animal-service
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./backend/animal-service/Dockerfile
+          context: ./backend
+          file: ./animal-service/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE_PREFIX }}-animal-service:${{ steps.meta.outputs.VERSION }}
@@ -67,8 +67,8 @@ jobs:
       - name: Build and Push user-service
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./backend/user-service/Dockerfile
+          context: ./backend
+          file: ./user-service/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE_PREFIX }}-user-service:${{ steps.meta.outputs.VERSION }}
@@ -79,8 +79,8 @@ jobs:
       - name: Build and Push matching-service
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./backend/matching-service/Dockerfile
+          context: ./backend
+          file: ./matching-service/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE_PREFIX }}-matching-service:${{ steps.meta.outputs.VERSION }}
@@ -91,8 +91,8 @@ jobs:
       - name: Build and Push reporting-service
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./backend/reporting-service/Dockerfile
+          context: ./backend
+          file: ./reporting-service/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE_PREFIX }}-reporting-service:${{ steps.meta.outputs.VERSION }}
@@ -103,8 +103,8 @@ jobs:
       - name: Build and Push adopter-service
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./backend/adopter-service/Dockerfile
+          context: ./backend
+          file: ./adopter-service/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service:${{ steps.meta.outputs.VERSION }}
