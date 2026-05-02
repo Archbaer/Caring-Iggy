@@ -1,18 +1,6 @@
 @import "tailwindcss";
 
 /* =============================================================================
-   ⚠️  DEPRECATION NOTICE
-   =============================================================================
-   All .ci-* classes below are DEPRECATED and will be removed after migration.
-   Use the new component library (components/ui/) instead:
-   - Button component for all buttons
-   - Card component for all cards
-   - Badge component for all badges
-   - Eyebrow component for all eyebrow labels
-   - .animate-fade-up + .delay-* classes for entrance animations
-   ============================================================================= */
-
-/* =============================================================================
    SECTION 1: @theme (Tailwind v4)
    ============================================================================= */
 
@@ -156,169 +144,20 @@ a {
 }
 
 /* =============================================================================
-   SECTION 6: Typography Scale
-   ============================================================================= */
-
-.ci-display {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 5.5rem);
-  font-weight: 500;
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.ci-h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.ci-h2 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.ci-h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.ci-body-lg {
-  font-family: var(--font-body);
-  font-size: 1.0625rem;
-  font-weight: 400;
-  line-height: 1.7;
-  color: var(--color-ink-soft);
-}
-
-.ci-body {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.7;
-  color: var(--color-ink-soft);
-}
-
-.ci-body-sm {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--color-ink-soft);
-}
-
-.ci-caption {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.04em;
-  color: var(--color-ink-faint);
-}
-
-.ci-label {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-ink-faint);
-}
-
-/* =============================================================================
    SECTION 7: Layout Shell
    ============================================================================= */
 
-.ci-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(249, 247, 244, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-4) var(--space-6);
-}
-
-.ci-header__inner {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.ci-header__nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.ci-brand {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  letter-spacing: -0.02em;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-
-.ci-brand:hover {
-  color: var(--color-primary);
-}
-
-.ci-main {
-  flex: 1;
-}
-
-.ci-page-shell {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-6);
-}
-
-.ci-page-wide {
-  max-width: var(--max-width-wide);
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-6);
-}
-
-/* =============================================================================
-   SECTION 8: Shell Overrides (backward compat + new design tokens)
-   ============================================================================= */
-
-.shell-body,
-.ci-body {
+.shell-body {
   min-height: 100vh;
 }
 
-.shell-frame,
-.ci-frame {
+.shell-frame {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
 }
 
-.shell-header,
-.ci-header {
+.shell-header {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
@@ -334,8 +173,7 @@ a {
   gap: var(--space-2);
 }
 
-.brand-mark,
-.ci-brand-mark {
+.brand-mark {
   display: inline-block;
   font-family: var(--font-display), Georgia, serif;
   font-size: 1.85rem;
@@ -344,8 +182,7 @@ a {
   color: var(--color-ink);
 }
 
-.brand-tagline,
-.ci-brand-tagline {
+.brand-tagline {
   color: var(--color-ink-soft);
   font-size: 0.875rem;
   margin: 0;
@@ -385,16 +222,14 @@ a {
   justify-self: auto;
 }
 
-.shell-main,
-.ci-main {
+.shell-main {
   flex: 1;
   padding-bottom: var(--space-7);
   margin: 0 auto;
   width: min(calc(100% - var(--space-6)), var(--max-width-content));
 }
 
-.shell-footer,
-.ci-footer {
+.shell-footer {
   border-top: 2px solid var(--color-border);
   color: var(--color-ink-soft);
   font-size: 0.9rem;
@@ -404,7 +239,7 @@ a {
 }
 
 /* Footer — full override */
-.ci-footer-full {
+.footer-full {
   background: var(--color-surface-warm);
   border-top: 1px solid var(--color-border);
   padding: var(--space-8) var(--space-6) var(--space-5);
@@ -548,8 +383,7 @@ a {
    SECTION 9: Page Shell / Landing
    ============================================================================= */
 
-.page-shell,
-.ci-page-shell {
+.page-shell {
   display: grid;
   gap: var(--space-6);
 }
@@ -578,8 +412,7 @@ a {
 .page-hero,
 .panel,
 .route-card,
-.empty-state,
-.ci-panel {
+.empty-state {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
@@ -721,8 +554,7 @@ a {
   gap: var(--space-3);
 }
 
-.primary-link,
-.ci-btn--primary {
+.primary-link {
   border-radius: var(--radius-full);
   display: inline-flex;
   justify-content: center;
@@ -738,8 +570,7 @@ a {
   box-shadow: var(--shadow-md);
 }
 
-.secondary-link,
-.ci-btn--ghost {
+.secondary-link {
   border: 1px solid var(--color-border);
   background: transparent;
   border-radius: var(--radius-full);
@@ -753,83 +584,6 @@ a {
   border-color: var(--color-accent);
   color: var(--color-accent);
   background: var(--color-accent-pale);
-}
-
-/* =============================================================================
-   SECTION 11: Cards (new .ci-card system)
-   ============================================================================= */
-
-.ci-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.ci-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.ci-card__media {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 4 / 3;
-}
-
-.ci-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 300ms ease;
-}
-
-.ci-card:hover .ci-card__media img {
-  transform: scale(1.04);
-}
-
-.ci-card__badge {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-}
-
-.ci-card__body {
-  padding: var(--space-card-lg);
-  display: grid;
-  gap: var(--gap-card-items);
-}
-
-.ci-card__name {
-  font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  margin: 0;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.ci-card__meta {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  color: var(--color-ink-soft);
-  margin: 0;
-  line-height: 1.5;
-}
-
-.ci-card__trait {
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  color: var(--color-ink-faint);
-  font-style: italic;
-  margin: 0;
-}
-
-.ci-card__actions {
-  margin-top: var(--space-2);
 }
 
 /* =============================================================================
@@ -861,8 +615,7 @@ a {
   padding: var(--space-5);
 }
 
-.animal-card,
-.ci-card {
+.animal-card {
   align-content: start;
 }
 
@@ -871,8 +624,7 @@ a {
 }
 
 .animal-card-media,
-.animal-detail-media,
-.ci-card__media {
+.animal-detail-media {
   overflow: hidden;
   border-radius: calc(var(--radius-md) + var(--space-1));
   border: 1px solid var(--color-border);
@@ -880,8 +632,7 @@ a {
 }
 
 .animal-card-image,
-.animal-detail-image,
-.ci-card__media img {
+.animal-detail-image {
   display: block;
   width: 100%;
   object-fit: cover;
@@ -1025,46 +776,7 @@ a {
    SECTION 15: Badges
    ============================================================================= */
 
-.ci-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.25rem 0.625rem;
-  border-radius: var(--radius-sm);
-}
-
-.ci-badge--available {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-}
-
-.ci-badge--pending {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-
-.ci-badge--adopted {
-  background: var(--color-primary-pale);
-  color: var(--color-primary);
-}
-
-.ci-badge--muted {
-  background: var(--color-surface-warm);
-  color: var(--color-ink-faint);
-}
-
-.ci-badge--accent {
-  background: var(--color-accent-pale);
-  color: var(--color-accent);
-}
-
-.status-badge,
-.ci-badge {
+.status-badge {
   align-items: center;
   border-radius: var(--radius-full);
   display: inline-flex;
@@ -1090,659 +802,6 @@ a {
 .status-badge--adopted {
   background: var(--color-primary-pale);
   color: var(--color-primary);
-}
-
-/* =============================================================================
-   SECTION 16: Buttons
-   ============================================================================= */
-
-.ci-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  border-radius: var(--radius-full);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  cursor: pointer;
-  transition: all 180ms ease;
-  text-decoration: none;
-  border: none;
-  line-height: 1;
-}
-
-.ci-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 24%, transparent 76%);
-  outline-offset: 2px;
-}
-
-.ci-btn:active {
-  transform: scale(0.97);
-}
-
-.ci-btn--primary {
-  background: var(--color-primary);
-  color: white;
-}
-
-.ci-btn--primary:hover {
-  background: var(--color-primary-deep);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.ci-btn--primary:active {
-  transform: scale(0.97);
-}
-
-.ci-btn--ghost {
-  background: transparent;
-  border: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
-}
-
-.ci-btn--ghost:hover {
-  background: var(--color-primary-pale);
-}
-
-.ci-btn--accent {
-  background: var(--color-accent);
-  color: white;
-}
-
-.ci-btn--accent:hover {
-  background: var(--color-accent-deep);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.ci-btn--danger {
-  background: var(--color-danger);
-  color: white;
-  border-radius: var(--radius-full);
-  border: none;
-}
-
-.ci-btn--danger:hover {
-  background: var(--color-danger-deep);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.ci-btn--danger:active {
-  transform: scale(0.97);
-}
-
-.ci-btn--danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.ci-btn--subtle {
-  background: var(--color-surface-warm);
-  color: var(--color-ink-soft);
-}
-
-.ci-btn--white {
-  background: white;
-  color: var(--color-primary);
-  border: 1.5px solid white;
-}
-
-.ci-btn--white:hover {
-  background: var(--color-primary-pale);
-  border-color: var(--color-primary-pale);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.ci-btn--sm {
-  font-size: 0.875rem;
-  padding: 0.5rem 1rem;
-}
-
-.ci-btn--lg {
-  font-size: 1.0625rem;
-  padding: 0.9375rem 1.75rem;
-}
-
-.ci-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.ci-btn--ghost-sm {
-  font-size: 0.8125rem;
-  padding: 0.375rem 0.875rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-  background: transparent;
-  color: var(--color-ink-soft);
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  transition: all 150ms ease;
-}
-
-.ci-btn--ghost-sm:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-pale);
-}
-
-/* =============================================================================
-   SECTION 17: Hero (new .ci-hero system)
-   ============================================================================= */
-
-.ci-hero {
-  max-width: var(--max-width-wide);
-  margin: 0 auto;
-  padding: var(--space-9) var(--space-6);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-  align-items: center;
-}
-
-@media (max-width: 900px) {
-  .ci-hero {
-    grid-template-columns: 1fr;
-    padding: var(--space-7) var(--space-5);
-    gap: var(--space-6);
-  }
-}
-
-.ci-hero__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin: 0 0 var(--space-3);
-}
-
-.ci-hero__title {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 5.5rem);
-  font-weight: 500;
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-5);
-}
-
-.ci-hero__copy {
-  font-size: 1.0625rem;
-  color: var(--color-ink-soft);
-  line-height: 1.7;
-  max-width: 50ch;
-  margin: 0 0 var(--space-6);
-}
-
-.ci-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.ci-hero__image {
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-xl);
-  aspect-ratio: 4 / 5;
-}
-
-.ci-hero__image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* =============================================================================
-   SECTION 18: Trust Bar
-   ============================================================================= */
-
-.ci-trust-bar {
-  background: var(--color-surface-warm);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-5) var(--space-6);
-}
-
-.ci-trust-bar__inner {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6);
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ci-trust-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--color-ink-soft);
-  font-size: 0.9375rem;
-}
-
-.ci-trust-item__icon {
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-md);
-  background: var(--color-primary-pale);
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* =============================================================================
-   SECTION 19: Sections
-   ============================================================================= */
-
-.ci-section {
-  padding: var(--space-8) var(--space-6);
-}
-
-.ci-section--warm {
-  background: var(--color-surface-warm);
-}
-
-.ci-section--dark {
-  background: var(--color-primary);
-}
-
-.ci-section__inner {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-}
-
-.ci-section__header {
-  margin-bottom: var(--space-6);
-}
-
-.ci-section__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin: 0 0 var(--space-2);
-}
-
-.ci-section__title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-3);
-  line-height: 1.1;
-}
-
-.ci-section__copy {
-  font-size: 1.0625rem;
-  color: var(--color-ink-soft);
-  line-height: 1.7;
-  max-width: 55ch;
-}
-
-.ci-section__header--center {
-  text-align: center;
-}
-
-.ci-section__header--center .ci-section__copy {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.ci-grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-5);
-}
-
-.ci-split-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.95fr);
-  gap: var(--space-7);
-  align-items: center;
-}
-
-.ci-card--padded {
-  padding: var(--space-5);
-}
-
-.ci-card--empty {
-  padding: var(--space-6);
-  text-align: center;
-}
-
-.ci-stack-md {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.ci-actions-center {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: center;
-}
-
-.ci-trust-item__content {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.ci-trust-item__title {
-  color: var(--color-ink);
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.ci-trust-item__copy {
-  color: var(--color-ink-soft);
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.ci-quote-card {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.ci-quote-card__quote {
-  color: var(--color-ink-soft);
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  font-style: italic;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.ci-quote-card__name {
-  color: var(--color-ink);
-  font-weight: 700;
-  margin: 0;
-}
-
-.ci-quote-card__meta {
-  color: var(--color-ink-faint);
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.ci-value-list {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.ci-value-title {
-  color: var(--color-ink);
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin: 0 0 var(--space-1);
-}
-
-.ci-inline-link {
-  align-items: center;
-  color: var(--color-primary);
-  display: inline-flex;
-  gap: var(--space-2);
-  font-weight: 600;
-  margin-top: var(--space-4);
-}
-
-.ci-inline-link:hover {
-  color: var(--color-primary-deep);
-}
-
-.ci-media-placeholder {
-  aspect-ratio: 4 / 5;
-  background: linear-gradient(135deg, var(--color-primary-pale) 0%, var(--color-accent-pale) 100%);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  display: grid;
-  overflow: hidden;
-  place-items: center;
-}
-
-.ci-media-placeholder__label {
-  color: color-mix(in srgb, var(--color-primary) 78%, white 22%);
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  opacity: 0.42;
-}
-
-/* =============================================================================
-   SECTION 20: Animal Grid
-   ============================================================================= */
-
-.ci-animal-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-card-lg);
-}
-
-@media (max-width: 900px) {
-  .ci-animal-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .ci-animal-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =============================================================================
-   SECTION 21: Steps / Process
-   ============================================================================= */
-
-.ci-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-}
-
-@media (max-width: 900px) {
-  .ci-steps {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ci-step__number {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  font-weight: 400;
-  color: var(--color-primary-pale);
-  line-height: 1;
-  margin: 0 0 var(--space-3);
-}
-
-.ci-step__title {
-  font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-2);
-}
-
-.ci-step__copy {
-  font-size: 0.9375rem;
-  color: var(--color-ink-soft);
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* =============================================================================
-   SECTION 22: CTA Band
-   ============================================================================= */
-
-.ci-cta-band {
-  background: var(--color-primary);
-  padding: var(--space-8) var(--space-6);
-  text-align: center;
-}
-
-.ci-cta-band__title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 500;
-  color: white;
-  margin: 0 0 var(--space-4);
-}
-
-.ci-cta-band__subtitle {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.0625rem;
-  max-width: 50ch;
-  margin: 0 auto var(--space-6);
-}
-
-.cta-band {
-  display: grid;
-  gap: var(--space-4);
-  align-items: end;
-  grid-template-columns: minmax(0, 1.4fr) auto;
-}
-
-.cta-heading {
-  max-width: 38rem;
-}
-
-.cta-actions {
-  justify-content: flex-start;
-}
-
-/* =============================================================================
-   SECTION 23: Footer (new .ci-footer system)
-   ============================================================================= */
-
-.ci-footer {
-  background: var(--color-surface-warm);
-  border-top: 1px solid var(--color-border);
-  padding: var(--space-8) var(--space-6) var(--space-5);
-}
-
-.ci-footer__top {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: var(--space-7);
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-border);
-}
-
-@media (max-width: 900px) {
-  .ci-footer__top {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .ci-footer__top {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ci-footer__brand-name {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-2);
-}
-
-.ci-footer__tagline {
-  font-size: 0.9375rem;
-  color: var(--color-ink-soft);
-  max-width: 28ch;
-  line-height: 1.6;
-  margin: 0 0 var(--space-4);
-}
-
-.ci-footer__social {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.ci-footer__social-link {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  color: var(--color-ink-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 180ms ease;
-  text-decoration: none;
-}
-
-.ci-footer__social-link:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  transform: translateY(-2px);
-}
-
-.ci-footer__nav-title {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-ink);
-  font-weight: 400;
-  margin: 0 0 var(--space-3);
-}
-
-.ci-footer__nav-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.ci-footer__nav-list a {
-  font-size: 0.9375rem;
-  color: var(--color-ink-soft);
-  text-decoration: none;
-  transition: color 150ms ease;
-}
-
-.ci-footer__nav-list a:hover {
-  color: var(--color-primary);
-}
-
-.ci-footer__bottom {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  padding-top: var(--space-4);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.ci-footer__copyright {
-  font-size: 0.8125rem;
-  color: var(--color-ink-faint);
-  margin: 0;
 }
 
 /* =============================================================================
@@ -1791,44 +850,6 @@ a {
 .delay-4 { animation-delay: 320ms; }
 .delay-5 { animation-delay: 400ms; }
 .delay-6 { animation-delay: 480ms; }
-
-/* @deprecated — use Button/Badge/Card components instead */
-.ci-skeleton {
-  background: linear-gradient(90deg, var(--color-surface-warm) 25%, var(--color-border) 50%, var(--color-surface-warm) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: var(--radius-md);
-}
-
-/* @deprecated — kept for migration; use .animate-fade-up */
-.ci-enter {
-  animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.ci-enter--1 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both; }
-.ci-enter--2 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
-.ci-enter--3 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 240ms both; }
-.ci-enter--4 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both; }
-.ci-enter--5 { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both; }
-
-/* @deprecated — kept for migration; use .animate-fade-up */
-.ci-hero-reveal {
-  animation: hero-reveal 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* @deprecated — kept for migration; use .animate-fade-up.delay-2 */
-.ci-hero-image-reveal {
-  animation: hero-image-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
-}
-
-/* @deprecated — kept for migration; use .animate-fade-up */
-.ci-trust-bar-reveal {
-  animation: trust-bar-reveal 500ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
-}
-
-/* @deprecated — kept for migration; use .animate-fade-up */
-.ci-card-spring {
-  animation: card-spring-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
 
 .skeleton-card {
   animation: pulse 1.3s ease-in-out infinite;
@@ -2597,16 +1618,9 @@ a {
     gap: var(--space-5);
   }
 
-  .ci-hero {
-    grid-template-columns: 1fr;
-    padding: var(--space-7) var(--space-5);
-    gap: var(--space-6);
-  }
-
   .animals-shell,
   .about-hero__content,
-  .about-quote,
-  .ci-cta-band {
+  .about-quote {
     padding-left: var(--space-5);
     padding-right: var(--space-5);
   }
@@ -2622,16 +1636,6 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .ci-steps {
-    grid-template-columns: 1fr;
-  }
-
-  .ci-footer__top {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .ci-grid-3,
-  .ci-split-layout,
   .about-story-grid,
   .about-value-grid,
   .animals-layout {
@@ -2657,144 +1661,7 @@ a {
    SECTION 30: Utility
    ============================================================================= */
 
-/* =============================================================================
-   SECTION 25B: Admin Dashboard
-   ============================================================================= */
-
-.ci-admin-canvas {
-  min-height: 100vh;
-  background: var(--gradient-admin-canvas);
-  padding: var(--space-8) var(--space-6);
-}
-
-@media (max-width: 640px) {
-  .ci-admin-canvas {
-    padding: var(--space-6) var(--space-5);
-  }
-}
-
-.ci-admin-header {
-  max-width: var(--max-width-content);
-  margin: 0 auto var(--space-8);
-}
-
-.ci-stat-card-grid {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  display: grid;
-  gap: var(--space-5);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-@media (max-width: 900px) {
-  .ci-stat-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .ci-stat-card-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Stat card icon badge circle — subtle 40px */
-.ci-stat-icon-badge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* Stat card — whole card clickable */
-.ci-stat-card {
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
-  text-decoration: none;
-  color: inherit;
-}
-
-.ci-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
-}
-
-/* Staff card */
-.ci-staff-card {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
-}
-
-.ci-staff-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
-}
-
-.ci-staff-avatar {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 9999px;
-  background: var(--color-primary-pale);
-  border: 2px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* Admin page header panel */
-.ci-admin-page-header {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-6) var(--space-5);
-  margin-bottom: var(--space-5);
-  max-width: var(--max-width-content);
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
-
-/* Staff card grid */
-.ci-staff-grid {
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ci-card:hover {
-    transform: none;
-  }
-
-  .ci-card:hover .ci-card__media img {
-    transform: none;
-  }
-
-  .ci-enter {
-    animation: none;
-  }
-
-  .ci-skeleton {
-    animation: none;
-  }
-
   /* New animation system — instant for reduced motion */
   .animate-fade-up {
     animation: none;

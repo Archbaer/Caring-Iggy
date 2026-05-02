@@ -9,7 +9,7 @@ import {
   resolveAuthenticatedRedirect,
 } from "@/lib/auth/role-check";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const session = await getSessionFromRequest(request);
   const pathname = request.nextUrl.pathname;
 

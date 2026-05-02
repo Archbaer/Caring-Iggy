@@ -25,7 +25,7 @@ export default async function SignupPage({ searchParams }: PageProps) {
   return (
     <div className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-20 bg-[var(--color-canvas)]">
       {/* Page header */}
-      <div className="w-full max-w-4xl mx-auto mb-10 text-center ci-hero-reveal">
+      <div className="w-full max-w-4xl mx-auto mb-10 text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
         <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
           Public auth route
         </p>

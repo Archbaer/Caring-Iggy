@@ -35,7 +35,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
         <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
         <h1 className="page-title">{currentAdopter.name}</h1>
         <p className="page-copy">
-          <span className="ci-badge">{currentAdopter.status}</span>
+          <span className="inline-flex items-center gap-1 font-[family-name:var(--font-mono)] text-[0.6875rem] font-normal tracking-[0.08em] uppercase py-1 px-2.5 rounded-[var(--radius-sm)]">{currentAdopter.status}</span>
         </p>
       </section>
 
@@ -113,7 +113,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
             <div className="flex flex-wrap gap-3 items-center">
               <button
                 type="button"
-                className="ci-btn ci-btn--primary"
+                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]"
                 onClick={() => setEditing(true)}
               >
                 Edit adopter

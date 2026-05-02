@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { AnimalFormFields } from "@/components/animals/animal-form-fields";
 import {
   deleteAnimalFromEditor,
   AnimalEditorApiError,
@@ -36,16 +37,6 @@ type EditorFormState = {
   imageUrl: string;
   previousOwnerId: string;
 };
-
-const STATUS_OPTIONS: AnimalStatusCode[] = [
-  "AVAILABLE",
-  "PENDING",
-  "ADOPTED",
-  "IN_TREATMENT",
-  "DECEASED",
-];
-const GENDER_OPTIONS: AnimalGender[] = ["MALE", "FEMALE", "UNKNOWN"];
-const SIZE_OPTIONS: AnimalSize[] = ["SMALL", "MEDIUM", "LARGE"];
 
 export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
   const router = useRouter();
@@ -153,6 +144,10 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     }
   }
 
+  function handleFieldChange(field: string, value: string) {
+    setUpdateForm((current) => ({ ...current, [field]: value }));
+  }
+
   return (
     <div className="page-shell">
       <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
@@ -164,105 +159,36 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
           </p>
 
           <form className="dashboard-form" onSubmit={handleUpdateSubmit}>
-            <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Name</span>
-                    <input className="auth-input" value={updateForm.name} onChange={(event) => setUpdateForm((current) => ({ ...current, name: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Animal type</span>
-                    <input className="auth-input" value={updateForm.animalType} onChange={(event) => setUpdateForm((current) => ({ ...current, animalType: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
+            <AnimalFormFields
+              formState={{
+                name: updateForm.name,
+                animalType: updateForm.animalType,
+                breed: updateForm.breed,
+                status: updateForm.status,
+                gender: updateForm.gender,
+                size: updateForm.size,
+                dateOfBirth: updateForm.dateOfBirth,
+                intakeDate: updateForm.intakeDate,
+                temperament: updateForm.temperament,
+                imageUrl: updateForm.imageUrl,
+                description: updateForm.description,
+              }}
+              onChange={handleFieldChange}
+            />
 
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Breed</span>
-                    <input className="auth-input" value={updateForm.breed} onChange={(event) => setUpdateForm((current) => ({ ...current, breed: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Status</span>
-                    <select className="auth-input" value={updateForm.status} onChange={(event) => setUpdateForm((current) => ({ ...current, status: event.target.value as AnimalStatusCode }))}>
-                      {STATUS_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Gender</span>
-                    <select className="auth-input" value={updateForm.gender} onChange={(event) => setUpdateForm((current) => ({ ...current, gender: event.target.value as AnimalGender | "" }))}>
-                      <option value="">Unspecified</option>
-                      {GENDER_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Size</span>
-                    <select className="auth-input" value={updateForm.size} onChange={(event) => setUpdateForm((current) => ({ ...current, size: event.target.value as AnimalSize | "" }))}>
-                      <option value="">Unspecified</option>
-                      {SIZE_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Date of birth</span>
-                    <input type="date" className="auth-input" value={updateForm.dateOfBirth} onChange={(event) => setUpdateForm((current) => ({ ...current, dateOfBirth: event.target.value }))} />
-                  </label>
-                  <label className="auth-field">
-                    <span className="auth-label">Intake date</span>
-                    <input type="date" className="auth-input" value={updateForm.intakeDate} onChange={(event) => setUpdateForm((current) => ({ ...current, intakeDate: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Temperament</span>
-                    <input className="auth-input" value={updateForm.temperament} onChange={(event) => setUpdateForm((current) => ({ ...current, temperament: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Image URL</span>
-                    <input className="auth-input" value={updateForm.imageUrl} onChange={(event) => setUpdateForm((current) => ({ ...current, imageUrl: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <div className="auth-grid" style={{ gridTemplateColumns: "1fr" }}>
-                  <label className="auth-field">
-                    <span className="auth-label">Previous owner ID</span>
-                    <input className="auth-input" value={updateForm.previousOwnerId} onChange={(event) => setUpdateForm((current) => ({ ...current, previousOwnerId: event.target.value }))} />
-                  </label>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerId">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner ID</span>
+                <input
+                  id="previousOwnerId"
+                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  value={updateForm.previousOwnerId}
+                  onChange={(event) =>
+                    setUpdateForm((current) => ({ ...current, previousOwnerId: event.target.value }))
+                  }
+                />
+              </label>
             </div>
-
-            <label className="auth-field">
-              <span className="auth-label">Description</span>
-              <textarea className="dashboard-textarea" rows={4} value={updateForm.description} onChange={(event) => setUpdateForm((current) => ({ ...current, description: event.target.value }))} />
-            </label>
 
             <div className="auth-actions" style={{ justifyContent: "center" }}>
               <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting}>

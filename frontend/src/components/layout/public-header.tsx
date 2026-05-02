@@ -71,7 +71,10 @@ export async function PublicHeader() {
         </nav>
 
         {/* Mobile menu hint */}
+        {/* TODO: implement mobile menu toggle */}
         <button
+          disabled
+          aria-disabled="true"
           aria-label="Open menu"
           className="sm:hidden p-2 rounded-lg text-[var(--color-ink-soft)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-colors duration-200"
         >
