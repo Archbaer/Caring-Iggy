@@ -36,3 +36,6 @@
 opencode.json
 CLAUDE.md
 docs/superpowers/plans/
+
+# Test directories
+**/src/test/*
