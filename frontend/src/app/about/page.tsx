@@ -70,7 +70,7 @@ export default function AboutPage() {
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-16 sm:py-20">
-          <div className="ci-hero-reveal">
+          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
             <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               San Francisco Animal Shelter
             </p>
@@ -83,7 +83,7 @@ export default function AboutPage() {
 
       {/* ─── Mission Quote ───────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center ci-hero-reveal">
+        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
           <div className="relative inline-flex flex-col items-center">
             {/* Decorative quote marks */}
             <span className="absolute -top-6 -left-8 font-[family-name:var(--font-display)] text-[8rem] text-[var(--color-primary-pale)] leading-none select-none pointer-events-none">
@@ -102,7 +102,7 @@ export default function AboutPage() {
       {/* ─── Story ────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-wide)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-          <div className="ci-hero-reveal">
+          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
             <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               Founded in 2018
             </p>
@@ -111,10 +111,10 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-5">
               <p className="text-[var(--color-ink-soft)] leading-relaxed text-base">
-                Caring Iggy began with a simple belief: that every animal deserves a home where they are truly understood. What started as one woman's effort to rescue a stray terrier named Iggy has grown into a dedicated team of staff, volunteers, and supporters working together to find the right match for every animal and every family.
+                Caring Iggy began with a simple belief: that every animal deserves a home where they are truly understood. What started as one woman&rsquo;s effort to rescue a stray terrier named Iggy has grown into a dedicated team of staff, volunteers, and supporters working together to find the right match for every animal and every family.
               </p>
               <p className="text-[var(--color-ink-soft)] leading-relaxed text-base">
-                We take time with every adoption. Our process isn't fast — it's thorough. We learn about the animals in our care, we learn about the families who approach us, and we do our best to make introductions that last a lifetime.
+                We take time with every adoption. Our process isn&rsquo;t fast — it&rsquo;s thorough. We learn about the animals in our care, we learn about the families who approach us, and we do our best to make introductions that last a lifetime.
               </p>
               <p className="text-[var(--color-ink-soft)] leading-relaxed text-base">
                 As a no-kill shelter, we never give up on an animal. Every resident in our care receives medical attention, behavioral support, and unconditional patience until the right home comes along.
@@ -123,7 +123,7 @@ export default function AboutPage() {
           </div>
 
           {/* Visual */}
-          <div className="ci-hero-image-reveal relative">
+          <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
             <div className="relative aspect-[5/4] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-7xl text-[var(--color-primary)] opacity-20">
@@ -215,7 +215,7 @@ export default function AboutPage() {
 
       {/* ─── CTA Band ────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center ci-hero-reveal">
+        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
           <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-white mb-5">
             Come visit us.
           </h2>
@@ -223,12 +223,12 @@ export default function AboutPage() {
             Mon–Sat 9AM–6PM at 742 Evergreen Terrace, San Francisco. No appointment needed for browsing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/animals" className="ci-btn ci-btn--white ci-btn--lg rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-white text-[var(--color-primary)] border-[1.5px] border-white hover:bg-[var(--color-primary-pale)] hover:border-[var(--color-primary-pale)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               Meet our animals
             </Link>
             <a
               href="mailto:hello@caringiggy.org"
-              className="ci-btn ci-btn--lg rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+              className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
             >
               Contact us
             </a>

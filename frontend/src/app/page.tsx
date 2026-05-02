@@ -92,7 +92,7 @@ export default async function Home() {
 
         <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Copy */}
-          <div className="ci-hero-reveal">
+          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
             <p className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-accent-pale)]/60 text-[var(--color-accent)] text-xs font-[family-name:var(--font-mono)] uppercase tracking-[0.12em]">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
               San Francisco Animal Shelter
@@ -108,13 +108,13 @@ export default async function Home() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/animals"
-                className="ci-btn ci-btn--primary ci-btn--lg rounded-full px-8 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-8 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
               >
                 Meet our animals
               </Link>
               <Link
                 href="/about"
-                className="ci-btn ci-btn--ghost ci-btn--lg rounded-full px-8 py-4 text-base font-semibold border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-8 py-4 text-base font-semibold border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
               >
                 Learn about us
               </Link>
@@ -123,7 +123,7 @@ export default async function Home() {
 
           {/* Hero image */}
           {featuredAnimals[0] && featuredAnimals[0].imageUrl ? (
-            <div className="ci-hero-image-reveal relative">
+            <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5]">
                 <Image
                   src={featuredAnimals[0].imageUrl}
@@ -147,7 +147,7 @@ export default async function Home() {
               </div>
             </div>
           ) : (
-            <div className="ci-hero-image-reveal relative">
+            <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)] flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-5xl text-[var(--color-primary)] opacity-30">
                   CI
@@ -159,7 +159,7 @@ export default async function Home() {
       </section>
 
       {/* ─── Trust Bar ──────────────────────────────────────────────────── */}
-      <div className="ci-trust-bar-reveal bg-[var(--color-surface-warm)] border-t border-b border-[var(--color-border)]">
+      <div className="animate-[trust-bar-reveal_500ms_cubic-bezier(0.22,1,0.36,1)_300ms_both] bg-[var(--color-surface-warm)] border-t border-b border-[var(--color-border)]">
         <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-5 flex flex-col sm:flex-row flex-wrap gap-6 sm:gap-10 justify-between items-start sm:items-center">
           {trustPoints.map((point, i) => (
             <div key={point.title} className={`flex items-start gap-3 delay-${i + 1}`}>
@@ -207,7 +207,7 @@ export default async function Home() {
           )}
 
           <div className="mt-12 flex justify-center">
-            <Link href="/animals" className="ci-btn ci-btn--primary ci-btn--lg rounded-full px-10 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               View all available animals
             </Link>
           </div>
@@ -329,10 +329,10 @@ export default async function Home() {
             Browse our animals and take the first step toward welcoming a new friend.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/animals" className="ci-btn ci-btn--white ci-btn--lg rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-white text-[var(--color-primary)] border-[1.5px] border-white hover:bg-[var(--color-primary-pale)] hover:border-[var(--color-primary-pale)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               Browse animals
             </Link>
-            <Link href="/about" className="ci-btn ci-btn--lg rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link href="/about" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               Learn about us
             </Link>
           </div>

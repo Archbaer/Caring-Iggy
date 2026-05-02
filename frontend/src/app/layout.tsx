@@ -45,11 +45,11 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
-      <body className="ci-body">
-        <div className="ci-frame">
+      <body className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.7] text-[var(--color-ink-soft)] min-h-screen">
+        <div className="flex flex-col min-h-screen">
           <PublicHeader />
 
-          <main className="ci-main">{children}</main>
+          <main className="flex-1 pb-[var(--space-7)] mx-auto w-[min(calc(100%-var(--space-6)),var(--max-width-content))]">{children}</main>
 
           <PublicFooter />
         </div>

@@ -93,7 +93,7 @@ export function AdminStaffDetailClient({ employee }: Props) {
               {currentEmployee.name}
             </h1>
             <div className="flex items-center gap-3">
-              <span className="ci-badge">{currentEmployee.role}</span>
+              <span className="inline-flex items-center gap-1 font-[family-name:var(--font-mono)] text-[0.6875rem] font-normal tracking-[0.08em] uppercase py-1 px-2.5 rounded-[var(--radius-sm)]">{currentEmployee.role}</span>
               <p className="text-sm text-[var(--color-ink-soft)]">{currentEmployee.email}</p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function AdminStaffDetailClient({ employee }: Props) {
             {!editing && (
               <button
                 type="button"
-                className="ci-btn ci-btn--primary w-fit"
+                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] w-fit"
                 onClick={() => setEditing(true)}
               >
                 Edit staff
@@ -174,7 +174,7 @@ export function AdminStaffDetailClient({ employee }: Props) {
           {deleteStep === "initial" ? (
             <button
               type="button"
-              className="ci-btn ci-btn--danger px-8 py-3 text-base font-semibold"
+              className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-danger)] text-white rounded-full border-none hover:bg-[var(--color-danger-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] px-8 py-3 text-base font-semibold"
               onClick={() => setDeleteStep("confirm")}
             >
               Delete staff
@@ -206,14 +206,14 @@ export function AdminStaffDetailClient({ employee }: Props) {
               <div className="flex flex-wrap gap-3 items-center justify-center">
                 <button
                   type="submit"
-                  className="ci-btn ci-btn--danger px-8 py-3 text-base font-semibold"
+                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-danger)] text-white rounded-full border-none hover:bg-[var(--color-danger-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] px-8 py-3 text-base font-semibold"
                   disabled={isDeleting || confirmName.trim() !== currentEmployee.name}
                 >
                   {isDeleting ? "Deleting..." : "Confirm deletion"}
                 </button>
                 <button
                   type="button"
-                  className="ci-btn ci-btn--ghost text-sm"
+                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] text-sm"
                   onClick={() => {
                     setDeleteStep("initial");
                     setConfirmName("");

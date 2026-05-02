@@ -26,8 +26,8 @@ export default async function DashboardMatchesPage() {
             see animal-adopter matches curated by our staff.
           </p>
           <div className="flex gap-3 justify-center">
-            <Link href="/dashboard" className="ci-btn ci-btn--primary">Back to dashboard</Link>
-            <Link href="/animals" className="ci-btn ci-btn--ghost">Browse animals</Link>
+            <Link href="/dashboard" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]">Back to dashboard</Link>
+            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)]">Browse animals</Link>
           </div>
         </section>
       </div>

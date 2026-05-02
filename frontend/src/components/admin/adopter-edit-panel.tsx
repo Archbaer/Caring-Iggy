@@ -181,12 +181,12 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
         ) : null}
 
         <div className="flex flex-wrap gap-3 items-center">
-          <button type="submit" className="ci-btn ci-btn--primary" disabled={isPending}>
+          <button type="submit" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]" disabled={isPending}>
             {isPending ? "Saving..." : "Save changes"}
           </button>
           <button
             type="button"
-            className="ci-btn ci-btn--secondary secondary"
+            className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-surface-warm)] text-[var(--color-ink-soft)]"
             onClick={onCancel}
             disabled={isPending}
           >
