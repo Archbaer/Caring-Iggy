@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
-import { fetchAuthSession } from "@/lib/api/auth";
+import { refreshCsrfToken } from "@/lib/api/auth";
 import type { BffError } from "@/lib/types";
 
 import { StaffEditPanel } from "@/components/admin/staff-edit-panel";
@@ -40,7 +40,7 @@ export function AdminStaffDetailClient({ employee }: Props) {
       return;
     }
 
-    const token = csrfTokenRef.current ?? (await refreshCsrfTokenImpl());
+    const token = csrfTokenRef.current ?? (await refreshCsrfToken());
 
     if (!token) {
       setDeleteError("Security checks could not be prepared. Refresh and try again.");
@@ -232,11 +232,3 @@ export function AdminStaffDetailClient({ employee }: Props) {
   );
 }
 
-async function refreshCsrfTokenImpl(): Promise<string | null> {
-  try {
-    const session = await fetchAuthSession();
-    return session.csrfToken;
-  } catch {
-    return null;
-  }
-}

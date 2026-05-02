@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
-import { AuthApiError, fetchAuthSession, signup } from "@/lib/api/auth";
+import { AuthApiError, fetchAuthSession, signup, refreshCsrfToken } from "@/lib/api/auth";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
 import type { SignupRequest } from "@/lib/types";
 
@@ -53,6 +53,8 @@ export function SignupForm() {
 
   async function submitSignup() {
     const token = csrfTokenRef.current ?? (await refreshCsrfToken());
+
+    if (token) csrfTokenRef.current = token;
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -183,15 +185,6 @@ export function SignupForm() {
     </article>
   );
 
-  async function refreshCsrfToken() {
-    try {
-      const session = await fetchAuthSession();
-      csrfTokenRef.current = session.csrfToken;
-      return session.csrfToken;
-    } catch {
-      return null;
-    }
-  }
 }
 
 type FormFieldProps = {

@@ -9,7 +9,7 @@ import {
   updateAnimalFromEditor,
 } from "@/lib/api/animal-editor-client";
 import type { AnimalDetailView } from "@/lib/api/animals";
-import { fetchAuthSession } from "@/lib/api/auth";
+import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
 import type {
   AnimalGender,
   AnimalSize,
@@ -89,6 +89,8 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     event.preventDefault();
     const token = await refreshCsrfToken();
 
+    if (token) setCsrfToken(token);
+
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
       return;
@@ -129,6 +131,8 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
 
   async function handleDelete() {
     const token = await refreshCsrfToken();
+
+    if (token) setCsrfToken(token);
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -297,16 +301,6 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
       ) : null}
     </div>
   );
-
-  async function refreshCsrfToken() {
-    try {
-      const session = await fetchAuthSession();
-      setCsrfToken(session.csrfToken);
-      return session.csrfToken;
-    } catch {
-      return null;
-    }
-  }
 
   async function handleMutationError(error: unknown) {
     setErrorMessage(toEditorMessage(error));

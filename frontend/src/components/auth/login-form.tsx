@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
-import { AuthApiError, fetchAuthSession, login } from "@/lib/api/auth";
+import { AuthApiError, fetchAuthSession, login, refreshCsrfToken } from "@/lib/api/auth";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
 
 type LoginFields = {
@@ -47,6 +47,8 @@ export function LoginForm() {
     event.preventDefault();
 
     const token = csrfTokenRef.current ?? (await refreshCsrfToken());
+
+    if (token) csrfTokenRef.current = token;
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -152,15 +154,6 @@ export function LoginForm() {
     </article>
   );
 
-  async function refreshCsrfToken() {
-    try {
-      const session = await fetchAuthSession();
-      csrfTokenRef.current = session.csrfToken;
-      return session.csrfToken;
-    } catch {
-      return null;
-    }
-  }
 }
 
 function toDisplayMessage(error: unknown): string {
