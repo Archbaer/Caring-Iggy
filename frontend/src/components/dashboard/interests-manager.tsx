@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { InterestStatusList } from "@/components/dashboard/interest-status-list";
 import { saveAdopterInterests, AdopterApiError } from "@/lib/api/adopter-client";
 import type { AnimalSummaryView } from "@/lib/api/animals";
-import { fetchAuthSession } from "@/lib/api/auth";
+import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
 import { MAX_INTERESTS } from "@/lib/types";
 
 type InterestsManagerProps = {
@@ -21,14 +21,19 @@ export function InterestsManager({
 }: InterestsManagerProps) {
   const router = useRouter();
 
-  const dedupedCurrent = Array.from(
-    new Map(rawCurrentAnimals.map((a) => [a.id, a])).values(),
+  const dedupedCurrent = useMemo(
+    () => Array.from(new Map(rawCurrentAnimals.map((a) => [a.id, a])).values()),
+    [rawCurrentAnimals],
   );
-  const dedupedCatalog = Array.from(
-    new Map(rawCatalogAnimals.map((a) => [a.id, a])).values(),
+  const dedupedCatalog = useMemo(
+    () => Array.from(new Map(rawCatalogAnimals.map((a) => [a.id, a])).values()),
+    [rawCatalogAnimals],
   );
 
-  const initialIds = Array.from(new Set(dedupedCurrent.map((a) => a.id)));
+  const initialIds = useMemo(
+    () => Array.from(new Set(dedupedCurrent.map((a) => a.id))),
+    [dedupedCurrent],
+  );
 
   const [selectedIds, setSelectedIds] = useState<string[]>(initialIds);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
@@ -74,8 +79,11 @@ export function InterestsManager({
   const selectedAnimals = Array.from(new Set(selectedIds))
     .map((animalId) => animalsById.get(animalId))
     .filter((animal): animal is AnimalSummaryView => Boolean(animal));
-  const availableAnimals = dedupedCatalog.filter(
-    (animal) => !selectedIds.includes(animal.id) && animal.status === "AVAILABLE",
+  const availableAnimals = useMemo(
+    () => dedupedCatalog.filter(
+      (animal) => !selectedIds.includes(animal.id) && animal.status === "AVAILABLE",
+    ),
+    [dedupedCatalog, selectedIds],
   );
   const capReached = selectedIds.length >= MAX_INTERESTS;
 
@@ -160,6 +168,8 @@ export function InterestsManager({
   async function updateInterests(nextIds: string[], animalId: string) {
     const token = await refreshCsrfToken();
 
+    if (token) setCsrfToken(token);
+
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
       return;
@@ -195,16 +205,6 @@ export function InterestsManager({
     }
   }
 
-  async function refreshCsrfToken() {
-    try {
-      const session = await fetchAuthSession();
-      setCsrfToken(session.csrfToken);
-
-      return session.csrfToken;
-    } catch {
-      return null;
-    }
-  }
 }
 
 function toDisplayMessage(error: unknown): string {

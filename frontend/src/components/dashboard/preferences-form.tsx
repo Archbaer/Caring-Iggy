@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { saveAdopterPreferences, AdopterApiError } from "@/lib/api/adopter-client";
-import { fetchAuthSession } from "@/lib/api/auth";
+import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
 import type { AdopterPreferences } from "@/lib/types";
 
 type PreferencesField = "preferredAnimalTypes" | "preferredBreeds" | "minAge" | "maxAge" | "preferredGenders" | "preferredSizes" | "preferredTemperaments" | "notes";
@@ -79,6 +79,8 @@ export function PreferencesForm({
     event.preventDefault();
 
     const token = csrfToken ?? (await refreshCsrfToken());
+
+    if (token) setCsrfToken(token);
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -383,16 +385,6 @@ export function PreferencesForm({
     </form>
   );
 
-  async function refreshCsrfToken() {
-    try {
-      const session = await fetchAuthSession();
-      setCsrfToken(session.csrfToken);
-
-      return session.csrfToken;
-    } catch {
-      return null;
-    }
-  }
 }
 
 function readFieldErrors(error: unknown): Record<PreferencesField, string[]> {

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
-import { fetchAuthSession } from "@/lib/api/auth";
+import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
 import type { BffError } from "@/lib/types";
 
 type EditFields = {
@@ -55,7 +55,7 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const token = csrfTokenRef.current ?? (await refreshCsrfTokenImpl());
+    const token = csrfTokenRef.current ?? (await refreshCsrfToken());
 
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
@@ -166,13 +166,4 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
       </form>
     </article>
   );
-}
-
-async function refreshCsrfTokenImpl(): Promise<string | null> {
-  try {
-    const session = await fetchAuthSession();
-    return session.csrfToken;
-  } catch {
-    return null;
-  }
 }

@@ -36,6 +36,15 @@ export async function fetchAuthSession(): Promise<AuthSessionSnapshot> {
   });
 }
 
+export async function refreshCsrfToken(): Promise<string | null> {
+  try {
+    const session = await fetchAuthSession();
+    return session.csrfToken;
+  } catch {
+    return null;
+  }
+}
+
 export async function login(
   body: LoginRequest,
   csrfToken: string,
