@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
 
@@ -98,9 +99,15 @@ export async function PublicFooter() {
             <ul className="space-y-2">
               {quickLinks.map((link, i) => (
                 <li key={`quick-${i}`}>
-                  <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -114,9 +121,9 @@ export async function PublicFooter() {
             <ul className="space-y-2">
               {adoptLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                  <Link href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -153,12 +160,12 @@ export async function PublicFooter() {
             &copy; {new Date().getFullYear()} Caring Iggy Animal Shelter. All rights reserved.
           </p>
           {session && (
-            <a
+            <Link
               href={dashboardLink}
               className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150"
             >
               {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
-            </a>
+            </Link>
           )}
         </div>
       </div>

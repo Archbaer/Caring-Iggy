@@ -3,18 +3,13 @@ import { redirect } from "next/navigation";
 import { SignupForm } from "@/components/auth/signup-form";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { resolveAuthenticatedRedirect } from "@/lib/auth/role-check";
+import { readQueryValue } from "@/lib/utils/url";
 
 type PageProps = {
   searchParams: Promise<{
     redirect?: string | string[];
   }>;
 };
-
-function readQueryValue(value?: string | string[]): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value[0];
-  return undefined;
-}
 
 export default async function SignupPage({ searchParams }: PageProps) {
   const [session, resolvedSearchParams] = await Promise.all([

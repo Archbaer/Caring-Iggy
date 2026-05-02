@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   fetchAdminEmployeeDetail,
   type AdminEmployeeDetail,
@@ -31,9 +32,9 @@ export default async function AdminStaffDetailPage({ params }: PageProps) {
         </section>
 
         <nav className="flex items-center gap-2">
-          <a href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+          <Link href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
             ← Staff
-          </a>
+          </Link>
         </nav>
 
         <section className="flex flex-col gap-3 py-8 text-center">
