@@ -62,72 +62,105 @@ export async function PublicFooter() {
   const dashboardLink = session ? defaultRouteForRole(session.role) : "/dashboard";
 
   return (
-    <footer className="ci-footer">
-      <div className="ci-footer__top">
-        <div>
-          <p className="ci-footer__brand-name">Caring Iggy</p>
-          <p className="ci-footer__tagline">Finding loving homes for animals in need since 2018.</p>
-          <div className="ci-footer__social">
-            {socialLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="ci-footer__social-link"
-                aria-label={link.label}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {link.icon}
-              </a>
-            ))}
+    <footer className="bg-[var(--color-surface-warm)] border-t border-[var(--color-border)]">
+      <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-12 pb-8">
+        {/* Top section: 4 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-10 text-center sm:text-left">
+          {/* Brand + Social */}
+          <div className="space-y-4 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
+            <p className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)]">
+              Caring Iggy
+            </p>
+            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed max-w-[28ch] mx-auto sm:mx-0">
+              Finding loving homes for animals in need since 2018.
+            </p>
+            <div className="flex gap-2 justify-center sm:justify-start">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="w-9 h-9 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:-translate-y-0.5 transition-all duration-200"
+                  aria-label={link.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
+            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+              Quick Links
+            </p>
+            <ul className="space-y-2">
+              {quickLinks.map((link, i) => (
+                <li key={`quick-${i}`}>
+                  <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Adopt */}
+          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
+            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+              Adopt
+            </p>
+            <ul className="space-y-2">
+              {adoptLinks.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
+            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+              Contact
+            </p>
+            <ul className="space-y-2 text-sm text-[var(--color-ink-soft)]">
+              <li>
+                <a href={`mailto:${contactInfo.email}`} className="hover:text-[var(--color-primary)] transition-colors duration-150">
+                  {contactInfo.email}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`} className="hover:text-[var(--color-primary)] transition-colors duration-150">
+                  {contactInfo.phone}
+                </a>
+              </li>
+              <li>{contactInfo.hours}</li>
+              <li className="mt-2 leading-snug">
+                742 Evergreen Terrace<br />
+                San Francisco, CA 94102
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div>
-          <p className="ci-footer__nav-title">Quick Links</p>
-          <ul className="ci-footer__nav-list">
-            {quickLinks.map((link, i) => (
-              <li key={`quick-${i}`}>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-          </ul>
+        {/* Divider */}
+        <div className="border-t border-[var(--color-divider)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[var(--color-ink-faint)]">
+            &copy; {new Date().getFullYear()} Caring Iggy Animal Shelter. All rights reserved.
+          </p>
+          {session && (
+            <a
+              href={dashboardLink}
+              className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150"
+            >
+              {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
+            </a>
+          )}
         </div>
-
-        <div>
-          <p className="ci-footer__nav-title">Adopt</p>
-          <ul className="ci-footer__nav-list">
-            {adoptLinks.map((link) => (
-              <li key={link.href}>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="ci-footer__nav-title">Contact</p>
-          <ul className="ci-footer__nav-list" style={{ fontStyle: "normal" }}>
-            <li><a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a></li>
-            <li><a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`}>{contactInfo.phone}</a></li>
-            <li style={{ color: "var(--color-ink-soft)", fontSize: "0.9375rem" }}>{contactInfo.hours}</li>
-            <li style={{ color: "var(--color-ink-soft)", fontSize: "0.9375rem", marginTop: "var(--space-2)" }}>
-              742 Evergreen Terrace<br />
-              San Francisco, CA 94102
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="ci-footer__bottom">
-        <p className="ci-footer__copyright">
-          &copy; {new Date().getFullYear()} Caring Iggy Animal Shelter. All rights reserved.
-        </p>
-        {session && (
-          <a href={dashboardLink} className="ci-btn ci-btn--subtle ci-btn--sm">
-            {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
-          </a>
-        )}
       </div>
     </footer>
   );
