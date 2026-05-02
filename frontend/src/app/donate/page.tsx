@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 
-import { PublicFooter } from "@/components/layout/public-footer";
-
 export const metadata: Metadata = {
   title: "Donate — Caring Iggy Animal Shelter",
   description:
@@ -117,8 +115,6 @@ export default function DonatePage() {
           Email our team
         </a>
       </div>
-
-      <PublicFooter />
     </>
   );
 }

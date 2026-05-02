@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -39,9 +40,9 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
       </section>
 
       <nav className="flex items-center gap-2">
-        <a href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+        <Link href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
           ← Adopters
-        </a>
+        </Link>
       </nav>
 
       <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4">

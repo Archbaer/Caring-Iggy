@@ -7,6 +7,7 @@ import type { AnimalSummaryView } from "@/lib/api/animals";
 import { isAnimalStatusCode } from "@/lib/constants/status-map";
 import type { AnimalSummary } from "@/lib/types";
 import { getCurrentSession } from "@/lib/auth/server-session";
+import { readQueryValue } from "@/lib/utils/url";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +24,6 @@ type PageProps = {
 type AnimalsResult =
   | { kind: "success"; animals: Awaited<ReturnType<typeof fetchAnimals>> }
   | { kind: "error"; message: string };
-
-function readQueryValue(value?: string | string[]): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value[0];
-  return undefined;
-}
 
 function readQueryArray(value?: string | string[]): string[] {
   if (typeof value === "string") return [value];

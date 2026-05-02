@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { PublicFooter } from "@/components/layout/public-footer";
 import { LOGIN_ROUTE } from "@/lib/auth/role-check";
 import { getCurrentSession } from "@/lib/auth/server-session";
 
@@ -26,13 +26,11 @@ export default async function DashboardMatchesPage() {
             see animal-adopter matches curated by our staff.
           </p>
           <div className="flex gap-3 justify-center">
-            <a href="/dashboard" className="ci-btn ci-btn--primary">Back to dashboard</a>
-            <a href="/animals" className="ci-btn ci-btn--ghost">Browse animals</a>
+            <Link href="/dashboard" className="ci-btn ci-btn--primary">Back to dashboard</Link>
+            <Link href="/animals" className="ci-btn ci-btn--ghost">Browse animals</Link>
           </div>
         </section>
       </div>
-
-      <PublicFooter />
     </>
   );
 }
