@@ -229,12 +229,12 @@ export function AnimalCreator() {
         </div>
 
         <div className="flex gap-4">
-          <Button type="submit" variant="primary" className="flex-1" disabled={isCreating}>
+          <Button type="submit" variant="default" className="flex-1" disabled={isCreating}>
             {isCreating ? "Creating..." : "Add Animal"}
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             className="flex-1"
             onClick={() => router.push("/animals")}
           >

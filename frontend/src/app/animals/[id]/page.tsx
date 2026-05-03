@@ -109,8 +109,8 @@ export default async function AnimalDetailPage({ params }: PageProps) {
             Animal profile unavailable.
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] mb-5">{result.message}</p>
-          <Button as="a" href="/animals" variant="primary">
-            Back to animals
+          <Button asChild variant="default">
+            <a href="/animals">Back to animals</a>
           </Button>
         </div>
       </div>

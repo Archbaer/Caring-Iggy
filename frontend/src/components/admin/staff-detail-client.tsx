@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
 import { refreshCsrfToken } from "@/lib/api/auth";
 import type { BffError } from "@/lib/types";
@@ -102,8 +104,8 @@ export function AdminStaffDetailClient({ employee }: Props) {
         {/* Info + Edit/Actions row */}
         <section className="grid grid-cols-[1fr_1fr] gap-4 animate-fade-up delay-1">
           {/* Identity card */}
-          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Identity</p>
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] text-center">Identity</p>
             <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)]">
               Account metadata
             </h2>
@@ -132,8 +134,8 @@ export function AdminStaffDetailClient({ employee }: Props) {
           </article>
 
           {/* Edit/Actions card */}
-          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
+          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 flex flex-col gap-4 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] text-center">Actions</p>
             <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)]">
               Manage this record
             </h2>
@@ -154,13 +156,7 @@ export function AdminStaffDetailClient({ employee }: Props) {
             </div>
 
             {!editing && (
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] w-fit"
-                onClick={() => setEditing(true)}
-              >
-                Edit staff
-              </button>
+              <Button onClick={() => setEditing(true)}>Edit staff</Button>
             )}
           </article>
         </section>
@@ -172,13 +168,9 @@ export function AdminStaffDetailClient({ employee }: Props) {
           </h2>
 
           {deleteStep === "initial" ? (
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-danger)] text-white rounded-full border-none hover:bg-[var(--color-danger-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] px-8 py-3 text-base font-semibold"
-              onClick={() => setDeleteStep("confirm")}
-            >
+            <Button variant="destructive" onClick={() => setDeleteStep("confirm")}>
               Delete staff
-            </button>
+            </Button>
           ) : (
             <form
               onSubmit={(e) => {
@@ -204,25 +196,16 @@ export function AdminStaffDetailClient({ employee }: Props) {
                 </p>
               ) : null}
               <div className="flex flex-wrap gap-3 items-center justify-center">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-danger)] text-white rounded-full border-none hover:bg-[var(--color-danger-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] px-8 py-3 text-base font-semibold"
-                  disabled={isDeleting || confirmName.trim() !== currentEmployee.name}
-                >
+                <Button variant="destructive" type="submit" disabled={isDeleting || confirmName.trim() !== currentEmployee.name}>
                   {isDeleting ? "Deleting..." : "Confirm deletion"}
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] text-sm"
-                  onClick={() => {
-                    setDeleteStep("initial");
-                    setConfirmName("");
-                    setDeleteError(null);
-                  }}
-                  disabled={isDeleting}
-                >
+                </Button>
+                <Button variant="outline" type="button" onClick={() => {
+                  setDeleteStep("initial");
+                  setConfirmName("");
+                  setDeleteError(null);
+                }} disabled={isDeleting}>
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           )}
