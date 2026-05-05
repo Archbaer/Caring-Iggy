@@ -128,7 +128,6 @@ export async function fetchAdminAdopters(): Promise<AdminAdopterSummary[]> {
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
   const response = await fetch(serviceUrl("ADOPTER", "/api/adopters"), {
-    credentials: "same-origin",
     cache: "no-store",
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
@@ -151,18 +150,17 @@ export async function fetchAdminAdopterDetail(
 ): Promise<AdminAdopterDetail> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
-  const cookieHeader = sessionToken ? `${SESSION_COOKIE_NAME}=${sessionToken}` : null;
 
   const [profileResponse, historyResponse] = await Promise.all([
     fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: cookieHeader ? { cookie: cookieHeader } : {},
+      headers: sessionToken
+        ? { cookie: serializeBackendSessionCookie(sessionToken) }
+        : {},
     }),
     fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}/history`), {
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: cookieHeader ? { cookie: cookieHeader } : {},
+      headers: sessionToken
+        ? { cookie: serializeBackendSessionCookie(sessionToken) }
+        : {},
     }),
   ]);
 
@@ -201,8 +199,6 @@ export async function fetchAdminEmployees(): Promise<AdminEmployeeSummary[]> {
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
   const response = await fetch(serviceUrl("USER", "/api/employees"), {
-    credentials: "same-origin",
-    cache: "no-store",
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
       : {},
@@ -226,7 +222,6 @@ export async function fetchAdminEmployeeDetail(
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
-    credentials: "same-origin",
     cache: "no-store",
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
@@ -252,11 +247,10 @@ export async function provisionStaff(
 
   const path = body.role === "ADMIN" ? "/api/auth/provision/admin" : "/api/auth/provision/staff";
   const response = await fetch(serviceUrl("USER", path), {
-    credentials: "same-origin",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(sessionToken ? { cookie: `${SESSION_COOKIE_NAME}=${sessionToken}` } : {}),
+      ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
     },
     body: JSON.stringify(body),
   });
@@ -282,9 +276,15 @@ export async function updateAdopter(
   adopterId: string,
   body: UpdateAdopterRequest,
 ): Promise<AdminAdopterDetail> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
+    },
     body: JSON.stringify(body),
   });
   if (!response.ok) {
@@ -301,10 +301,15 @@ export async function updateStaff(
   employeeId: string,
   body: UpdateStaffRequest,
 ): Promise<AdminEmployeeDetail> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
-    credentials: "same-origin",
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
+    },
     body: JSON.stringify(body),
   });
 
@@ -320,9 +325,14 @@ export async function updateStaff(
 }
 
 export async function deleteStaff(employeeId: string): Promise<void> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+
   const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
-    credentials: "same-origin",
     method: "DELETE",
+    headers: sessionToken
+      ? { cookie: serializeBackendSessionCookie(sessionToken) }
+      : {},
   });
 
   if (!response.ok) {

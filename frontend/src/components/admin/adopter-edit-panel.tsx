@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import type { AdminAdopterDetail } from "@/lib/api/admin";
 import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
+import { CSRF_HEADER_NAME } from "@/lib/auth/csrf";
 import { Button } from "@/components/ui/button";
 import type { BffError } from "@/lib/types";
 
@@ -73,9 +74,10 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
     try {
       const response = await fetch(`/api/admin/adopters/${adopter.id}`, {
         method: "PUT",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": token,
+          [CSRF_HEADER_NAME]: token,
         },
         body: JSON.stringify({
           name: fields.name.trim() || undefined,

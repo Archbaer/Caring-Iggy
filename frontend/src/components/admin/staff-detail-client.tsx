@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
 import { refreshCsrfToken } from "@/lib/api/auth";
+import { CSRF_HEADER_NAME } from "@/lib/auth/csrf";
 import type { BffError } from "@/lib/types";
 
 import { StaffEditPanel } from "@/components/admin/staff-edit-panel";
+import { SuccessCard } from "@/components/ui/success-card";
 
 type Props = {
   employee: AdminEmployeeDetail;
@@ -24,11 +26,11 @@ export function AdminStaffDetailClient({ employee }: Props) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmName, setConfirmName] = useState("");
+  const [successEmployee, setSuccessEmployee] = useState<AdminEmployeeDetail | null>(null);
   const csrfTokenRef = useRef<string | null>(null);
 
   function handleSuccess(updated: AdminEmployeeDetail) {
-    setCurrentEmployee(updated);
-    setEditing(false);
+    setSuccessEmployee(updated);
     router.refresh();
   }
 
@@ -55,9 +57,10 @@ export function AdminStaffDetailClient({ employee }: Props) {
     try {
       const response = await fetch(`/api/admin/staff/${employee.id}`, {
         method: "DELETE",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": token,
+          [CSRF_HEADER_NAME]: token,
         },
       });
 
@@ -72,6 +75,26 @@ export function AdminStaffDetailClient({ employee }: Props) {
     } finally {
       setIsDeleting(false);
     }
+  }
+
+  if (successEmployee) {
+    return (
+      <div className="min-h-screen" style={{ background: "var(--gradient-admin-canvas)" }}>
+        <div className="max-w-[var(--max-width-content)] mx-auto px-6 sm:px-8 py-12">
+          <SuccessCard
+            title="Staff record updated"
+            fields={[
+              { label: "Name", value: successEmployee.name },
+              { label: "Email", value: successEmployee.email },
+              { label: "Telephone", value: successEmployee.telephone ?? "—" },
+              { label: "Role", value: successEmployee.role },
+            ]}
+            primaryHref="/dashboard/admin/staff"
+            primaryLabel="See all staff"
+          />
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { AdminAdopterDetail } from "@/lib/api/admin";
 
 import { AdopterEditPanel } from "@/components/admin/adopter-edit-panel";
+import { SuccessCard } from "@/components/ui/success-card";
 
 type Props = {
   adopter: AdminAdopterDetail;
@@ -17,10 +18,10 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [currentAdopter, setCurrentAdopter] = useState(adopter);
+  const [successAdopter, setSuccessAdopter] = useState<AdminAdopterDetail | null>(null);
 
   function handleSuccess(updated: AdminAdopterDetail) {
-    setCurrentAdopter(updated);
-    setEditing(false);
+    setSuccessAdopter(updated);
     router.refresh();
   }
 
@@ -29,6 +30,25 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
   }
 
   const preferenceEntries = Object.entries(currentAdopter.preferences);
+
+  if (successAdopter) {
+    return (
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 py-12">
+        <SuccessCard
+          title="Adopter record updated"
+          fields={[
+            { label: "Name", value: successAdopter.name },
+            { label: "Email", value: successAdopter.email },
+            { label: "Telephone", value: successAdopter.telephone },
+            { label: "Address", value: successAdopter.address || "—" },
+            { label: "Status", value: successAdopter.status },
+          ]}
+          primaryHref="/dashboard/admin/adopters"
+          primaryLabel="See all adopters"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 space-y-6">

@@ -18,6 +18,7 @@ import type {
   BffError,
 } from "@/lib/types";
 import { readErrorMessage } from "@/lib/utils/animal-editor";
+import { SuccessCard } from "@/components/ui/success-card";
 
 type EditorFormState = {
   name: string;
@@ -50,6 +51,7 @@ export function AnimalCreator() {
   const [isCreating, setIsCreating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [createdAnimalData, setCreatedAnimalData] = useState<{ id: string; name: string; animalType: string; breed: string; status: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,52 +91,56 @@ export function AnimalCreator() {
     setSuccessMessage(null);
 
     try {
-      const createdAnimal = await createAnimalFromEditor(
-        {
-          name: createForm.name.trim(),
-          ...(createForm.animalType.trim()
-            ? { animalType: createForm.animalType.trim() }
-            : {}),
-          ...(createForm.breed.trim() ? { breed: createForm.breed.trim() } : {}),
-          status: createForm.status,
-          ...(createForm.gender ? { gender: createForm.gender } : {}),
-          ...(createForm.size ? { size: createForm.size } : {}),
-          ...(createForm.dateOfBirth
-            ? { dateOfBirth: createForm.dateOfBirth }
-            : {}),
-          ...(createForm.intakeDate ? { intakeDate: createForm.intakeDate } : {}),
-          ...(createForm.temperament.trim()
-            ? { temperament: createForm.temperament.trim() }
-            : {}),
-          ...(createForm.description.trim()
-            ? { description: createForm.description.trim() }
-            : {}),
-          ...(createForm.imageUrl.trim()
-            ? { imageUrl: createForm.imageUrl.trim() }
-            : {}),
-          ...(createForm.previousOwnerName.trim() &&
-          createForm.previousOwnerTelephone.trim()
-            ? {
-                previousOwner: {
-                  name: createForm.previousOwnerName.trim(),
-                  telephone: createForm.previousOwnerTelephone.trim(),
-                  ...(createForm.previousOwnerEmail.trim()
-                    ? { email: createForm.previousOwnerEmail.trim() }
-                    : {}),
-                  ...(createForm.previousOwnerAddress.trim()
-                    ? { address: createForm.previousOwnerAddress.trim() }
-                    : {}),
-                },
-              }
-            : {}),
-        },
-        token,
-      );
+      const requestBody = {
+        name: createForm.name.trim(),
+        ...(createForm.animalType.trim()
+          ? { animalType: createForm.animalType.trim() }
+          : {}),
+        ...(createForm.breed.trim() ? { breed: createForm.breed.trim() } : {}),
+        status: createForm.status,
+        ...(createForm.gender ? { gender: createForm.gender } : {}),
+        ...(createForm.size ? { size: createForm.size } : {}),
+        ...(createForm.dateOfBirth
+          ? { dateOfBirth: createForm.dateOfBirth }
+          : {}),
+        ...(createForm.intakeDate ? { intakeDate: createForm.intakeDate } : {}),
+        ...(createForm.temperament.trim()
+          ? { temperament: createForm.temperament.trim() }
+          : {}),
+        ...(createForm.description.trim()
+          ? { description: createForm.description.trim() }
+          : {}),
+        ...(createForm.imageUrl.trim()
+          ? { imageUrl: createForm.imageUrl.trim() }
+          : {}),
+        ...(createForm.previousOwnerName.trim() &&
+        createForm.previousOwnerTelephone.trim()
+          ? {
+              previousOwner: {
+                name: createForm.previousOwnerName.trim(),
+                telephone: createForm.previousOwnerTelephone.trim(),
+                ...(createForm.previousOwnerEmail.trim()
+                  ? { email: createForm.previousOwnerEmail.trim() }
+                  : {}),
+                ...(createForm.previousOwnerAddress.trim()
+                  ? { address: createForm.previousOwnerAddress.trim() }
+                  : {}),
+              },
+            }
+          : {}),
+      };
+      console.log("[DEBUG AnimalCreator] request body:", JSON.stringify(requestBody));
+      console.log("[DEBUG AnimalCreator] CSRF token:", token);
+      const createdAnimal = await createAnimalFromEditor(requestBody, token);
 
       setCreateForm(createEmptyForm());
-      setSuccessMessage("Animal record created.");
-      router.push(`/animals/${createdAnimal.id}`);
-      router.refresh();
+      setCreatedAnimalData({
+        id: createdAnimal.id,
+        name: createdAnimal.name,
+        animalType: createdAnimal.animalType,
+        breed: createdAnimal.breed,
+        status: createdAnimal.status,
+      });
     } catch (error) {
       await handleMutationError(error);
     } finally {
@@ -144,6 +150,26 @@ export function AnimalCreator() {
 
   function handleFieldChange(field: string, value: string) {
     setCreateForm((current) => ({ ...current, [field]: value }));
+  }
+
+  if (createdAnimalData) {
+    return (
+      <div className="max-w-3xl">
+        <SuccessCard
+          title="Animal record created"
+          fields={[
+            { label: "Name", value: createdAnimalData.name },
+            { label: "Type", value: createdAnimalData.animalType },
+            { label: "Breed", value: createdAnimalData.breed },
+            { label: "Status", value: createdAnimalData.status },
+          ]}
+          primaryHref="/animals"
+          primaryLabel="See all animals"
+          secondaryHref={`/animals/${createdAnimalData.id}`}
+          secondaryLabel="See animal"
+        />
+      </div>
+    );
   }
 
   return (

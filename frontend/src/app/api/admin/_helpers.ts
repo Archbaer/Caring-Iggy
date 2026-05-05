@@ -6,12 +6,12 @@ import {
   extractCsrfToken,
   validateCsrfRequest,
 } from "@/lib/auth/csrf";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { readSessionFromRequest } from "@/lib/auth/server";
 
 export async function requireAdminRequest(
   request: NextRequest,
 ): Promise<{ ok: true } | { ok: false; response: Response }> {
-  const session = await getSessionFromRequest(request);
+  const session = await readSessionFromRequest(request);
 
   if (!session) {
     return {
@@ -22,7 +22,7 @@ export async function requireAdminRequest(
     };
   }
 
-  if (session.role !== "ADMIN") {
+  if (session.user.role !== "ADMIN") {
     return {
       ok: false,
       response: errorResponse(

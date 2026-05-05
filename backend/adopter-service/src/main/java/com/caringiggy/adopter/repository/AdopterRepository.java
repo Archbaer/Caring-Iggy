@@ -210,15 +210,35 @@ public class AdopterRepository {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (!first) sb.append(",");
             sb.append("\"").append(entry.getKey()).append("\":");
-            if (entry.getValue() instanceof String) {
-                sb.append("\"").append(entry.getValue()).append("\"");
-            } else {
-                sb.append(entry.getValue());
-            }
+            appendJsonValue(sb, entry.getValue());
             first = false;
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void appendJsonValue(StringBuilder sb, Object value) {
+        if (value == null) {
+            sb.append("null");
+        } else if (value instanceof String) {
+            sb.append("\"").append(value).append("\"");
+        } else if (value instanceof Number || value instanceof Boolean) {
+            sb.append(value);
+        } else if (value instanceof Map) {
+            sb.append(toJsonString((Map<String, Object>) value));
+        } else if (value instanceof Collection) {
+            sb.append("[");
+            boolean first = true;
+            for (Object item : (Collection<?>) value) {
+                if (!first) sb.append(",");
+                appendJsonValue(sb, item);
+                first = false;
+            }
+            sb.append("]");
+        } else {
+            sb.append("\"").append(value).append("\"");
+        }
     }
 
     private Array toUuidSqlArray(Connection connection, List<UUID> interestedAnimals) throws SQLException {
