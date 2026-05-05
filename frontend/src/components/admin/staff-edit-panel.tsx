@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import type { AdminEmployeeDetail } from "@/lib/api/admin";
 import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
+import { CSRF_HEADER_NAME } from "@/lib/auth/csrf";
+import { Button } from "@/components/ui/button";
 import type { BffError } from "@/lib/types";
 
 type EditFields = {
@@ -68,9 +70,10 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
     try {
       const response = await fetch(`/api/admin/staff/${employee.id}`, {
         method: "PUT",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": token,
+          [CSRF_HEADER_NAME]: token,
         },
         body: JSON.stringify({
           name: fields.name.trim() || undefined,
@@ -151,17 +154,12 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
         ) : null}
 
         <div className="flex flex-wrap gap-3 items-center">
-          <button type="submit" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]" disabled={isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending ? "Saving..." : "Save changes"}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-surface-warm)] text-[var(--color-ink-soft)]"
-            onClick={onCancel}
-            disabled={isPending}
-          >
+          </Button>
+          <Button variant="outline" type="button" onClick={onCancel} disabled={isPending}>
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     </article>

@@ -17,6 +17,7 @@ import type {
   AnimalStatusCode,
 } from "@/lib/types";
 import { readErrorMessage } from "@/lib/utils/animal-editor";
+import { SuccessCard } from "@/components/ui/success-card";
 
 type AnimalEditorProps = {
   animal: AnimalDetailView;
@@ -46,6 +47,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [updatedAnimal, setUpdatedAnimal] = useState<{ id: string; name: string; animalType: string; breed: string; status: string } | null>(null);
 
   useEffect(() => {
     setUpdateForm(toUpdateForm(animal));
@@ -92,7 +94,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     setSuccessMessage(null);
 
     try {
-      await updateAnimalFromEditor(
+      const updated = await updateAnimalFromEditor(
         animal.id,
         {
           name: updateForm.name.trim(),
@@ -111,8 +113,13 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
         token,
       );
 
-      setSuccessMessage("Animal record updated.");
-      setTimeout(() => { router.push("/animals"); }, 1200);
+      setUpdatedAnimal({
+        id: updated.id,
+        name: updated.name,
+        animalType: updated.animalType,
+        breed: updated.breed,
+        status: updated.status,
+      });
     } catch (error) {
       await handleMutationError(error);
     } finally {
@@ -146,6 +153,28 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
 
   function handleFieldChange(field: string, value: string) {
     setUpdateForm((current) => ({ ...current, [field]: value }));
+  }
+
+  if (updatedAnimal) {
+    return (
+      <div className="page-shell">
+        <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
+          <SuccessCard
+            title="Animal record updated"
+            fields={[
+              { label: "Name", value: updatedAnimal.name },
+              { label: "Type", value: updatedAnimal.animalType },
+              { label: "Breed", value: updatedAnimal.breed },
+              { label: "Status", value: updatedAnimal.status },
+            ]}
+            primaryHref="/animals"
+            primaryLabel="See all animals"
+            secondaryHref={`/animals/${updatedAnimal.id}`}
+            secondaryLabel="See animal"
+          />
+        </div>
+      </div>
+    );
   }
 
   return (

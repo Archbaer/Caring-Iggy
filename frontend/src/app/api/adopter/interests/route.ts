@@ -11,11 +11,11 @@ import {
   extractCsrfToken,
   validateCsrfRequest,
 } from "@/lib/auth/csrf";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { readSessionFromRequest } from "@/lib/auth/server";
 import { MAX_INTERESTS, type UpdateInterestsRequest } from "@/lib/types";
 
 export async function PUT(request: NextRequest): Promise<Response> {
-  const session = await getSessionFromRequest(request);
+  const session = await readSessionFromRequest(request);
 
   if (!session) {
     return errorResponse(
@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest): Promise<Response> {
     );
   }
 
-  if (session.role !== "ADOPTER" || !session.profileId) {
+  if (session.user.role !== "ADOPTER" || !session.user.profileId) {
     return errorResponse(
       bffError(403, "FORBIDDEN", "Only adopter accounts can update interested animals."),
     );
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest): Promise<Response> {
   }
 
   try {
-    await updateAdopterInterests(session.profileId, parsedBody.body);
+    await updateAdopterInterests(session.user.profileId, parsedBody.body);
 
     return jsonResponse({ ok: true }, { status: 200 });
   } catch (error) {
