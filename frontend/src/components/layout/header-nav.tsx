@@ -9,7 +9,7 @@ type HeaderNavProps = {
 
 export function HeaderNav({ dashboardLink }: HeaderNavProps) {
   const pathname = usePathname();
-  const isOnDashboard = pathname.startsWith("/dashboard");
+  const isOnDashboard = pathname?.startsWith("/dashboard") ?? false;
 
   return (
     <Link

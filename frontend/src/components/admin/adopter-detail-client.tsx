@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 import type { AdminAdopterDetail } from "@/lib/api/admin";
 
 import { AdopterEditPanel } from "@/components/admin/adopter-edit-panel";
+import { SuccessCard } from "@/components/ui/success-card";
 
 type Props = {
   adopter: AdminAdopterDetail;
@@ -16,10 +18,10 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [currentAdopter, setCurrentAdopter] = useState(adopter);
+  const [successAdopter, setSuccessAdopter] = useState<AdminAdopterDetail | null>(null);
 
   function handleSuccess(updated: AdminAdopterDetail) {
-    setCurrentAdopter(updated);
-    setEditing(false);
+    setSuccessAdopter(updated);
     router.refresh();
   }
 
@@ -29,8 +31,33 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
 
   const preferenceEntries = Object.entries(currentAdopter.preferences);
 
+  if (successAdopter) {
+    return (
+      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 py-12">
+        <SuccessCard
+          title="Adopter record updated"
+          fields={[
+            { label: "Name", value: successAdopter.name },
+            { label: "Email", value: successAdopter.email },
+            { label: "Telephone", value: successAdopter.telephone },
+            { label: "Address", value: successAdopter.address || "—" },
+            { label: "Status", value: successAdopter.status },
+          ]}
+          primaryHref="/dashboard/admin/adopters"
+          primaryLabel="See all adopters"
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 space-y-6">
+      <nav className="flex items-center gap-2">
+        <Link href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+          ← Adopters
+        </Link>
+      </nav>
+
       <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
         <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
         <h1 className="page-title">{currentAdopter.name}</h1>
@@ -39,13 +66,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
         </p>
       </section>
 
-      <nav className="flex items-center gap-2">
-        <Link href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
-          ← Adopters
-        </Link>
-      </nav>
-
-      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4">
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-6">
         <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
           <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Contact</p>
           <h2 className="text-lg font-semibold text-[var(--color-ink)]">Adopter profile</h2>
@@ -110,15 +131,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
           <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
             <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
             <h2 className="text-lg font-semibold text-[var(--color-ink)]">Manage this record</h2>
-            <div className="flex flex-wrap gap-3 items-center">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]"
-                onClick={() => setEditing(true)}
-              >
-                Edit adopter
-              </button>
-            </div>
+            <Button onClick={() => setEditing(true)}>Edit adopter</Button>
           </article>
         )}
       </section>

@@ -52,8 +52,8 @@ export function RegisterInterestButton({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-sm text-[var(--color-ink-soft)]">You already registered interest in this animal.</p>
-        <Button variant="ghost" as="a" href={dashboardHref}>
-          View dashboard
+        <Button variant="ghost" asChild>
+          <a href={dashboardHref}>View dashboard</a>
         </Button>
         {error && (
           <p className="mt-2 text-sm text-[var(--color-error)]">{error}</p>
@@ -66,8 +66,8 @@ export function RegisterInterestButton({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-sm text-[var(--color-ink-soft)]">Your interest list is full.</p>
-        <Button variant="ghost" as="a" href={manageInterestsHref}>
-          Manage your interests
+        <Button variant="ghost" asChild>
+          <a href={manageInterestsHref}>Manage your interests</a>
         </Button>
         {error && (
           <p className="mt-2 text-sm text-[var(--color-error)]">{error}</p>

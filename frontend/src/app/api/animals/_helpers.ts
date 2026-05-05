@@ -7,7 +7,7 @@ import {
   extractCsrfToken,
   validateCsrfRequest,
 } from "@/lib/auth/csrf";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { readSessionFromRequest } from "@/lib/auth/server";
 import type {
   AnimalCreateRequest,
   AnimalGender,
@@ -34,7 +34,7 @@ const SIZE_VALUES: AnimalSize[] = ["SMALL", "MEDIUM", "LARGE"];
 export async function requireAnimalEditorRequest(
   request: NextRequest,
 ): Promise<RouteAccessResult> {
-  const session = await getSessionFromRequest(request);
+  const session = await readSessionFromRequest(request);
 
   if (!session) {
     return {
@@ -45,7 +45,7 @@ export async function requireAnimalEditorRequest(
     };
   }
 
-  if (session.role !== "STAFF" && session.role !== "ADMIN") {
+  if (session.user.role !== "STAFF" && session.user.role !== "ADMIN") {
     return {
       ok: false,
       response: errorResponse(
@@ -87,6 +87,8 @@ export async function parseCreateAnimalBody(
 > {
   const body = await readJsonBody(request);
 
+  console.log("[DEBUG parseCreateAnimalBody] raw body:", JSON.stringify(body));
+
   if (!body) {
     return {
       ok: false,
@@ -97,6 +99,7 @@ export async function parseCreateAnimalBody(
   const name = readRequiredString(body.name);
 
   if (!name) {
+    console.log("[DEBUG parseCreateAnimalBody] name missing or empty");
     return {
       ok: false,
       error: bffError(422, "VALIDATION_ERROR", "Animal name is required."),
@@ -106,6 +109,7 @@ export async function parseCreateAnimalBody(
   const previousOwner = readPreviousOwner(body.previousOwner);
 
   if (body.previousOwner && !previousOwner) {
+    console.log("[DEBUG parseCreateAnimalBody] previousOwner invalid");
     return {
       ok: false,
       error: bffError(
@@ -116,23 +120,24 @@ export async function parseCreateAnimalBody(
     };
   }
 
-  return {
-    ok: true,
-    body: {
-      name,
-      ...(readOptionalDate(body.dateOfBirth) ? { dateOfBirth: readOptionalDate(body.dateOfBirth) } : {}),
-      ...(readOptionalString(body.animalType) ? { animalType: readOptionalString(body.animalType) } : {}),
-      ...(readOptionalString(body.breed) ? { breed: readOptionalString(body.breed) } : {}),
-      ...(readOptionalEnum(body.gender, GENDER_VALUES) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES)! } : {}),
-      ...(readOptionalEnum(body.size, SIZE_VALUES) ? { size: readOptionalEnum(body.size, SIZE_VALUES)! } : {}),
-      ...(readOptionalString(body.temperament) ? { temperament: readOptionalString(body.temperament) } : {}),
-      ...(readOptionalEnum(body.status, STATUS_VALUES) ? { status: readOptionalEnum(body.status, STATUS_VALUES)! } : {}),
-      ...(readOptionalDate(body.intakeDate) ? { intakeDate: readOptionalDate(body.intakeDate) } : {}),
-      ...(readOptionalString(body.description) ? { description: readOptionalString(body.description) } : {}),
-      ...(readOptionalString(body.imageUrl) ? { imageUrl: readOptionalString(body.imageUrl) } : {}),
-      ...(previousOwner ? { previousOwner } : {}),
-    },
+  const parsedBody = {
+    name,
+    ...(readOptionalDate(body.dateOfBirth) ? { dateOfBirth: readOptionalDate(body.dateOfBirth) } : {}),
+    ...(readOptionalString(body.animalType) ? { animalType: readOptionalString(body.animalType) } : {}),
+    ...(readOptionalString(body.breed) ? { breed: readOptionalString(body.breed) } : {}),
+    ...(readOptionalEnum(body.gender, GENDER_VALUES) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES)! } : {}),
+    ...(readOptionalEnum(body.size, SIZE_VALUES) ? { size: readOptionalEnum(body.size, SIZE_VALUES)! } : {}),
+    ...(readOptionalString(body.temperament) ? { temperament: readOptionalString(body.temperament) } : {}),
+    ...(readOptionalEnum(body.status, STATUS_VALUES) ? { status: readOptionalEnum(body.status, STATUS_VALUES)! } : {}),
+    ...(readOptionalDate(body.intakeDate) ? { intakeDate: readOptionalDate(body.intakeDate) } : {}),
+    ...(readOptionalString(body.description) ? { description: readOptionalString(body.description) } : {}),
+    ...(readOptionalString(body.imageUrl) ? { imageUrl: readOptionalString(body.imageUrl) } : {}),
+    ...(previousOwner ? { previousOwner } : {}),
   };
+
+  console.log("[DEBUG parseCreateAnimalBody] parsed body:", JSON.stringify(parsedBody));
+
+  return { ok: true, body: parsedBody };
 }
 
 export async function parseUpdateAnimalBody(

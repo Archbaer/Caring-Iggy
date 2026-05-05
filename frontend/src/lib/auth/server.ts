@@ -211,7 +211,7 @@ async function validateAuthCsrf(request: NextRequest): Promise<Response | null> 
   );
 }
 
-async function readSessionFromRequest(
+export async function readSessionFromRequest(
   request: NextRequest,
 ): Promise<UpstreamSessionSnapshot | null> {
   const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value ?? null;
