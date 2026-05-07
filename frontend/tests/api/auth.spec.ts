@@ -284,6 +284,122 @@ test.describe("Edge cases", () => {
   });
 });
 
+// ── XSS in signup fields ──────────────────────────────────────────
+
+test.describe("XSS in signup fields", () => {
+  test("XSS in firstName does not cause 500", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `xss-firstname-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        password: "password123",
+        firstName: '<script>alert("xss")</script>',
+        lastName: "Test",
+        telephone: "+1-555-9999",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    // Should not crash — either 200 (escaped) or 422 (rejected)
+    expect([200, 422]).toContain(resp.status());
+  });
+
+  test("XSS in lastName does not cause 500", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `xss-lastname-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        password: "password123",
+        firstName: "Test",
+        lastName: '<img src=x onerror=alert(1)>',
+        telephone: "+1-555-9999",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect([200, 422]).toContain(resp.status());
+  });
+
+  test("XSS in telephone does not cause 500", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `xss-phone-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        password: "password123",
+        firstName: "Test",
+        lastName: "User",
+        telephone: '"><script>alert(1)</script>',
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect([200, 422]).toContain(resp.status());
+  });
+});
+
+// ── Password complexity ───────────────────────────────────────────
+
+test.describe("Password complexity", () => {
+  test("signup with short password returns 422", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `short-pass-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        password: "ab",
+        firstName: "Short",
+        lastName: "Pass",
+        telephone: "+1-555-9999",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect(resp.status()).toBe(422);
+    const body = await resp.json();
+    expect(body).toMatchObject(ERROR_SHAPE);
+  });
+
+  test("signup with empty password returns 422", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `empty-pass-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        password: "",
+        firstName: "Empty",
+        lastName: "Pass",
+        telephone: "+1-555-9999",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect(resp.status()).toBe(422);
+    const body = await resp.json();
+    expect(body).toMatchObject(ERROR_SHAPE);
+  });
+
+  test("signup with missing password returns 422", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const uniqueEmail = `no-pass-${Date.now()}@caringiggy.test`;
+
+    const resp = await request.post("/api/auth/signup", {
+      data: {
+        email: uniqueEmail,
+        firstName: "No",
+        lastName: "Pass",
+        telephone: "+1-555-9999",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect(resp.status()).toBe(422);
+    const body = await resp.json();
+    expect(body).toMatchObject(ERROR_SHAPE);
+  });
+});
+
 // ── Malformed JSON ────────────────────────────────────────────────
 
 test.describe("Malformed JSON", () => {
