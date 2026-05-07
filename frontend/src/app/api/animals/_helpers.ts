@@ -96,6 +96,8 @@ export async function parseCreateAnimalBody(
     };
   }
 
+  const fieldErrors: Record<string, string[]> = {};
+
   const name = readRequiredString(body.name);
 
   if (!name) {
@@ -106,7 +108,7 @@ export async function parseCreateAnimalBody(
     };
   }
 
-  const previousOwner = readPreviousOwner(body.previousOwner);
+  const previousOwner = readPreviousOwner(body.previousOwner, fieldErrors);
 
   if (body.previousOwner && !previousOwner) {
     console.log("[DEBUG parseCreateAnimalBody] previousOwner invalid");
@@ -116,24 +118,32 @@ export async function parseCreateAnimalBody(
         422,
         "VALIDATION_ERROR",
         "Previous owner entries require both a name and telephone.",
+        fieldErrors,
       ),
     };
   }
 
   const parsedBody = {
     name,
-    ...(readOptionalDate(body.dateOfBirth) ? { dateOfBirth: readOptionalDate(body.dateOfBirth) } : {}),
+    ...(readOptionalDate(body.dateOfBirth, "dateOfBirth", fieldErrors) ? { dateOfBirth: readOptionalDate(body.dateOfBirth, "dateOfBirth", fieldErrors) } : {}),
     ...(readOptionalString(body.animalType) ? { animalType: readOptionalString(body.animalType) } : {}),
     ...(readOptionalString(body.breed) ? { breed: readOptionalString(body.breed) } : {}),
-    ...(readOptionalEnum(body.gender, GENDER_VALUES) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES)! } : {}),
-    ...(readOptionalEnum(body.size, SIZE_VALUES) ? { size: readOptionalEnum(body.size, SIZE_VALUES)! } : {}),
+    ...(readOptionalEnum(body.gender, GENDER_VALUES, "gender", fieldErrors) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES, "gender", fieldErrors)! } : {}),
+    ...(readOptionalEnum(body.size, SIZE_VALUES, "size", fieldErrors) ? { size: readOptionalEnum(body.size, SIZE_VALUES, "size", fieldErrors)! } : {}),
     ...(readOptionalString(body.temperament) ? { temperament: readOptionalString(body.temperament) } : {}),
-    ...(readOptionalEnum(body.status, STATUS_VALUES) ? { status: readOptionalEnum(body.status, STATUS_VALUES)! } : {}),
-    ...(readOptionalDate(body.intakeDate) ? { intakeDate: readOptionalDate(body.intakeDate) } : {}),
+    ...(readOptionalEnum(body.status, STATUS_VALUES, "status", fieldErrors) ? { status: readOptionalEnum(body.status, STATUS_VALUES, "status", fieldErrors)! } : {}),
+    ...(readOptionalDate(body.intakeDate, "intakeDate", fieldErrors) ? { intakeDate: readOptionalDate(body.intakeDate, "intakeDate", fieldErrors) } : {}),
     ...(readOptionalString(body.description) ? { description: readOptionalString(body.description) } : {}),
     ...(readOptionalString(body.imageUrl) ? { imageUrl: readOptionalString(body.imageUrl) } : {}),
     ...(previousOwner ? { previousOwner } : {}),
   };
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return {
+      ok: false,
+      error: bffError(422, "VALIDATION_ERROR", "One or more fields contain invalid values.", fieldErrors),
+    };
+  }
 
   console.log("[DEBUG parseCreateAnimalBody] parsed body:", JSON.stringify(parsedBody));
 
@@ -155,20 +165,29 @@ export async function parseUpdateAnimalBody(
     };
   }
 
+  const fieldErrors: Record<string, string[]> = {};
+
   const nextBody: AnimalUpdateRequest = {
     ...(readOptionalString(body.name) ? { name: readOptionalString(body.name) } : {}),
-    ...(readOptionalDate(body.dateOfBirth) ? { dateOfBirth: readOptionalDate(body.dateOfBirth) } : {}),
+    ...(readOptionalDate(body.dateOfBirth, "dateOfBirth", fieldErrors) ? { dateOfBirth: readOptionalDate(body.dateOfBirth, "dateOfBirth", fieldErrors) } : {}),
     ...(readOptionalString(body.animalType) ? { animalType: readOptionalString(body.animalType) } : {}),
     ...(readOptionalString(body.breed) ? { breed: readOptionalString(body.breed) } : {}),
-    ...(readOptionalEnum(body.gender, GENDER_VALUES) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES)! } : {}),
-    ...(readOptionalEnum(body.size, SIZE_VALUES) ? { size: readOptionalEnum(body.size, SIZE_VALUES)! } : {}),
+    ...(readOptionalEnum(body.gender, GENDER_VALUES, "gender", fieldErrors) ? { gender: readOptionalEnum(body.gender, GENDER_VALUES, "gender", fieldErrors)! } : {}),
+    ...(readOptionalEnum(body.size, SIZE_VALUES, "size", fieldErrors) ? { size: readOptionalEnum(body.size, SIZE_VALUES, "size", fieldErrors)! } : {}),
     ...(readOptionalString(body.temperament) ? { temperament: readOptionalString(body.temperament) } : {}),
-    ...(readOptionalEnum(body.status, STATUS_VALUES) ? { status: readOptionalEnum(body.status, STATUS_VALUES)! } : {}),
-    ...(readOptionalDate(body.intakeDate) ? { intakeDate: readOptionalDate(body.intakeDate) } : {}),
+    ...(readOptionalEnum(body.status, STATUS_VALUES, "status", fieldErrors) ? { status: readOptionalEnum(body.status, STATUS_VALUES, "status", fieldErrors)! } : {}),
+    ...(readOptionalDate(body.intakeDate, "intakeDate", fieldErrors) ? { intakeDate: readOptionalDate(body.intakeDate, "intakeDate", fieldErrors) } : {}),
     ...(readOptionalString(body.description) ? { description: readOptionalString(body.description) } : {}),
     ...(readOptionalString(body.imageUrl) ? { imageUrl: readOptionalString(body.imageUrl) } : {}),
     ...(readOptionalString(body.previousOwnerId) ? { previousOwnerId: readOptionalString(body.previousOwnerId) } : {}),
   };
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return {
+      ok: false,
+      error: bffError(422, "VALIDATION_ERROR", "One or more fields contain invalid values.", fieldErrors),
+    };
+  }
 
   if (Object.keys(nextBody).length === 0) {
     return {
@@ -216,25 +235,46 @@ function readOptionalString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
-function readOptionalDate(value: unknown): string | undefined {
-  if (typeof value !== "string" || !value.trim()) {
+function readOptionalDate(
+  value: unknown,
+  fieldName: string,
+  fieldErrors: Record<string, string[]>,
+): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "string") {
+    (fieldErrors[fieldName] ??= []).push(`Invalid date format for ${fieldName}`);
     return undefined;
   }
-
-  return /^\d{4}-\d{2}-\d{2}$/.test(value.trim()) ? value.trim() : undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    (fieldErrors[fieldName] ??= []).push(`Invalid date format for ${fieldName}. Expected YYYY-MM-DD`);
+    return undefined;
+  }
+  return trimmed;
 }
 
 function readOptionalEnum<T extends string>(
   value: unknown,
   allowed: readonly T[],
+  fieldName: string,
+  fieldErrors: Record<string, string[]>,
 ): T | undefined {
-  return typeof value === "string" && allowed.includes(value as T)
-    ? (value as T)
-    : undefined;
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "string") {
+    (fieldErrors[fieldName] ??= []).push(`Invalid value for ${fieldName}`);
+    return undefined;
+  }
+  if (!allowed.includes(value.toUpperCase() as T)) {
+    (fieldErrors[fieldName] ??= []).push(`Invalid value for ${fieldName}: "${value}"`);
+    return undefined;
+  }
+  return value.toUpperCase() as T;
 }
 
 function readPreviousOwner(
   value: unknown,
+  fieldErrors: Record<string, string[]>,
 ): AnimalCreateRequest["previousOwner"] | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
@@ -242,18 +282,27 @@ function readPreviousOwner(
 
   const input = value as Record<string, unknown>;
 
-  const name = readRequiredString(input.name);
-  const telephone = readRequiredString(input.telephone);
+  const name = readOptionalString(input.name);
+  const telephone = readOptionalString(input.telephone);
+  const email = readOptionalString(input.email);
+  const address = readOptionalString(input.address);
 
-  if (!name || !telephone) {
-    return undefined;
+  if (!name && !telephone && !email && !address) return undefined;
+
+  if (!name) {
+    (fieldErrors["previousOwnerName"] ??= []).push("Previous owner name is required when providing owner details");
   }
+  if (!telephone) {
+    (fieldErrors["previousOwnerTelephone"] ??= []).push("Previous owner telephone is required when providing owner details");
+  }
+
+  if (!name || !telephone) return undefined;
 
   return {
     name,
     telephone,
-    ...(readOptionalString(input.email) ? { email: readOptionalString(input.email) } : {}),
-    ...(readOptionalString(input.address) ? { address: readOptionalString(input.address) } : {}),
+    ...(email ? { email } : {}),
+    ...(address ? { address } : {}),
   };
 }
 
