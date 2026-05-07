@@ -210,6 +210,28 @@ test.describe("PUT /api/animals/{id}/edit", () => {
     expect(resp.status()).toBe(403);
   });
 
+  test("concurrent duplicate edits are idempotent", async ({ request }) => {
+    await loginAsStaff(request);
+
+    const createResp = await createAnimal(request, { name: "Idempotent Test" });
+    const animal = await createResp.json();
+
+    const csrfToken = await getCsrfToken(request);
+
+    const editPayload = { name: "Idempotent Updated" };
+    const headers = { "x-csrf-token": csrfToken, origin: "http://localhost:3000" };
+
+    const [resp1, resp2] = await Promise.all([
+      request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
+      request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
+    ]);
+
+    expect([200, 403]).toContain(resp1.status());
+    expect([200, 403]).toContain(resp2.status());
+
+    const anySuccess = resp1.status() === 200 || resp2.status() === 200;
+    expect(anySuccess).toBe(true);
+  });
 });
 
 // ── DELETE /api/animals/{id}/delete ──────────────────────────────

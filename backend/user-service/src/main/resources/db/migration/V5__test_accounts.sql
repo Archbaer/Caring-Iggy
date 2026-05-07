@@ -11,3 +11,13 @@ INSERT INTO accounts (id, email, password_hash, role, profile_id, profile_type, 
     ('dddddddd-4444-4444-8444-444444444444', 'teststaff@caringiggy.test', '$2b$12$/D0ZNF3LNdfkmZ/AOooY1ObnfwkS0wx0vTrredsOYbRj89UkpQKqm', 'STAFF', 'bbbbbbbb-2222-4222-8222-222222222222', 'EMPLOYEE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('eeeeeeee-5555-4555-8555-555555555555', 'testadopter@caringiggy.test', '$2b$12$/D0ZNF3LNdfkmZ/AOooY1ObnfwkS0wx0vTrredsOYbRj89UkpQKqm', 'ADOPTER', 'cccccccc-1111-4111-8111-111111111111', 'ADOPTER', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
+
+-- Allow EMPLOYEE role (legacy alias for STAFF) for role normalization testing
+-- The chk_accounts_role constraint must include EMPLOYEE for legacy account support
+DO $$
+BEGIN
+    ALTER TABLE accounts DROP CONSTRAINT IF EXISTS chk_accounts_role;
+    ALTER TABLE accounts
+        ADD CONSTRAINT chk_accounts_role
+        CHECK (role IN ('ADOPTER', 'STAFF', 'ADMIN', 'EMPLOYEE'));
+END $$;
