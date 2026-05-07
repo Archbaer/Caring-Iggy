@@ -98,3 +98,51 @@ test.describe("GET requests skip CSRF", () => {
     expect(resp.status()).toBe(200);
   });
 });
+
+// ── CSRF Token Rotation After Logout ───────────────────────────────
+
+test.describe("CSRF token rotation after logout", () => {
+  test("old CSRF token rejected after logout", async ({ request }) => {
+    // Step 1: Login and get the CSRF token
+    const sessionResp = await request.get("/api/auth/session");
+    const { csrfToken: preLoginCsrf } = await sessionResp.json();
+
+    const loginResp = await request.post("/api/auth/login", {
+      data: {
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
+      },
+      headers: {
+        "x-csrf-token": preLoginCsrf,
+        origin: "http://localhost:3000",
+      },
+    });
+    expect(loginResp.ok()).toBeTruthy();
+    const loginBody = await loginResp.json();
+    const postLoginCsrf = loginBody.csrfToken;
+
+    // Step 2: Logout
+    await request.post("/api/auth/logout", {
+      headers: {
+        "x-csrf-token": postLoginCsrf,
+        origin: "http://localhost:3000",
+      },
+    });
+
+    // Step 3: Try to use the old CSRF token for a mutation
+    // After logout, a new ci_csrf cookie was issued. The old token header should mismatch.
+    const resp = await request.post("/api/auth/login", {
+      data: {
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
+      },
+      headers: {
+        "x-csrf-token": postLoginCsrf,
+        origin: "http://localhost:3000",
+      },
+    });
+    // The old token should be rejected (token_mismatch or missing_token)
+    // If the ci_csrf cookie was rotated, the header token won't match
+    expect(resp.status()).toBe(403);
+  });
+});
