@@ -191,9 +191,13 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(Account account, LocalDateTime expiresAt) {
+        String role = account.getRole().name();
+        if (AccountRole.EMPLOYEE.name().equals(role)) {
+            role = AccountRole.STAFF.name();
+        }
         SessionUserDto sessionUser = SessionUserDto.builder()
                 .accountId(account.getId())
-                .role(account.getRole().name())
+                .role(role)
                 .profileType(account.getProfileType().name())
                 .profileId(account.getProfileId())
                 .build();

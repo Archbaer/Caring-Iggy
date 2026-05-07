@@ -86,12 +86,16 @@ public class EmployeeService {
     }
 
     private EmployeeDto toDto(Employee employee) {
+        String role = employee.getRole().name();
+        if (EmployeeRole.EMPLOYEE.name().equals(role)) {
+            role = EmployeeRole.STAFF.name();
+        }
         return EmployeeDto.builder()
                 .id(employee.getId())
                 .name(employee.getName())
                 .email(employee.getEmail())
                 .telephone(employee.getTelephone())
-                .role(employee.getRole().name())
+                .role(role)
                 .createdAt(employee.getCreatedAt())
                 .updatedAt(employee.getUpdatedAt())
                 .build();

@@ -91,7 +91,7 @@ export function AnimalCard({
           </Link>
           {canEdit && (
             <Link
-              href={`/animals/${animal.id}/edit`}
+              href={`/dashboard/animals/${animal.id}/edit`}
               className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] transition-all duration-200"
             >
               Edit
