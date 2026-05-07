@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:auth": "playwright test --project=anon --project=admin --project=staff"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
