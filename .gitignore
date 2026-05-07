@@ -39,3 +39,6 @@ docs/superpowers/plans/
 
 # Test directories
 **/src/test/*
+
+# Test plans
+TEST_IMPLEMENTATION_PLAN.md
