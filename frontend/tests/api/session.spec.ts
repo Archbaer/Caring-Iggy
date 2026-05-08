@@ -190,4 +190,14 @@ test.describe("502 upstream unavailable", () => {
     });
     expect(resp.status()).toBe(502);
   });
+
+  test("admin endpoint returns 500 on simulated crash", async ({
+    request,
+  }) => {
+    await loginAsAdmin(request);
+    const resp = await request.get("/api/admin/staff", {
+      headers: { "x-test-simulate-failure": "crash" },
+    });
+    expect(resp.status()).toBe(500);
+  });
 });
