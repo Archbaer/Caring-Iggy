@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { updateAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
+import { checkTestSimulateFailure } from "@/lib/auth/server";
 
 import {
   parseUpdateAnimalBody,
@@ -29,6 +30,9 @@ export async function PUT(
   if (!csrf.ok) {
     return csrf.response;
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   const parsedBody = await parseUpdateAnimalBody(request);
 

@@ -128,12 +128,13 @@ export async function handleSessionRoute(request: NextRequest): Promise<Response
     },
   );
 
-  setCsrfCookie(response, nextCsrf.cookieValue);
-
   if (!currentSession) {
+    setCsrfCookie(response, nextCsrf.cookieValue);
     clearSessionCookies(response);
   } else {
-    await applySessionCookies(response, currentSession);
+    const maxAge = getSessionMaxAge(request, currentSession.user.role);
+    setCsrfCookie(response, nextCsrf.cookieValue, maxAge);
+    await applySessionCookies(response, currentSession, maxAge);
   }
 
   return response;
@@ -188,8 +189,9 @@ async function handleAuthMutationRoute(
     },
   );
 
-  await applySessionCookies(response, currentSession);
-  setCsrfCookie(response, nextCsrf.cookieValue);
+  const maxAge = getSessionMaxAge(request, currentSession.user.role);
+  await applySessionCookies(response, currentSession, maxAge);
+  setCsrfCookie(response, nextCsrf.cookieValue, maxAge);
 
   return response;
 }
@@ -318,13 +320,30 @@ async function fetchSessionUser(
   };
 }
 
+function getSessionMaxAge(request: NextRequest, role: string): number {
+  // Test-only: allow short TTL via x-test-session-ttl header
+  const testTtl = request.headers.get("x-test-session-ttl");
+  if (testTtl) {
+    const parsed = parseInt(testTtl, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+
+  // Role-based TTL
+  if (role === "ADOPTER") return 35 * 60; // 35 minutes
+  return 20 * 60; // 20 minutes (STAFF, ADMIN)
+}
+
 async function applySessionCookies(
   response: NextResponse,
   session: UpstreamSessionSnapshot,
+  maxAgeOverride?: number,
 ): Promise<void> {
   const nowInSeconds = Math.floor(Date.now() / 1000);
-  const expiresAt = Math.max(session.expiresAt, nowInSeconds + 60);
-  const maxAge = Math.max(expiresAt - nowInSeconds, 60);
+  const expiresAt = session.expiresAt ?? nowInSeconds + DEFAULT_SESSION_TTL_SECONDS;
+  // Use override if provided, otherwise compute from backend expiry (capped)
+  const maxAge = maxAgeOverride !== undefined
+    ? Math.min(maxAgeOverride, Math.max(expiresAt - nowInSeconds, 60))
+    : Math.max(expiresAt - nowInSeconds, 60);
   const stateCookie = await encodeSessionState({
     sub: session.user.accountId,
     role: session.user.role,
@@ -376,7 +395,7 @@ function clearSessionCookies(response: NextResponse): void {
   });
 }
 
-function setCsrfCookie(response: NextResponse, cookieValue: string): void {
+function setCsrfCookie(response: NextResponse, cookieValue: string, maxAge?: number): void {
   response.cookies.set({
     name: CSRF_COOKIE_NAME,
     value: cookieValue,
@@ -384,6 +403,7 @@ function setCsrfCookie(response: NextResponse, cookieValue: string): void {
     sameSite: "lax",
     secure: isSecureCookie(),
     path: "/",
+    ...(maxAge !== undefined ? { maxAge } : {}),
   });
 }
 
@@ -830,4 +850,33 @@ class UpstreamAuthError extends Error {
     super(responseError.message);
     this.responseError = responseError;
   }
+}
+
+/**
+ * Test-only: returns 502 response if x-test-simulate-failure header is set.
+ * Call this before making upstream requests in route handlers.
+ */
+export function checkTestSimulateFailure(request: NextRequest): NextResponse | null {
+  const failure = request.headers.get("x-test-simulate-failure");
+    if (failure === "upstream") {
+      return NextResponse.json(
+        {
+          status: 502,
+          code: "UPSTREAM_UNAVAILABLE",
+          message: "Simulated upstream failure for testing.",
+        },
+        { status: 502 },
+      );
+    }
+    if (failure === "crash") {
+      return NextResponse.json(
+        {
+          status: 500,
+          code: "INTERNAL_ERROR",
+          message: "Simulated internal error for testing.",
+        },
+        { status: 500 },
+      );
+    }
+  return null;
 }
