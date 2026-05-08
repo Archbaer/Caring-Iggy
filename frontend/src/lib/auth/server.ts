@@ -858,15 +858,25 @@ class UpstreamAuthError extends Error {
  */
 export function checkTestSimulateFailure(request: NextRequest): NextResponse | null {
   const failure = request.headers.get("x-test-simulate-failure");
-  if (failure === "upstream") {
-    return NextResponse.json(
-      {
-        status: 502,
-        code: "UPSTREAM_UNAVAILABLE",
-        message: "Simulated upstream failure for testing.",
-      },
-      { status: 502 },
-    );
-  }
+    if (failure === "upstream") {
+      return NextResponse.json(
+        {
+          status: 502,
+          code: "UPSTREAM_UNAVAILABLE",
+          message: "Simulated upstream failure for testing.",
+        },
+        { status: 502 },
+      );
+    }
+    if (failure === "crash") {
+      return NextResponse.json(
+        {
+          status: 500,
+          code: "INTERNAL_ERROR",
+          message: "Simulated internal error for testing.",
+        },
+        { status: 500 },
+      );
+    }
   return null;
 }
