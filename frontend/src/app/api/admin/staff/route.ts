@@ -7,6 +7,7 @@ import {
   type ProvisionStaffRequest,
 } from "@/lib/api/admin";
 import { bffError, errorResponse, jsonResponse } from "@/lib/api/client";
+import { checkTestSimulateFailure } from "@/lib/auth/server";
 
 import { requireAdminRequest, validateMutationCsrf } from "../_helpers";
 
@@ -16,6 +17,9 @@ export async function GET(request: NextRequest): Promise<Response> {
   if (!access.ok) {
     return access.response;
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   try {
     return jsonResponse(await fetchAdminEmployees(), { status: 200 });
@@ -38,6 +42,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!csrf.ok) {
     return csrf.response;
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   const parsedBody = await parseProvisionBody(request);
 

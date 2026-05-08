@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { deleteAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
+import { checkTestSimulateFailure } from "@/lib/auth/server";
 
 import {
   requireAnimalEditorRequest,
@@ -28,6 +29,9 @@ export async function DELETE(
   if (!csrf.ok) {
     return csrf.response;
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   try {
     const { id } = await context.params;
