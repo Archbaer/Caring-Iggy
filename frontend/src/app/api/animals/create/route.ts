@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { createAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
+import { checkTestSimulateFailure } from "@/lib/auth/server";
 
 import {
   parseCreateAnimalBody,
@@ -22,6 +23,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!csrf.ok) {
     return csrf.response;
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   const parsedBody = await parseCreateAnimalBody(request);
 
