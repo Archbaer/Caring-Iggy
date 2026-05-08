@@ -11,7 +11,7 @@ import {
   extractCsrfToken,
   validateCsrfRequest,
 } from "@/lib/auth/csrf";
-import { readSessionFromRequest } from "@/lib/auth/server";
+import { checkTestSimulateFailure, readSessionFromRequest } from "@/lib/auth/server";
 import { MAX_INTERESTS, type UpdateInterestsRequest } from "@/lib/types";
 
 export async function PUT(request: NextRequest): Promise<Response> {
@@ -41,6 +41,9 @@ export async function PUT(request: NextRequest): Promise<Response> {
       bffError(403, "FORBIDDEN", "Security validation failed. Refresh and try again."),
     );
   }
+
+  const simulatedFailure = checkTestSimulateFailure(request);
+  if (simulatedFailure) return simulatedFailure;
 
   const parsedBody = await parseInterestsBody(request);
 
