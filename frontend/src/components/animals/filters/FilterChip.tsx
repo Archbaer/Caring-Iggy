@@ -8,13 +8,13 @@ export type FilterChipProps = {
 
 export function FilterChip({ label, href, isActive }: FilterChipProps) {
   const baseClasses =
-    "rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200";
+    "rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200";
 
   const activeClasses =
-    "bg-[var(--color-accent-pale)] text-[var(--color-accent)] border-[var(--color-accent)]";
+    "bg-[var(--color-primary)] text-white shadow-sm font-bold";
 
   const inactiveClasses =
-    "border-[var(--color-border)] bg-transparent text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)]";
+    "bg-white border border-[var(--color-border)] text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]";
 
   return (
     <Link href={href} className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}>

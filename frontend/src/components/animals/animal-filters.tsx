@@ -52,7 +52,7 @@ function FilterSection({
         aria-expanded={open}
         className="flex items-center justify-between w-full py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 rounded"
       >
-        <span className="text-xs font-semibold uppercase tracking-widest text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors duration-150">
+        <span className="text-xs font-semibold text-[var(--color-ink-soft)] uppercase tracking-wide">
           {label}
         </span>
         <svg
@@ -68,7 +68,7 @@ function FilterSection({
         </svg>
       </button>
       {open && (
-        <div className="pb-3 flex flex-col gap-2">
+        <div className="pb-3 flex flex-wrap gap-2">
           {children}
         </div>
       )}
@@ -98,10 +98,10 @@ function MultiChipRow({
             key={opt}
             onClick={() => buildHref(next)}
             className={`
-              rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-200
+              rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200
               ${isActive
-                ? "bg-[var(--color-accent-pale)] text-[var(--color-accent)] border-[var(--color-accent)]"
-                : "border-[var(--color-border)] text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)]"
+                ? "bg-[var(--color-primary)] text-white shadow-sm font-bold"
+                : "bg-white border border-[var(--color-border)] text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
               }
             `}
           >
@@ -128,8 +128,8 @@ export function AnimalFilters({
   const hasActiveFilters = status || type || sex || sizes.length > 0 || breeds.length > 0;
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-      <div className="p-4 space-y-0">
+    <div className="rounded-3xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-lg)] p-6">
+      <div className="space-y-0">
         <FilterSection label="Status" defaultOpen={!!status}>
           <div className="flex flex-wrap gap-2">
             <FilterPill label="All" href={buildAnimalsHref({ ...current, status: undefined })} isActive={!status} />
@@ -181,7 +181,7 @@ export function AnimalFilters({
           <div className="pt-4">
             <Link
               href="/animals"
-              className="inline-flex items-center justify-center w-full rounded-lg border border-[var(--color-border)] text-sm font-medium text-[var(--color-ink-soft)] px-4 py-2 hover:bg-[var(--color-canvas)] transition-colors duration-150"
+              className="inline-flex items-center justify-center w-full rounded-2xl border-2 border-[var(--color-border)] text-sm font-bold text-[var(--color-ink-soft)] px-4 py-2.5 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] transition-all duration-200"
             >
               Clear filters
             </Link>
