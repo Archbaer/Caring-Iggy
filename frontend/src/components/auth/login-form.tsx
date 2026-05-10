@@ -81,21 +81,21 @@ export function LoginForm() {
   }
 
   return (
-    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
+    <article className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
       <p className="mb-1 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
         Existing account
       </p>
-      <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+      <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-2">
         Sign in
       </h2>
       <p className="text-sm text-[var(--color-ink-soft)] mb-6 leading-relaxed">
         Use the email and password tied to your Caring Iggy account.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {/* Email */}
         <div className="space-y-2">
-          <label htmlFor="login-email" className="block text-sm font-bold text-[var(--color-ink)]">
+          <label htmlFor="login-email" className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">
             Email
           </label>
           <input
@@ -103,7 +103,7 @@ export function LoginForm() {
             name="email"
             type="email"
             autoComplete="email"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[var(--color-primary-glow)] transition-all duration-200"
             value={fields.email}
             onChange={(event) => setFields((f) => ({ ...f, email: event.target.value }))}
             required
@@ -112,7 +112,7 @@ export function LoginForm() {
 
         {/* Password */}
         <div className="space-y-2">
-          <label htmlFor="login-password" className="block text-sm font-bold text-[var(--color-ink)]">
+          <label htmlFor="login-password" className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">
             Password
           </label>
           <input
@@ -120,7 +120,7 @@ export function LoginForm() {
             name="password"
             type="password"
             autoComplete="current-password"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[var(--color-primary-glow)] transition-all duration-200"
             value={fields.password}
             onChange={(event) => setFields((f) => ({ ...f, password: event.target.value }))}
             required
@@ -129,7 +129,7 @@ export function LoginForm() {
 
         {/* Error */}
         {errorMessage && (
-          <p className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger-bg)] px-4 py-3 text-sm text-[var(--color-danger)]" aria-live="polite" role="status">
+          <p className="rounded-2xl border border-[var(--color-danger)]/20 bg-[var(--color-danger-bg)] px-4 py-3 text-sm text-[var(--color-danger)] font-medium" aria-live="polite" role="status">
             {errorMessage}
           </p>
         )}
@@ -139,13 +139,13 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] rounded-full px-8 py-3 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] disabled:opacity-70 disabled:cursor-wait disabled:transform-none transition-all duration-200"
+            className="w-full rounded-2xl bg-[var(--color-primary)] text-white px-6 py-3.5 text-sm font-bold shadow-[var(--shadow-md)] hover:bg-[var(--color-primary-deep)] hover:shadow-[var(--shadow-lg)] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
           >
             {isPending ? "Signing in..." : "Sign in"}
           </button>
           <Link
             href="/signup"
-            className="rounded-full border border-[var(--color-border)] bg-transparent px-6 py-3 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] transition-all duration-200"
+            className="text-sm text-[var(--color-primary)] font-semibold hover:underline"
           >
             Need an account?
           </Link>

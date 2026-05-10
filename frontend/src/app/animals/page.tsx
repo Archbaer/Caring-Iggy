@@ -106,21 +106,22 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
   const filteredCount = visibleAnimals.length;
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto px-4 sm:px-6 pt-[calc(var(--space-5)+4rem)] pb-8">
-      {/* Page header — centered banner */}
-      <div className="w-full mb-8 pt-4 text-center">
-        <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)] font-semibold">Adoption Catalog</p>
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl lg:text-6xl font-medium text-[var(--color-ink)] mt-2 text-wrap-balance">Meet our animals.</h1>
-        <p className="text-base text-[var(--color-ink-soft)] mt-3">
-          {filteredCount} {filteredCount === 1 ? "animal" : "animals"} available
-          {filteredCount !== totalCount && ` (filtered from ${totalCount})`}
-        </p>
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-4 sm:px-6 pt-[5rem] pb-8 bg-canvas-pattern">
+      {/* Page header — left-aligned with count badge */}
+      <div className="flex items-center justify-between mb-6 pb-5 border-b border-[var(--color-border)]">
+        <div>
+          <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-1">Shelter catalog</p>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)]">Find your companion</h1>
+        </div>
+        <span className="rounded-full bg-[var(--color-primary)] text-white text-sm font-bold px-4 py-1.5">
+          {totalCount} animals
+        </span>
       </div>
 
       {/* Responsive layout: vertical stack on mobile with gap, grid on desktop */}
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[260px_1fr] lg:gap-8">
         {/* Mobile: filter bar 80% centered. Desktop: sticky sidebar */}
-        <div className="w-4/5 mx-auto lg:w-full lg:mx-0 lg:sticky lg:top-[calc(var(--space-5)+4rem)] lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+        <div className="w-4/5 mx-auto lg:w-full lg:mx-0 lg:sticky lg:top-[5rem] lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
           <AnimalFilters
             status={status}
             type={type}
@@ -132,29 +133,29 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
           />
         </div>
 
-        {/* Animal cards — 2 cols on mobile, 3 cols on lg */}
+        {/* Animal cards — 2 cols on mobile, 3 cols on sm, 4 cols on lg */}
         <div className="w-full">
           {animalsResult.kind === "error" ? (
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 text-center">
+            <div className="rounded-3xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-md)] p-8 text-center">
               <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink-faint)] mb-2">Catalog error</p>
               <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-3">Animal data is not available.</h2>
               <p className="text-sm text-[var(--color-ink-soft)] mb-4">{animalsResult.message}</p>
-              <Link href="/animals" className="inline-flex items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-sm font-medium px-6 py-2.5 hover:bg-[var(--color-primary-deep)] transition-colors duration-150">Retry catalog</Link>
+              <Link href="/animals" className="inline-flex items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-sm font-semibold px-6 py-2.5 hover:bg-[var(--color-primary-deep)] transition-colors duration-150">Retry catalog</Link>
             </div>
           ) : visibleAnimals.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               {visibleAnimals.map((animal, index) => (
                 <AnimalCard key={animal.id} animal={animal as AnimalSummaryView} enterIndex={index} canEdit={canEditAnimal} />
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 text-center">
+            <div className="rounded-3xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-md)] p-12 text-center">
               <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink-faint)] mb-2">No results</p>
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-3">No animals match those filters.</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink-soft)] mb-3">No animals match those filters.</h2>
               <p className="text-sm text-[var(--color-ink-soft)] mb-4">
                 Try a different status or remove the type filter to widen the public catalog.
               </p>
-              <Link href="/animals" className="inline-flex items-center justify-center rounded-full border border-[var(--color-border)] text-sm font-medium text-[var(--color-ink-soft)] px-6 py-2.5 hover:bg-[var(--color-canvas)] transition-colors duration-150">Clear filters</Link>
+              <Link href="/animals" className="inline-flex items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-sm font-semibold px-6 py-2.5 hover:bg-[var(--color-primary-deep)] transition-colors duration-150">Clear filters</Link>
             </div>
           )}
         </div>

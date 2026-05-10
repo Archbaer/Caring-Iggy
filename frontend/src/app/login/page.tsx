@@ -23,46 +23,40 @@ export default async function LoginPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-20 bg-[var(--color-canvas)]">
-      {/* Page header */}
-      <div className="w-full max-w-4xl mx-auto mb-10 text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-        <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-          Public auth route
+    <div className="min-h-screen lg:grid lg:grid-cols-2">
+      {/* LEFT: Dark brand panel — hidden on mobile */}
+      <div className="hidden lg:flex flex-col justify-center px-16 py-20" style={{ background: 'var(--gradient-hero)' }}>
+        <a href="/" className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-white mb-16">
+          🐾 Caring Iggy
+        </a>
+        <h2 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-white mb-4">
+          Every animal deserves<br/>a loving home.
+        </h2>
+        <p className="text-blue-200 text-base leading-relaxed">
+          Join our community and help us make a difference.
         </p>
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-4">
-          Welcome back to your adoption workspace.
-        </h1>
-        <p className="text-[var(--color-ink-soft)] leading-relaxed max-w-[55ch] mx-auto">
-          Sign in with an existing account to continue browsing animals, return to your adopter dashboard, or resume administrator follow-up work.
-        </p>
+        <div className="mt-16 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/10 p-6">
+          <p className="text-white/80 text-sm">"Adopting through Caring Iggy was the best decision we ever made."</p>
+          <p className="text-white/50 text-xs mt-2">— The Johnson Family</p>
+        </div>
       </div>
 
-      {/* Content grid */}
-      <div className="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Info panel */}
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
-          <p className="mb-1 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-            Accounts
-          </p>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-5">
-            One login, role-aware destination.
-          </h2>
-          <ul className="space-y-3">
-            {[
-              "Adopters return to the protected dashboard by default.",
-              "Staff return to the shared dashboard workspace by default.",
-              "Admins are routed directly to adopter-management screens.",
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-[var(--color-ink-soft)]">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] flex-shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* RIGHT: Form panel — white */}
+      <div className="flex flex-col items-center justify-center px-8 py-16 bg-white">
+        {/* Mobile-only back link */}
+        <a href="/" className="lg:hidden mb-8 text-sm text-[var(--color-accent)] font-semibold">← Back to home</a>
 
-        {/* Login form */}
-        <LoginForm />
+        <div className="w-full max-w-md">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
+            Welcome back
+          </h1>
+          <p className="text-[var(--color-ink-soft)] mb-8">
+            Sign in to continue browsing animals and managing your account.
+          </p>
+
+          {/* LoginForm component — keep imported, keep logic */}
+          <LoginForm />
+        </div>
       </div>
     </div>
   );
