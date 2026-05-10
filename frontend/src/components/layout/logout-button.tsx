@@ -12,7 +12,7 @@ export function LogoutButton() {
   return (
     <button
       type="button"
-      className="link-chip shell-nav-button"
+      className="px-3 py-1.5 rounded-full text-sm font-bold text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
       disabled={isPending}
       onClick={() => {
         void handleLogout();

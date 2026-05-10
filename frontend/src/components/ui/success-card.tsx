@@ -55,20 +55,22 @@ export function SuccessCard({
       initial="hidden"
       animate="visible"
       className={cn(
-        "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg p-6 sm:p-8 flex flex-col gap-5",
+        "rounded-3xl bg-white border border-[var(--color-success)]/30 shadow-[var(--shadow-lg)] p-6 sm:p-8 flex flex-col gap-5",
         className,
       )}
     >
       <motion.div variants={itemVariants} className="flex items-center gap-3">
-        <CheckCircle className="h-6 w-6 text-[var(--color-primary)] shrink-0" />
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] tracking-[-0.02em]">
+        <div className="w-10 h-10 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center text-xl">
+          <CheckCircle className="h-6 w-6 text-[var(--color-success)] shrink-0" />
+        </div>
+        <h2 className="text-xl font-extrabold text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-display)' }}>
           {title}
         </h2>
       </motion.div>
 
       <motion.ul
         variants={itemVariants}
-        className="flex flex-col gap-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-warm)] p-4"
+        className="flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-4"
       >
         {fields.map((field) => (
           <li key={field.label} className="flex flex-col gap-0.5 text-sm">
