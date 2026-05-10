@@ -84,37 +84,39 @@ export default async function Home() {
   return (
     <>
       {/* ─── Hero ───────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-[var(--color-canvas)]">
-        {/* Warm atmospheric background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-pale)] via-[var(--color-canvas)] to-[var(--color-primary-pale)] opacity-60" />
-        <div className="absolute -top-40 -right-40 w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-[var(--color-accent-pale)] to-transparent opacity-50 blur-3xl" />
-        <div className="absolute -bottom-40 -left-20 w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[var(--color-primary-pale)] to-transparent opacity-40 blur-3xl" />
+      <section
+        className="relative min-h-[92vh] flex items-center justify-center px-6 py-20 overflow-hidden"
+        style={{ background: 'var(--gradient-hero)' }}
+      >
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-32 -right-32 w-[36rem] h-[36rem] rounded-full bg-[var(--color-accent)]/15 blur-[120px]" />
+          <div className="absolute -bottom-32 -left-32 w-[40rem] h-[40rem] rounded-full bg-[var(--color-primary-pale)]/10 blur-[140px]" />
+        </div>
 
-        <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Copy */}
+        <div className="relative z-10 lg:grid lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-[var(--max-width-content)] w-full">
+          {/* Left text column */}
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-accent-pale)]/60 text-[var(--color-accent)] text-xs font-[family-name:var(--font-mono)] uppercase tracking-[0.12em]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
-              San Francisco Animal Shelter
+            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-6">
+              Welcome to Caring Iggy
             </p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-medium leading-[1.0] tracking-[-0.03em] text-[var(--color-ink)] mb-6">
-              Every animal deserves a home.
+            <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-white mb-6">
+              Every animal deserves a <span style={{ color: 'var(--color-accent)' }}>loving home</span>.
             </h1>
-            <p className="text-lg text-[var(--color-ink-soft)] leading-relaxed max-w-[48ch] mb-10">
+            <p className="text-lg text-blue-200 leading-relaxed max-w-prose mb-10">
               Caring Iggy connects adopted animals with loving families through a transparent,
               guided adoption process. Browse our current residents, learn their stories,
               and take the first step toward welcoming a new companion.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 mt-2">
               <Link
                 href="/animals"
-                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-8 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[var(--color-accent)] text-white px-8 py-4 text-base font-bold shadow-[var(--shadow-coral)] hover:bg-[var(--color-accent-deep)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 Meet our animals
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-8 py-4 text-base font-semibold border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-2xl border-2 border-white/40 text-white px-8 py-4 text-base font-bold hover:bg-white/10 hover:border-white/70 transition-all duration-300"
               >
                 Learn about us
               </Link>
@@ -124,7 +126,7 @@ export default async function Home() {
           {/* Hero image */}
           {featuredAnimals[0] && featuredAnimals[0].imageUrl ? (
             <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5]">
+              <div className="overflow-hidden rounded-[2rem] shadow-2xl ring-4 ring-white/10 aspect-[4/5]">
                 <Image
                   src={featuredAnimals[0].imageUrl}
                   alt={featuredAnimals[0].name}
@@ -133,10 +135,8 @@ export default async function Home() {
                   style={{ objectFit: "cover" }}
                   priority
                 />
-                {/* Warm overlay at bottom */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)]/20 via-transparent to-transparent" />
               </div>
-              {/* Decorative accent card */}
               <div className="absolute -bottom-5 -left-5 lg:-left-8 bg-[var(--color-surface)] rounded-2xl shadow-xl p-4 border border-[var(--color-border)]">
                 <p className="text-xs font-[family-name:var(--font-mono)] uppercase tracking-[0.1em] text-[var(--color-accent)] mb-1">
                   Currently available
@@ -148,7 +148,7 @@ export default async function Home() {
             </div>
           ) : (
             <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)] flex items-center justify-center">
+              <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl ring-4 ring-white/10 bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)] flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-5xl text-[var(--color-primary)] opacity-30">
                   CI
                 </span>
@@ -159,18 +159,14 @@ export default async function Home() {
       </section>
 
       {/* ─── Trust Bar ──────────────────────────────────────────────────── */}
-      <div className="animate-[trust-bar-reveal_500ms_cubic-bezier(0.22,1,0.36,1)_300ms_both] bg-[var(--color-surface-warm)] border-t border-b border-[var(--color-border)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-5 flex flex-col sm:flex-row flex-wrap gap-6 sm:gap-10 justify-between items-start sm:items-center">
+      <div className="px-6 py-6 bg-white border-b border-[var(--color-border)] shadow-sm">
+        <div className="max-w-[var(--max-width-content)] mx-auto flex flex-wrap items-center justify-center gap-8 sm:gap-16">
           {trustPoints.map((point, i) => (
-            <div key={point.title} className={`flex items-start gap-3 delay-${i + 1}`}>
-              <div className="mt-0.5 flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
+            <div key={point.title} className={`flex items-center gap-3 delay-${i + 1}`}>
+              <span className="text-3xl">🐾</span>
               <div>
-                <p className="text-sm font-bold text-[var(--color-ink)] mb-0.5">{point.title}</p>
-                <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">{point.copy}</p>
+                <p className="text-xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">{point.title}</p>
+                <p className="text-xs text-[var(--color-ink-soft)] font-medium">{point.copy}</p>
               </div>
             </div>
           ))}
@@ -179,21 +175,18 @@ export default async function Home() {
 
       {/* ─── Featured Animals ────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
-          <div className="mb-12 delay-1">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              Currently available
+        <div className="max-w-[var(--max-width-content)] mx-auto">
+          <div className="mb-12 text-center">
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
+              Meet our animals
             </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-4">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)] mb-12 text-center">
               Animals looking for homes.
             </h2>
-            <p className="text-base text-[var(--color-ink-soft)] leading-relaxed max-w-[55ch]">
-              These animals are ready for adoption now. Browse their profiles to learn more about their personality and needs.
-            </p>
           </div>
 
           {featuredAnimals.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 delay-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredAnimals.map((animal) => (
                 <AnimalCard key={animal.id} animal={animal} />
               ))}
@@ -206,8 +199,8 @@ export default async function Home() {
             </div>
           )}
 
-          <div className="mt-12 flex justify-center">
-            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+          <div className="mt-12 text-center">
+            <Link href="/animals" className="text-[var(--color-accent)] font-bold text-sm hover:underline">
               View all available animals
             </Link>
           </div>
@@ -215,32 +208,33 @@ export default async function Home() {
       </section>
 
       {/* ─── How Adoption Works ──────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-surface-warm)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
-          <div className="mb-14">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              Our approach
+      <section
+        className="px-6 py-20 sm:py-24"
+        style={{ background: 'var(--color-surface-deep)' }}
+      >
+        <div className="max-w-[var(--max-width-content)] mx-auto">
+          <div className="mb-12 text-center">
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
+              How it works
             </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-4">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-white text-center mb-12">
               How adoption works.
             </h2>
-            <p className="text-base text-[var(--color-ink-soft)] leading-relaxed max-w-[55ch]">
-              We take time to make the right match — for you and for the animal.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {processSteps.map((step, index) => (
-              <div key={step.title} className={`relative pl-8 delay-${index + 1}`}>
-                <span className="absolute -left-1 top-0 font-[family-name:var(--font-display)] text-7xl font-medium text-[var(--color-primary-pale)] leading-none select-none">
+              <div key={step.title} className={`rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center delay-${index + 1}`}>
+                <span
+                  className="text-7xl font-[family-name:var(--font-display)] font-black leading-none select-none"
+                  style={{ color: 'var(--color-accent)' }}
+                >
                   0{index + 1}
                 </span>
-                <div className="relative pt-10">
-                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-[var(--color-ink-soft)] leading-relaxed">{step.copy}</p>
-                </div>
+                <h3 className="text-xl font-bold text-white mt-4 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-blue-200 leading-relaxed">{step.copy}</p>
               </div>
             ))}
           </div>
@@ -248,29 +242,32 @@ export default async function Home() {
       </section>
 
       {/* ─── Testimonials ──────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
+      <section className="px-6 py-20 sm:py-24 bg-white">
+        <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14 text-center">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              Happy tails
+            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
+              Testimonials
             </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)]">
               Families who found their companion.
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <div key={t.adopter} className={`
-                rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6
-                shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300
-                delay-${i + 1}
-              `}>
-                <p className="font-[family-name:var(--font-display)] text-lg italic text-[var(--color-ink)] leading-relaxed mb-4">
+              <div key={t.adopter} className={`rounded-2xl border-l-4 border-[var(--color-accent)] bg-[var(--color-accent-pale)]/30 p-6 delay-${i + 1}`}>
+                <p className="text-[var(--color-ink)] italic leading-relaxed mb-4">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <p className="font-semibold text-sm text-[var(--color-ink)]">{t.adopter}</p>
-                <p className="text-xs text-[var(--color-ink-faint)]">Adopted {t.animal}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-sm font-bold">
+                    {t.adopter.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[var(--color-ink-soft)]">{t.adopter}</p>
+                    <p className="text-xs text-[var(--color-ink-faint)]">Adopted {t.animal}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -278,15 +275,16 @@ export default async function Home() {
       </section>
 
       {/* ─── Values Band ─────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-surface-warm)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary-pale)]">
+        <div className="lg:grid lg:grid-cols-2 gap-12 items-center max-w-[var(--max-width-content)] mx-auto">
           <div>
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
+            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
               Our commitment
             </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.1] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)] mb-4">
               Every animal deserves care.
             </h2>
+            <div className="w-12 h-1.5 rounded-full bg-[var(--color-accent)] mb-6" />
             <div className="space-y-6">
               {values.map((value, i) => (
                 <div key={value.title} className={`delay-${i + 1}`}>
@@ -306,13 +304,12 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="relative h-72 sm:h-80 lg:h-96 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] to-[var(--color-accent-pale)]">
+          <div className="relative h-72 sm:h-80 lg:h-96 rounded-[2rem] ring-4 ring-[var(--color-primary)]/20 overflow-hidden bg-gradient-to-br from-[var(--color-primary-pale)] to-[var(--color-accent-pale)]">
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl text-[var(--color-primary)] opacity-20">
                 CI
               </span>
             </div>
-            {/* Decorative circles */}
             <div className="absolute top-8 right-8 w-24 h-24 rounded-full bg-[var(--color-surface)]/20" />
             <div className="absolute bottom-10 left-10 w-16 h-16 rounded-full bg-[var(--color-accent)]/20" />
           </div>
@@ -320,22 +317,20 @@ export default async function Home() {
       </section>
 
       {/* ─── CTA Band ────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center">
-          <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-white mb-5">
+      <section className="px-6 py-24 relative overflow-hidden" style={{ background: 'var(--gradient-cta)' }}>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/10 blur-[80px]" />
+        </div>
+        <div className="relative max-w-[var(--max-width-content)] mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl font-[family-name:var(--font-display)] font-extrabold text-white mb-4">
             Ready to meet your new companion?
           </h2>
-          <p className="text-base text-white/75 max-w-[50ch] mx-auto mb-10">
+          <p className="text-white/80 text-lg mb-8 max-w-md mx-auto">
             Browse our animals and take the first step toward welcoming a new friend.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-white text-[var(--color-primary)] border-[1.5px] border-white hover:bg-[var(--color-primary-pale)] hover:border-[var(--color-primary-pale)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-              Browse animals
-            </Link>
-            <Link href="/about" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-              Learn about us
-            </Link>
-          </div>
+          <Link href="/animals" className="inline-flex items-center gap-2 rounded-2xl bg-white text-[var(--color-accent)] px-10 py-4 text-base font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300">
+            Browse animals
+          </Link>
         </div>
       </section>
     </>
