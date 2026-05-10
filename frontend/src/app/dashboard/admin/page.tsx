@@ -24,43 +24,48 @@ export default async function AdminDashboardPage() {
   const animalCount = animalsResult.length;
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      {/* Hero card — matches staff dashboard hero style */}
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 grid grid-cols-[1.35fr_0.9fr] gap-5 items-start animate-fade-up">
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-8 bg-canvas-pattern">
+      {/* Header panel */}
+      <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] mb-8">
         <div className="flex flex-col gap-2">
-          <Eyebrow>Admin workspace</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
-            Dashboard
+          <Eyebrow className="text-[var(--color-accent)]">Administration</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-[var(--color-ink)] mb-2">
+            Admin workspace
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
             Manage your shelter&apos;s adopters, staff, and animals
           </p>
         </div>
 
-        <dl className="grid grid-cols-3 gap-4">
-          <div>
-            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Adopters</dt>
-            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{adopterCount}</dd>
+        {/* Stat cards */}
+        <dl className="grid grid-cols-2 sm:grid-cols-4 gap-5 mt-6">
+          <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
+            <dt className="text-xs text-[var(--color-ink-soft)] font-medium">Adopters</dt>
+            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-primary)]">{adopterCount}</dd>
           </div>
-          <div>
-            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Staff</dt>
-            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{staffCount}</dd>
+          <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
+            <dt className="text-xs text-[var(--color-ink-soft)] font-medium">Staff</dt>
+            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-primary)]">{staffCount}</dd>
           </div>
-          <div>
-            <dt className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Animals</dt>
-            <dd className="text-sm font-medium text-[var(--color-ink)] mt-1">{animalCount}</dd>
+          <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
+            <dt className="text-xs text-[var(--color-ink-soft)] font-medium">Animals</dt>
+            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-primary)]">{animalCount}</dd>
+          </div>
+          <div className="rounded-2xl bg-[var(--color-accent-pale)] p-6 text-center">
+            <dt className="text-xs text-[var(--color-ink-soft)] font-medium">Active</dt>
+            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-accent)]">{animalCount}</dd>
           </div>
         </dl>
       </section>
 
-      {/* Card grid — matches staff dashboard card grid style */}
-      <section className="my-6 grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 animate-fade-up delay-1">
-        <Card variant="route">
+      {/* Route cards */}
+      <section className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+        <Card variant="route" className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 hover:border-[var(--color-primary)]/50 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1 transition-all duration-300">
           <Eyebrow>People</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
             Adopters
           </h2>
-          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-soft)] mt-1">
             {adopterCount === 0
               ? "No adopter accounts yet"
               : `${adopterCount} adopter${adopterCount === 1 ? "" : "s"} in the system`}
@@ -72,12 +77,12 @@ export default async function AdminDashboardPage() {
           </div>
         </Card>
 
-        <Card variant="route">
+        <Card variant="route" className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 hover:border-[var(--color-primary)]/50 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1 transition-all duration-300">
           <Eyebrow>Team</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
             Staff members
           </h2>
-          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-soft)] mt-1">
             {staffCount === 0
               ? "No staff accounts yet"
               : `${staffCount} team member${staffCount === 1 ? "" : "s"} on staff`}
@@ -89,12 +94,12 @@ export default async function AdminDashboardPage() {
           </div>
         </Card>
 
-        <Card variant="route">
+        <Card variant="route" className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 hover:border-[var(--color-primary)]/50 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1 transition-all duration-300">
           <Eyebrow>Animals</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
             Animal catalog
           </h2>
-          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-soft)] mt-1">
             {animalCount === 0
               ? "No animals in the catalog yet"
               : `${animalCount} animal${animalCount === 1 ? "" : "s"} across all statuses`}
