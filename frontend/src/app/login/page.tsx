@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { getCurrentSession } from "@/lib/auth/server-session";
@@ -26,9 +27,9 @@ export default async function LoginPage({ searchParams }: PageProps) {
     <div className="min-h-screen lg:grid lg:grid-cols-2">
       {/* LEFT: Dark brand panel — hidden on mobile */}
       <div className="hidden lg:flex flex-col justify-center px-16 py-20" style={{ background: 'var(--gradient-hero)' }}>
-        <a href="/" className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-white mb-16">
+        <Link href="/" className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-white mb-16">
           🐾 Caring Iggy
-        </a>
+        </Link>
         <h2 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-white mb-4">
           Every animal deserves<br/>a loving home.
         </h2>
@@ -36,7 +37,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
           Join our community and help us make a difference.
         </p>
         <div className="mt-16 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/10 p-6">
-          <p className="text-white/80 text-sm">"Adopting through Caring Iggy was the best decision we ever made."</p>
+          <p className="text-white/80 text-sm">&ldquo;Adopting through Caring Iggy was the best decision we ever made.&rdquo;</p>
           <p className="text-white/50 text-xs mt-2">— The Johnson Family</p>
         </div>
       </div>
@@ -44,7 +45,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
       {/* RIGHT: Form panel — white */}
       <div className="flex flex-col items-center justify-center px-8 py-16 bg-white">
         {/* Mobile-only back link */}
-        <a href="/" className="lg:hidden mb-8 text-sm text-[var(--color-accent)] font-semibold">← Back to home</a>
+        <Link href="/" className="lg:hidden mb-8 text-sm text-[var(--color-accent)] font-semibold">← Back to home</Link>
 
         <div className="w-full max-w-md">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
