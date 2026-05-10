@@ -17,7 +17,7 @@ export default async function DashboardInterestsPage() {
 
   if (result.kind === "error") {
     return (
-      <div className="max-w-[80rem] mx-auto bg-canvas-pattern p-6 sm:p-8">
+      <div className="max-w-[80rem] mx-auto bg-canvas-pattern px-6 py-8">
         <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)]">
           <Eyebrow>Protected route</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
@@ -49,7 +49,7 @@ export default async function DashboardInterestsPage() {
   ).length;
 
   return (
-    <div className="max-w-[80rem] mx-auto bg-canvas-pattern p-6 sm:p-8">
+    <div className="max-w-[80rem] mx-auto bg-canvas-pattern px-6 py-8">
       <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] animate-fade-up">
         <div className="flex flex-col gap-2 mb-4">
           <Eyebrow>Protected route</Eyebrow>

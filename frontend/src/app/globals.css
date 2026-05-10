@@ -5,7 +5,7 @@
   --color-background: var(--color-canvas);
   --color-foreground: var(--color-ink);
   --font-sans: var(--font-body), system-ui, sans-serif;
-  --font-display: var(--font-display), Georgia, serif;
+  --font-display: 'Nunito', Georgia, serif;
 }
 
 /* ===== DESIGN TOKENS ===== */

@@ -13,7 +13,7 @@ export default async function DashboardMatchesPage() {
 
   return (
     <>
-      <div className="max-w-[80rem] mx-auto bg-canvas-pattern p-6 sm:p-8">
+      <div className="max-w-[80rem] mx-auto bg-canvas-pattern px-6 py-8">
         <section
           className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-lg)] p-8 max-w-[80rem] mx-auto text-center"
         >

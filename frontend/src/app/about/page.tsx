@@ -69,7 +69,7 @@ export default function AboutPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-16 sm:py-20">
+        <div className="relative z-10 w-full max-w-[var(--max-width-content)] mx-auto px-6 py-16 sm:py-20">
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
             <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               San Francisco Animal Shelter
@@ -83,7 +83,7 @@ export default function AboutPage() {
 
       {/* ─── Mission Quote ───────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-white">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
           <div className="relative inline-flex flex-col items-center">
             {/* Decorative quote marks */}
             <span className="absolute -top-6 -left-8 font-[family-name:var(--font-display)] text-[8rem] text-[var(--color-primary-pale)] leading-none select-none pointer-events-none">
@@ -101,7 +101,7 @@ export default function AboutPage() {
 
       {/* ─── Story ────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-white">
-        <div className="max-w-[var(--max-width-wide)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+        <div className="max-w-[var(--max-width-content)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
             <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               Founded in 2018
@@ -140,7 +140,7 @@ export default function AboutPage() {
 
       {/* ─── Values ───────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
+        <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14 text-center delay-1">
             <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               What guides us
@@ -178,7 +178,7 @@ export default function AboutPage() {
 
       {/* ─── Team ─────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
+        <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14">
             <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
               The people
@@ -213,7 +213,7 @@ export default function AboutPage() {
 
       {/* ─── CTA Band ────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24" style={{ background: 'var(--gradient-cta)' }}>
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
           <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-white mb-5">
             Come visit us.
           </h2>

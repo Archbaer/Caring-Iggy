@@ -106,7 +106,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
   const filteredCount = visibleAnimals.length;
 
   return (
-    <div className="max-w-[var(--max-width-wide)] mx-auto px-4 sm:px-6 pt-[5rem] pb-8 bg-canvas-pattern">
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-4 sm:px-6 pt-20 pb-8 bg-canvas-pattern">
       {/* Page header — left-aligned with count badge */}
       <div className="flex items-center justify-between mb-6 pb-5 border-b border-[var(--color-border)]">
         <div>
