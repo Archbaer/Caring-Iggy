@@ -17,13 +17,13 @@ export default async function DashboardInterestsPage() {
 
   if (result.kind === "error") {
     return (
-      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8">
+      <div className="max-w-[80rem] mx-auto bg-canvas-pattern p-6 sm:p-8">
+        <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)]">
           <Eyebrow>Protected route</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
             Interested animals
           </h1>
-          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+          <p className="text-[var(--color-ink-soft)] mt-2">
             We couldn&apos;t load your interested animal list.
           </p>
         </section>
@@ -32,7 +32,7 @@ export default async function DashboardInterestsPage() {
 
         <section className="flex flex-col gap-3 py-8 text-center">
           <Eyebrow>Interests error</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)]">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)]">
             Try loading your interested animals again.
           </h2>
           <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
@@ -49,29 +49,51 @@ export default async function DashboardInterestsPage() {
   ).length;
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 animate-fade-up">
+    <div className="max-w-[80rem] mx-auto bg-canvas-pattern p-6 sm:p-8">
+      <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] animate-fade-up">
         <div className="flex flex-col gap-2 mb-4">
           <Eyebrow>Protected route</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
             Interested animals
           </h1>
-          <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+          <p className="text-[var(--color-ink-soft)] mt-2">
             Save up to {MAX_INTERESTS} animal profiles, review their real current adoption status, and keep your shortlist current without inventing approval or rejection states.
           </p>
         </div>
 
-        <p className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm font-medium text-[var(--color-ink)]">
+        <p className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-primary-pale)] px-3.5 py-1.5 text-sm font-medium text-[var(--color-primary)]">
           {availableSavedCount} of {MAX_INTERESTS} available animals saved.
         </p>
       </section>
 
       <DashboardSectionNav currentPath="/dashboard/interests" />
 
-      <InterestsManager
-        currentAnimals={result.currentAnimals}
-        catalogAnimals={result.catalogAnimals}
-      />
+      <div className="lg:grid lg:grid-cols-[1fr_300px] gap-8">
+        <div>
+          <InterestsManager
+            currentAnimals={result.currentAnimals}
+            catalogAnimals={result.catalogAnimals}
+          />
+        </div>
+
+        <aside className="bg-[var(--color-primary-pale)] rounded-3xl p-6 border border-[var(--color-border)] self-start sticky top-24">
+          <h3 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-4">Managing Interests</h3>
+          <ul className="flex flex-col gap-3 text-sm text-[var(--color-ink-soft)]">
+            <li className="flex gap-2">
+              <span className="text-[var(--color-primary)] font-bold">1.</span>
+              <span>You can save up to {MAX_INTERESTS} animals at a time. Remove one to add another when the cap is reached.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[var(--color-primary)] font-bold">2.</span>
+              <span>Status labels reflect real-time adoption availability from the shelter.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[var(--color-primary)] font-bold">3.</span>
+              <span>View full animal profiles before adding them to your interest list.</span>
+            </li>
+          </ul>
+        </aside>
+      </div>
     </div>
   );
 }

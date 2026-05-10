@@ -89,9 +89,9 @@ export function InterestsManager({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] shadow-[var(--shadow-sm)] p-6 flex flex-col gap-4">
         <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Current list</p>
-        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Interested animals</h2>
+        <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Interested animals</h2>
         <p className="text-sm text-[var(--color-ink-soft)]">
           You can keep up to {MAX_INTERESTS} interested animals in this release. The limit is enforced in the UI and the protected BFF.
         </p>
@@ -110,9 +110,9 @@ export function InterestsManager({
         />
       </section>
 
-      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] shadow-[var(--shadow-sm)] p-6 flex flex-col gap-4">
         <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Catalog</p>
-        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Add from the animal list</h2>
+        <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Add from the animal list</h2>
         <p className="text-sm text-[var(--color-ink-soft)]">
           Browse public profiles and save up to {MAX_INTERESTS}. If the cap is full, remove one before adding another.
         </p>
@@ -120,21 +120,21 @@ export function InterestsManager({
         {availableAnimals.length > 0 ? (
           <div className="flex flex-col gap-3">
             {availableAnimals.map((animal) => (
-              <div key={animal.id} className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <div key={animal.id} className="flex items-center justify-between gap-4 rounded-2xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-4 hover:shadow-[var(--shadow-md)] transition-all duration-200">
                 <div>
-                  <h3 className="text-base font-medium text-[var(--color-ink)]">{animal.name}</h3>
+                  <h3 className="font-semibold text-[var(--color-ink)]">{animal.name}</h3>
                   <p className="text-sm text-[var(--color-ink-soft)]">
                     {animal.breed} · {animal.animalType} · {animal.statusLabel}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Link href={`/animals/${animal.id}`} className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+                  <Link href={`/animals/${animal.id}`} className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]">
                     View profile
                   </Link>
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                    className="inline-flex items-center gap-1.5 rounded-2xl border-2 border-[var(--color-border)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--color-ink)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                     disabled={capReached || pendingAnimalId === animal.id}
                     onClick={() => {
                       void updateInterests([...selectedIds, animal.id], animal.id);
@@ -152,13 +152,13 @@ export function InterestsManager({
       </section>
 
       {errorMessage ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border border-[var(--color-danger-bg)] bg-[var(--color-danger-bg)] p-4 text-sm text-[var(--color-danger)]" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border border-[var(--color-primary-pale)] bg-[var(--color-primary-pale)] p-4 text-sm text-[var(--color-primary)]" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}
