@@ -103,69 +103,69 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
   }
 
   return (
-    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-      <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Edit</p>
+    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+      <p className="text-xs text-[var(--color-ink-faint)] font-medium">Edit</p>
       <h2 className="text-lg font-semibold text-[var(--color-ink)]">Update adopter record</h2>
 
       <form className="grid gap-6" onSubmit={handleSubmit}>
         <label className="flex flex-col gap-1.5" htmlFor="adopter-name">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Name</span>
           <input
             id="adopter-name"
             name="name"
             type="text"
             autoComplete="name"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.name}
             onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="adopter-telephone">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Telephone</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Telephone</span>
           <input
             id="adopter-telephone"
             name="telephone"
             type="tel"
             autoComplete="tel"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.telephone}
             onChange={(e) => setFields((f) => ({ ...f, telephone: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="adopter-email">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Email</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Email</span>
           <input
             id="adopter-email"
             name="email"
             type="email"
             autoComplete="email"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.email}
             onChange={(e) => setFields((f) => ({ ...f, email: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="adopter-address">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Address</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Address</span>
           <input
             id="adopter-address"
             name="address"
             type="text"
             autoComplete="street-address"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.address}
             onChange={(e) => setFields((f) => ({ ...f, address: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="adopter-status">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Status</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Status</span>
           <select
             id="adopter-status"
             name="status"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.status}
             onChange={(e) => setFields((f) => ({ ...f, status: e.target.value }))}
           >
