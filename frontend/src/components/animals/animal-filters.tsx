@@ -47,7 +47,7 @@ function FilterSection({
 
   return (
     <div className="border-b border-[var(--color-border)] last:border-b-0">
-      <button
+      <button type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className="flex items-center justify-between w-full py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 rounded"
@@ -94,7 +94,7 @@ function MultiChipRow({
           ? selected.filter((s) => s !== opt)
           : [...selected, opt];
         return (
-          <button
+          <button type="button"
             key={opt}
             onClick={() => buildHref(next)}
             className={`

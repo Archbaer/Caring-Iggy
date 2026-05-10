@@ -73,7 +73,7 @@ export async function PublicHeader() {
 
         {/* Mobile menu hint */}
         {/* TODO: implement mobile menu toggle */}
-        <button
+        <button type="button"
           disabled
           aria-disabled="true"
           aria-label="Open menu"
