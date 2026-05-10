@@ -10,6 +10,7 @@ import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalForView } from "@/lib/api/animals";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { MAX_INTERESTS } from "@/lib/types";
+import Link from "next/link";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -109,7 +110,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] mb-5">{result.message}</p>
           <Button asChild variant="default">
-            <a href="/animals">Back to animals</a>
+            <Link href="/animals">Back to animals</Link>
           </Button>
         </div>
       </div>
@@ -126,9 +127,9 @@ export default async function AnimalDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-[86rem] mx-auto px-6 pt-8 pb-8">
-      <a href="/animals" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold text-sm hover:underline mb-6">
+      <Link href="/animals" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold text-sm hover:underline mb-6">
         ← Back to animals
-      </a>
+      </Link>
 
       <div
         className="grid gap-7 mb-7 items-start"
