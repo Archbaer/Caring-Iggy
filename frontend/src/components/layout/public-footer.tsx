@@ -63,16 +63,16 @@ export async function PublicFooter() {
   const dashboardLink = session ? defaultRouteForRole(session.role) : "/dashboard";
 
   return (
-    <footer className="bg-[var(--color-surface-warm)] border-t border-[var(--color-border)]">
-      <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-12 pb-8">
+    <footer className="bg-[var(--color-surface-deep)]">
+      <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-16 pb-10">
         {/* Top section: 4 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-10 text-center sm:text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10 text-center sm:text-left">
           {/* Brand + Social */}
-          <div className="space-y-4 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
-            <p className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)]">
-              Caring Iggy
+          <div className="space-y-4">
+            <p className="text-xl font-extrabold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+              🐾 Caring Iggy
             </p>
-            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed max-w-[28ch] mx-auto sm:mx-0">
+            <p className="text-sm text-[var(--color-ink-faint)] leading-relaxed max-w-[28ch] mx-auto sm:mx-0">
               Finding loving homes for animals in need since 2018.
             </p>
             <div className="flex gap-2 justify-center sm:justify-start">
@@ -80,7 +80,7 @@ export async function PublicFooter() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="w-9 h-9 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink-soft)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:-translate-y-0.5 transition-all duration-200"
+                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all duration-200"
                   aria-label={link.label}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -92,19 +92,19 @@ export async function PublicFooter() {
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+          <div className="space-y-3">
+            <p className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>
               Quick Links
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {quickLinks.map((link, i) => (
                 <li key={`quick-${i}`}>
                   {link.href.startsWith("/") ? (
-                    <Link href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                    <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
                       {link.label}
                     </Link>
                   ) : (
-                    <a href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                    <a href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
                       {link.label}
                     </a>
                   )}
@@ -114,14 +114,14 @@ export async function PublicFooter() {
           </div>
 
           {/* Adopt */}
-          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+          <div className="space-y-3">
+            <p className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>
               Adopt
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {adoptLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150">
+                  <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -130,18 +130,18 @@ export async function PublicFooter() {
           </div>
 
           {/* Contact */}
-          <div className="space-y-3 lg:border-t lg:border-[var(--color-border)] lg:pt-8">
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.1em] text-[var(--color-ink)] font-semibold">
+          <div className="space-y-3">
+            <p className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>
               Contact
             </p>
-            <ul className="space-y-2 text-sm text-[var(--color-ink-soft)]">
+            <ul className="space-y-2.5 text-sm text-[var(--color-ink-faint)]">
               <li>
-                <a href={`mailto:${contactInfo.email}`} className="hover:text-[var(--color-primary)] transition-colors duration-150">
+                <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">
                   {contactInfo.email}
                 </a>
               </li>
               <li>
-                <a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`} className="hover:text-[var(--color-primary)] transition-colors duration-150">
+                <a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`} className="hover:text-white transition-colors">
                   {contactInfo.phone}
                 </a>
               </li>
@@ -154,15 +154,15 @@ export async function PublicFooter() {
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-[var(--color-divider)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Bottom bar */}
+        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[var(--color-ink-faint)]">
             &copy; {new Date().getFullYear()} Caring Iggy Animal Shelter. All rights reserved.
           </p>
           {session && (
             <Link
               href={dashboardLink}
-              className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-primary)] transition-colors duration-150"
+              className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors"
             >
               {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
             </Link>
