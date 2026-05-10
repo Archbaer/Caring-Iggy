@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { AnimalFormFields } from "@/components/animals/animal-form-fields";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   AnimalEditorApiError,
   createAnimalFromEditor,
@@ -174,10 +172,8 @@ export function AnimalCreator() {
 
   return (
     <div className="max-w-3xl">
-      <Card variant="panel" className="p-0 overflow-hidden">
-
-      <form className="dashboard-form" onSubmit={handleCreateSubmit}>
-      <div className="space-y-6">
+      <form onSubmit={handleCreateSubmit}>
+      <div className="space-y-5">
         <AnimalFormFields
           formState={{
             name: createForm.name,
@@ -195,13 +191,15 @@ export function AnimalCreator() {
           onChange={handleFieldChange}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerName">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner name</span>
+        <h3 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-4 mt-8">Previous owner</h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="space-y-5">
+            <label htmlFor="previousOwnerName">
+              <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Previous owner name</span>
               <input
                 id="previousOwnerName"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={createForm.previousOwnerName}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, previousOwnerName: event.target.value }))
@@ -210,12 +208,12 @@ export function AnimalCreator() {
             </label>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerTelephone">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner telephone</span>
+          <div className="space-y-5">
+            <label htmlFor="previousOwnerTelephone">
+              <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Previous owner telephone</span>
               <input
                 id="previousOwnerTelephone"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={createForm.previousOwnerTelephone}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, previousOwnerTelephone: event.target.value }))
@@ -224,13 +222,13 @@ export function AnimalCreator() {
             </label>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerEmail">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner email</span>
+          <div className="space-y-5">
+            <label htmlFor="previousOwnerEmail">
+              <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Previous owner email</span>
               <input
                 id="previousOwnerEmail"
                 type="email"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={createForm.previousOwnerEmail}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, previousOwnerEmail: event.target.value }))
@@ -239,12 +237,12 @@ export function AnimalCreator() {
             </label>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex flex-col gap-1.5" htmlFor="previousOwnerAddress">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner address</span>
+          <div className="space-y-5">
+            <label htmlFor="previousOwnerAddress">
+              <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Previous owner address</span>
               <input
                 id="previousOwnerAddress"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={createForm.previousOwnerAddress}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, previousOwnerAddress: event.target.value }))
@@ -254,31 +252,33 @@ export function AnimalCreator() {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <Button type="submit" variant="default" className="flex-1" disabled={isCreating}>
+        <div className="flex gap-4 pt-4">
+          <button
+            type="submit"
+            className="inline-flex items-center rounded-2xl bg-[var(--color-primary)] text-white px-8 py-3.5 text-sm font-bold shadow-[var(--shadow-md)] hover:bg-[var(--color-primary-deep)] hover:shadow-[var(--shadow-lg)] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+            disabled={isCreating}
+          >
             {isCreating ? "Creating..." : "Add Animal"}
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant="outline"
-            className="flex-1"
+            className="inline-flex items-center rounded-2xl border-2 border-[var(--color-primary)] text-[var(--color-primary)] px-8 py-3.5 text-sm font-bold hover:bg-[var(--color-primary-pale)] active:scale-[0.98] transition-all duration-200"
             onClick={() => router.push("/animals")}
           >
             Cancel
-          </Button>
+          </button>
         </div>
       </div>
       </form>
-      </Card>
 
       {errorMessage ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border-2 border-[var(--color-danger)] bg-[var(--color-danger)]/5 p-4 text-sm text-[var(--color-danger)] font-medium mt-6" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border-2 border-[var(--color-primary)] bg-[var(--color-primary-pale)] p-4 text-sm text-[var(--color-primary-deep)] font-medium mt-6" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}

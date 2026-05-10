@@ -8,11 +8,10 @@ import {
 } from "@/lib/constants/animal-options";
 
 const INPUT_CLASS =
-  "w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200";
+  "w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200";
 
-const LABEL_CLASS = "flex flex-col gap-1.5";
-const LABEL_TEXT_CLASS = "text-sm font-medium text-[var(--color-ink)]";
-const FIELD_WRAPPER_CLASS = "space-y-2";
+const LABEL_TEXT_CLASS = "block text-sm font-semibold text-[var(--color-ink)] mb-1.5";
+const FIELD_WRAPPER_CLASS = "space-y-5";
 
 interface AnimalFormFieldsProps {
   formState: AnimalFormState;
@@ -35,10 +34,10 @@ interface AnimalFormState {
 
 export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps) {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="name">
+          <label htmlFor="name">
             <span className={LABEL_TEXT_CLASS}>Name</span>
             <input
               id="name"
@@ -51,7 +50,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="animalType">
+          <label htmlFor="animalType">
             <span className={LABEL_TEXT_CLASS}>Animal type</span>
             <input
               id="animalType"
@@ -63,7 +62,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="breed">
+          <label htmlFor="breed">
             <span className={LABEL_TEXT_CLASS}>Breed</span>
             <input
               id="breed"
@@ -75,7 +74,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="status">
+          <label htmlFor="status">
             <span className={LABEL_TEXT_CLASS}>Status</span>
             <select
               id="status"
@@ -95,7 +94,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="gender">
+          <label htmlFor="gender">
             <span className={LABEL_TEXT_CLASS}>Gender</span>
             <select
               id="gender"
@@ -116,7 +115,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="size">
+          <label htmlFor="size">
             <span className={LABEL_TEXT_CLASS}>Size</span>
             <select
               id="size"
@@ -137,7 +136,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="dateOfBirth">
+          <label htmlFor="dateOfBirth">
             <span className={LABEL_TEXT_CLASS}>Date of birth</span>
             <input
               id="dateOfBirth"
@@ -150,7 +149,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         </div>
 
         <div className={FIELD_WRAPPER_CLASS}>
-          <label className={LABEL_CLASS} htmlFor="intakeDate">
+          <label htmlFor="intakeDate">
             <span className={LABEL_TEXT_CLASS}>Intake date</span>
             <input
               id="intakeDate"
@@ -162,8 +161,8 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
           </label>
         </div>
 
-        <div className={`${FIELD_WRAPPER_CLASS} md:col-span-2`}>
-          <label className={LABEL_CLASS} htmlFor="temperament">
+        <div className={`${FIELD_WRAPPER_CLASS} sm:col-span-2`}>
+          <label htmlFor="temperament">
             <span className={LABEL_TEXT_CLASS}>Temperament</span>
             <input
               id="temperament"
@@ -174,8 +173,8 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
           </label>
         </div>
 
-        <div className={`${FIELD_WRAPPER_CLASS} md:col-span-2`}>
-          <label className={LABEL_CLASS} htmlFor="imageUrl">
+        <div className={`${FIELD_WRAPPER_CLASS} sm:col-span-2`}>
+          <label htmlFor="imageUrl">
             <span className={LABEL_TEXT_CLASS}>Image URL</span>
             <input
               id="imageUrl"
@@ -188,7 +187,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
       </div>
 
       <div className={FIELD_WRAPPER_CLASS}>
-        <label className={LABEL_CLASS} htmlFor="description">
+        <label htmlFor="description">
           <span className={LABEL_TEXT_CLASS}>Description</span>
           <textarea
             id="description"

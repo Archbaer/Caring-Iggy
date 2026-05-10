@@ -157,37 +157,36 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
 
   if (updatedAnimal) {
     return (
-      <div className="page-shell">
-        <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
-          <SuccessCard
-            title="Animal record updated"
-            fields={[
-              { label: "Name", value: updatedAnimal.name },
-              { label: "Type", value: updatedAnimal.animalType },
-              { label: "Breed", value: updatedAnimal.breed },
-              { label: "Status", value: updatedAnimal.status },
-            ]}
-            primaryHref="/animals"
-            primaryLabel="See all animals"
-            secondaryHref={`/animals/${updatedAnimal.id}`}
-            secondaryLabel="See animal"
-          />
-        </div>
+      <div className="max-w-3xl">
+        <SuccessCard
+          title="Animal record updated"
+          fields={[
+            { label: "Name", value: updatedAnimal.name },
+            { label: "Type", value: updatedAnimal.animalType },
+            { label: "Breed", value: updatedAnimal.breed },
+            { label: "Status", value: updatedAnimal.status },
+          ]}
+          primaryHref="/animals"
+          primaryLabel="See all animals"
+          secondaryHref={`/animals/${updatedAnimal.id}`}
+          secondaryLabel="See animal"
+        />
       </div>
     );
   }
 
   return (
-    <div className="page-shell">
-      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
-        <section className="panel dashboard-form-panel">
-          <p className="eyebrow">Authorized {roleCopy}</p>
-          <h3 className="panel-title">Update this animal</h3>
-          <p className="panel-copy">
-            This client shell lazy-loads for {roleCopy} accounts only. Mutations still go through protected BFF routes with server-side role and CSRF checks.
-          </p>
+    <div className="max-w-3xl space-y-8">
+      {/* Update form section */}
+      <section className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] mb-1">Authorized {roleCopy}</p>
+        <h3 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mb-2">Update this animal</h3>
+        <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed mb-6">
+          This client shell lazy-loads for {roleCopy} accounts only. Mutations still go through protected BFF routes with server-side role and CSRF checks.
+        </p>
 
-          <form className="dashboard-form" onSubmit={handleUpdateSubmit}>
+        <form onSubmit={handleUpdateSubmit}>
+          <div className="space-y-5">
             <AnimalFormFields
               formState={{
                 name: updateForm.name,
@@ -205,12 +204,12 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
               onChange={handleFieldChange}
             />
 
-            <div className="space-y-2">
-              <label className="flex flex-col gap-1.5" htmlFor="previousOwnerId">
-                <span className="text-sm font-medium text-[var(--color-ink)]">Previous owner ID</span>
+            <div className="space-y-5">
+              <label htmlFor="previousOwnerId">
+                <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Previous owner ID</span>
                 <input
                   id="previousOwnerId"
-                  className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                  className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                   value={updateForm.previousOwnerId}
                   onChange={(event) =>
                     setUpdateForm((current) => ({ ...current, previousOwnerId: event.target.value }))
@@ -219,38 +218,46 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
               </label>
             </div>
 
-            <div className="auth-actions" style={{ justifyContent: "center" }}>
-              <button type="submit" className="auth-submit" disabled={isUpdating || isDeleting}>
+            <div className="flex justify-center pt-4">
+              <button
+                type="submit"
+                className="inline-flex items-center rounded-2xl bg-[var(--color-primary)] text-white px-8 py-3.5 text-sm font-bold shadow-[var(--shadow-md)] hover:bg-[var(--color-primary-deep)] hover:shadow-[var(--shadow-lg)] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                disabled={isUpdating || isDeleting}
+              >
                 {isUpdating ? "Saving..." : "Save animal changes"}
               </button>
             </div>
-          </form>
-        </section>
-      </div>
-
-      <div style={{ maxWidth: "var(--max-width-content)", margin: "0 auto" }}>
-        <section className="panel dashboard-form-panel">
-          <p className="eyebrow">Danger zone</p>
-          <h3 className="panel-title">Delete this animal</h3>
-          <p className="panel-copy">
-            Deletion remains server-authorized. Lazy loading improves page weight only; it is not the authorization boundary.
-          </p>
-          <div className="auth-actions">
-            <button type="button" className="dashboard-action-button" disabled={isUpdating || isDeleting} onClick={() => { void handleDelete(); }}>
-              {isDeleting ? "Deleting..." : "Delete animal record"}
-            </button>
           </div>
-        </section>
-      </div>
+        </form>
+      </section>
+
+      {/* Danger zone section */}
+      <section className="rounded-3xl border border-[var(--color-danger)]/30 bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6">
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-danger)] mb-1">Danger zone</p>
+        <h3 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mb-2">Delete this animal</h3>
+        <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed mb-6">
+          Deletion remains server-authorized. Lazy loading improves page weight only; it is not the authorization boundary.
+        </p>
+        <div>
+          <button
+            type="button"
+            className="inline-flex items-center rounded-2xl bg-[var(--color-danger)] text-white px-8 py-3.5 text-sm font-bold shadow-[var(--shadow-sm)] hover:bg-[var(--color-danger-deep)] hover:shadow-[var(--shadow-md)] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+            disabled={isUpdating || isDeleting}
+            onClick={() => { void handleDelete(); }}
+          >
+            {isDeleting ? "Deleting..." : "Delete animal record"}
+          </button>
+        </div>
+      </section>
 
       {errorMessage ? (
-        <p className="auth-error-banner" aria-live="polite" role="status">
+        <p className="rounded-2xl border-2 border-[var(--color-danger)] bg-[var(--color-danger)]/5 p-4 text-sm text-[var(--color-danger)] font-medium" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="dashboard-success-banner" aria-live="polite" role="status">
+        <p className="rounded-2xl border-2 border-[var(--color-primary)] bg-[var(--color-primary-pale)] p-4 text-sm text-[var(--color-primary-deep)] font-medium" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}
