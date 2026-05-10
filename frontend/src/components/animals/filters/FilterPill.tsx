@@ -8,13 +8,13 @@ export type FilterPillProps = {
 
 export function FilterPill({ label, href, isActive }: FilterPillProps) {
   const baseClasses =
-    "rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200";
+    "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold transition-all duration-200";
 
   const activeClasses =
-    "bg-[var(--color-accent-pale)] text-[var(--color-accent)] border-[var(--color-accent)]";
+    "bg-[var(--color-primary-pale)] text-[var(--color-primary)]";
 
   const inactiveClasses =
-    "border-[var(--color-border)] text-[var(--color-ink-soft)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]";
+    "border border-[var(--color-border)] text-[var(--color-ink-soft)] bg-white hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]";
 
   return (
     <Link href={href} className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}>
