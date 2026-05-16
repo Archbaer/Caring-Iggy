@@ -143,8 +143,9 @@ export function PreferencesForm({
                 const checked = selectedTypes.includes(animalType);
 
                 return (
-                  <label key={animalType} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
+                  <label key={animalType} htmlFor={`pref-type-${animalType}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-type-${animalType}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -229,8 +230,9 @@ export function PreferencesForm({
                 const checked = selectedBreeds.includes(breed);
 
                 return (
-                  <label key={breed} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
+                  <label key={breed} htmlFor={`pref-breed-${breed}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-breed-${breed}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -259,8 +261,9 @@ export function PreferencesForm({
               {GENDER_OPTIONS.map((gender) => {
                 const checked = selectedGenders.includes(gender);
                 return (
-                  <label key={gender} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
+                  <label key={gender} htmlFor={`pref-gender-${gender}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-gender-${gender}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -285,8 +288,9 @@ export function PreferencesForm({
               {SIZE_OPTIONS.map((size) => {
                 const checked = selectedSizes.includes(size);
                 return (
-                  <label key={size} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
+                  <label key={size} htmlFor={`pref-size-${size}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-size-${size}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -314,8 +318,9 @@ export function PreferencesForm({
           {TEMPERAMENT_OPTIONS.map((temperament) => {
             const checked = selectedTemperaments.includes(temperament);
             return (
-              <label key={temperament} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
+              <label key={temperament} htmlFor={`pref-temperament-${temperament}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                 <input
+                  id={`pref-temperament-${temperament}`}
                   type="checkbox"
                   checked={checked}
                   onChange={() => {

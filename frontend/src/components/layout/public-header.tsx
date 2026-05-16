@@ -20,14 +20,14 @@ export async function PublicHeader() {
           className="flex items-center gap-2.5 text-2xl font-extrabold text-white tracking-tight flex-shrink-0"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          🐾 Caring Iggy
+          <span aria-hidden="true">🐾</span> Caring Iggy
         </Link>
 
         {/* Nav — client component handles active state */}
         <nav className="hidden sm:flex items-center gap-2" aria-label="Primary">
           <Link
             href="/animals"
-            className="px-4 py-2 rounded-full text-sm font-bold text-[var(--color-ink-on-dark)] border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all duration-200"
+            className="px-4 py-2 rounded-full text-sm font-bold text-[var(--color-ink-on-dark)] border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
             Animals
           </Link>
@@ -39,9 +39,9 @@ export async function PublicHeader() {
           </Link>
           <Link
             href="/donate"
-            className="px-5 py-2 rounded-full text-sm font-bold bg-[var(--color-accent)] text-white shadow-[var(--shadow-coral)] hover:bg-[var(--color-accent-deep)] hover:scale-105 active:scale-95 transition-all duration-200"
+            className="px-5 py-2 rounded-full text-sm font-bold bg-[var(--color-accent)] text-white shadow-[var(--shadow-coral)] hover:bg-[var(--color-accent-deep)] hover:scale-105 active:scale-95 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
-            ❤️ Donate
+            <span aria-hidden="true">❤️</span> Donate
           </Link>
 
           <div className="w-px h-5 bg-white/20 mx-1" />
@@ -58,13 +58,13 @@ export async function PublicHeader() {
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 rounded-full text-sm font-bold text-white border border-white/20 hover:bg-white/10 transition-all duration-200"
+                className="px-4 py-2 rounded-full text-sm font-bold text-white border border-white/20 hover:bg-white/10 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 rounded-full text-sm font-bold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] transition-all duration-200"
+                className="px-4 py-2 rounded-full text-sm font-bold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
               >
                 Sign up
               </Link>

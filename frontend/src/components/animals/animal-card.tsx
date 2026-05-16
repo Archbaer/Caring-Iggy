@@ -79,14 +79,14 @@ export function AnimalCard({
         <div className="flex gap-3 mt-auto pt-2">
           <Link
             href={`/animals/${animal.id}`}
-            className="inline-flex items-center rounded-2xl border-2 border-[var(--color-accent)]/40 bg-[var(--color-accent-pale)] px-4 py-2 text-sm font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] active:scale-95 transition-all duration-200"
+            className="inline-flex items-center rounded-2xl border-2 border-[var(--color-accent)]/40 bg-[var(--color-accent-pale)] px-4 py-2 text-sm font-bold text-[var(--color-accent-deep)] hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] active:scale-95 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
             View profile
           </Link>
           {canEdit && (
             <Link
               href={`/dashboard/animals/${animal.id}/edit`}
-              className="inline-flex items-center rounded-2xl border-2 border-[var(--color-primary)]/40 bg-[var(--color-primary-pale)] px-4 py-2 text-sm font-bold text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] active:scale-95 transition-all duration-200"
+              className="inline-flex items-center rounded-2xl border-2 border-[var(--color-primary)]/40 bg-[var(--color-primary-pale)] px-4 py-2 text-sm font-bold text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] active:scale-95 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
             >
               Edit
             </Link>

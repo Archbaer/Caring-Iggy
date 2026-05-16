@@ -70,7 +70,7 @@ export async function PublicFooter() {
           {/* Brand + Social */}
           <div className="space-y-4">
             <p className="text-xl font-extrabold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-              🐾 Caring Iggy
+              <span aria-hidden="true">🐾</span> Caring Iggy
             </p>
             <p className="text-sm text-[var(--color-ink-faint)] leading-relaxed max-w-[28ch] mx-auto sm:mx-0">
               Finding loving homes for animals in need since 2018.
@@ -80,7 +80,7 @@ export async function PublicFooter() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all duration-200"
+                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
                   aria-label={link.label}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -100,11 +100,11 @@ export async function PublicFooter() {
               {quickLinks.map((link, i) => (
                 <li key={`quick-${i}`}>
                   {link.href.startsWith("/") ? (
-                    <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
+                    <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2">
                       {link.label}
                     </Link>
                   ) : (
-                    <a href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
+                    <a href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2">
                       {link.label}
                     </a>
                   )}
@@ -121,7 +121,7 @@ export async function PublicFooter() {
             <ul className="space-y-2.5">
               {adoptLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2">
                     {link.label}
                   </Link>
                 </li>
@@ -136,12 +136,12 @@ export async function PublicFooter() {
             </p>
             <ul className="space-y-2.5 text-sm text-[var(--color-ink-faint)]">
               <li>
-                <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">
+                <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2">
                   {contactInfo.email}
                 </a>
               </li>
               <li>
-                <a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`} className="hover:text-white transition-colors">
+                <a href={`tel:${contactInfo.phone.replace(/\D/g, "")}`} className="hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2">
                   {contactInfo.phone}
                 </a>
               </li>
@@ -162,7 +162,7 @@ export async function PublicFooter() {
           {session && (
             <Link
               href={dashboardLink}
-              className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors"
+              className="text-sm text-[var(--color-ink-faint)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
             >
               {session.role === "ADMIN" ? "Admin workspace" : "Your workspace"}
             </Link>
