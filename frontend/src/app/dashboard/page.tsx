@@ -110,7 +110,7 @@ export default async function DashboardPage() {
       {/* Adopter hero */}
       <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] animate-fade-up">
         <div className="flex flex-col gap-2">
-          <span className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-2">Dashboard</span>
+          <Eyebrow>Dashboard</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-[var(--color-ink)]">
             Welcome back, {profile.name}
           </h1>

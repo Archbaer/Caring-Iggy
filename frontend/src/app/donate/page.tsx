@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Donate — Caring Iggy Animal Shelter",
   description:
@@ -26,9 +27,7 @@ export default function DonatePage() {
         </div>
 
         <div className="relative z-10">
-          <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-6">
-            Make a difference
-          </p>
+          <Eyebrow>Make a difference</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl font-extrabold text-white mb-6 leading-tight">
             Give an animal <span style={{ color: 'var(--color-accent)' }}>a second chance.</span>
           </h1>
@@ -44,7 +43,7 @@ export default function DonatePage() {
       <section className="py-16 px-6 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-12" style={{ textAlign: "center" }}>
-            <p className="font-[family-name:var(--font-mono)] text-[0.6875rem] tracking-[0.12em] uppercase text-[var(--color-accent)] mb-4">Ways to give</p>
+            <Eyebrow>Ways to give</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-[-0.02em] text-[var(--color-ink)] mb-6 leading-[1.1]">Choose the support path that fits you.</h2>
           </div>
 

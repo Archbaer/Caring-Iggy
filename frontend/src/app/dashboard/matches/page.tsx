@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Eyebrow } from "@/components/ui/eyebrow";
 
 import { LOGIN_ROUTE } from "@/lib/auth/role-check";
 import { getCurrentSession } from "@/lib/auth/server-session";
@@ -17,7 +18,7 @@ export default async function DashboardMatchesPage() {
         <section
           className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-lg)] p-8 max-w-[80rem] mx-auto text-center"
         >
-          <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-2">Coming soon</p>
+          <Eyebrow>Coming soon</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-4">Matching is coming.</h1>
           <p
             className="text-base leading-relaxed text-[var(--color-ink-soft)] mb-5 max-w-[64ch] mx-auto"
