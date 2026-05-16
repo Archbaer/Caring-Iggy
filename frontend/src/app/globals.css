@@ -156,7 +156,8 @@
   .animate-fade-up,
   .animate-hero-reveal,
   .animate-card-spring-in,
-  .animate-hero-image-reveal {
+  .animate-hero-image-reveal,
+  .animate-pulse {
     animation: none !important;
   }
 }

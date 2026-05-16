@@ -1,28 +1,32 @@
 "use client";
 
-import Link from "next/link";
+import { EmptyState } from "@/components/ui/empty-state";
 
-type ErrorProps = {
+export default function Error({
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-};
-
-export default function Error({ error, reset }: ErrorProps) {
+}) {
   return (
-    <section className="support-shell">
-      <p className="eyebrow">Route error</p>
-      <h1 className="not-found-title">The shell could not finish rendering.</h1>
-      <p className="support-copy">
-        {error.message || "An unexpected error interrupted this route."}
-      </p>
-      <div className="support-actions">
-        <button type="button" className="primary-link" onClick={reset}>
+    <div className="max-w-[var(--max-width-content)] mx-auto px-4 sm:px-6 pt-20 pb-8">
+      <EmptyState
+        variant="error"
+        eyebrow="Route error"
+        title="Something interrupted this page."
+        body={error.message || "Please try again."}
+        cta={{ href: "/", label: "Return home" }}
+      />
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={reset}
+          className="text-[var(--color-primary)] font-semibold text-sm underline-offset-4 hover:underline"
+        >
           Try again
         </button>
-        <Link href="/" className="secondary-link">
-          Return home
-        </Link>
       </div>
-    </section>
+    </div>
   );
 }
