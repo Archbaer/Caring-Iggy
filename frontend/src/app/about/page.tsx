@@ -123,7 +123,7 @@ export default function AboutPage() {
           </div>
 
           {/* Visual */}
-          <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
+          <div className="animate-hero-image-reveal delay-2 relative">
             <div className="relative aspect-[5/4] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-7xl text-[var(--color-primary)] opacity-20">

@@ -125,7 +125,7 @@ export default async function Home() {
 
           {/* Hero image */}
           {featuredAnimals[0] && featuredAnimals[0].imageUrl ? (
-            <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
+            <div className="animate-hero-image-reveal delay-2 relative">
               <div className="overflow-hidden rounded-[2rem] shadow-2xl ring-4 ring-white/10 aspect-[4/5]">
                 <Image
                   src={featuredAnimals[0].imageUrl}
@@ -147,7 +147,7 @@ export default async function Home() {
               </div>
             </div>
           ) : (
-            <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
+            <div className="animate-hero-image-reveal delay-2 relative">
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl ring-4 ring-white/10 bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)] flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-5xl text-[var(--color-primary)] opacity-30">
                   CI
