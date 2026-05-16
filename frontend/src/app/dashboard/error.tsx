@@ -1,28 +1,28 @@
 "use client";
 
-import Link from "next/link";
+import { EmptyState } from "@/components/ui/empty-state";
 
-type ErrorProps = {
+export default function DashboardError({
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-};
-
-export default function DashboardError({ error, reset }: ErrorProps) {
+}) {
   return (
-    <section className="support-shell">
-      <p className="eyebrow">Dashboard error</p>
-      <h1 className="not-found-title">Protected route shell failed.</h1>
-      <p className="support-copy">
-        {error.message || "The dashboard scaffold hit an unexpected error."}
-      </p>
-      <div className="support-actions">
-        <button type="button" className="primary-link" onClick={reset}>
-          Retry dashboard
+    <div className="max-w-[var(--max-width-content)] mx-auto px-4 sm:px-6 pt-20 pb-8">
+      <EmptyState
+        variant="error"
+        eyebrow="Dashboard error"
+        title="Something interrupted the dashboard."
+        body={error.message || "Please try again."}
+        cta={{ href: "/", label: "Return home" }}
+      />
+      <div className="mt-4 text-center">
+        <button type="button" onClick={reset} className="text-[var(--color-primary)] font-semibold text-sm underline-offset-4 hover:underline">
+          Try again
         </button>
-        <Link href="/dashboard" className="secondary-link">
-          Reload dashboard
-        </Link>
       </div>
-    </section>
+    </div>
   );
 }

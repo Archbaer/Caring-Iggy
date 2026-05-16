@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Eyebrow } from "@/components/ui/eyebrow";
 
 import { LOGIN_ROUTE } from "@/lib/auth/role-check";
 import { getCurrentSession } from "@/lib/auth/server-session";
@@ -13,12 +14,12 @@ export default async function DashboardMatchesPage() {
 
   return (
     <>
-      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+      <div className="max-w-[80rem] mx-auto bg-canvas-pattern px-6 py-8">
         <section
-          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 max-w-[var(--max-width-content)] mx-auto text-center"
+          className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-lg)] p-8 max-w-[80rem] mx-auto text-center"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Coming soon</p>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-ink)] mb-4">Matching is coming.</h1>
+          <Eyebrow>Coming soon</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-4">Matching is coming.</h1>
           <p
             className="text-base leading-relaxed text-[var(--color-ink-soft)] mb-5 max-w-[64ch] mx-auto"
           >
@@ -26,8 +27,8 @@ export default async function DashboardMatchesPage() {
             see animal-adopter matches curated by our staff.
           </p>
           <div className="flex gap-3 justify-center">
-            <Link href="/dashboard" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]">Back to dashboard</Link>
-            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)]">Browse animals</Link>
+            <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]">Back to dashboard</Link>
+            <Link href="/animals" className="inline-flex items-center justify-center gap-2 rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-transparent border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-pale)]">Browse animals</Link>
           </div>
         </section>
       </div>

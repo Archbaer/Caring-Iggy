@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 import type { AdminAdopterDetail } from "@/lib/api/admin";
 
@@ -33,7 +34,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
 
   if (successAdopter) {
     return (
-      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 py-12">
+      <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-8 bg-canvas-pattern">
         <SuccessCard
           title="Adopter record updated"
           fields={[
@@ -51,49 +52,54 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
   }
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8 space-y-6">
+    <div className="max-w-[80rem] mx-auto px-6 py-8 space-y-6 bg-canvas-pattern">
       <nav className="flex items-center gap-2">
-        <Link href="/dashboard/admin/adopters" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+        <Link href="/dashboard/admin/adopters" className="text-[var(--color-accent)] font-semibold text-sm hover:underline">
           ← Adopters
         </Link>
       </nav>
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
-        <h1 className="page-title">{currentAdopter.name}</h1>
-        <p className="page-copy">
-          <span className="inline-flex items-center gap-1 font-[family-name:var(--font-mono)] text-[0.6875rem] font-normal tracking-[0.08em] uppercase py-1 px-2.5 rounded-[var(--radius-sm)]">{currentAdopter.status}</span>
+      <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] border border-[var(--color-border)] p-8">
+        <p className="text-xs text-[var(--color-ink-faint)] font-medium">Admin route</p>
+        <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mt-2 mb-2">{currentAdopter.name}</h1>
+        <p className="mt-2">
+          <Badge variant="muted">{currentAdopter.status}</Badge>
         </p>
       </section>
 
-      <section className="grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-6">
-        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Contact</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Adopter profile</h2>
-          <ul className="flex flex-col gap-2 text-sm">
-            <li>
-              <strong>Email:</strong> {currentAdopter.email}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <article className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-8">
+          <p className="text-xs text-[var(--color-ink-faint)] font-medium">Contact</p>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mt-1 mb-4">Adopter profile</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            <li className="flex flex-col gap-0.5">
+              <span className="text-xs text-[var(--color-ink-faint)]">Email</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.email}</span>
             </li>
-            <li>
-              <strong>Telephone:</strong> {currentAdopter.telephone}
+            <li className="flex flex-col gap-0.5">
+              <span className="text-xs text-[var(--color-ink-faint)]">Telephone</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.telephone}</span>
             </li>
-            <li>
-              <strong>Address:</strong> {currentAdopter.address ?? "No address on file."}
+            <li className="flex flex-col gap-0.5">
+              <span className="text-xs text-[var(--color-ink-faint)]">Address</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.address ?? "No address on file."}</span>
             </li>
-            <li>
-              <strong>Interested animals:</strong> {currentAdopter.interestCount}
+            <li className="flex flex-col gap-0.5">
+              <span className="text-xs text-[var(--color-ink-faint)]">Interested animals</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.interestCount}</span>
             </li>
           </ul>
         </article>
 
-        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Preferences</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Saved adopter preferences</h2>
+        <article className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-8">
+          <p className="text-xs text-[var(--color-ink-faint)] font-medium">Preferences</p>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mt-1 mb-4">Saved adopter preferences</h2>
           {preferenceEntries.length > 0 ? (
-            <ul className="flex flex-col gap-2 text-sm">
+            <ul className="flex flex-col gap-3 text-sm">
               {preferenceEntries.map(([key, value]) => (
-                <li key={key}>
-                  <strong>{key}:</strong> {formatPreferenceValue(value)}
+                <li key={key} className="flex flex-col gap-0.5">
+                  <span className="text-xs text-[var(--color-ink-faint)]">{key}</span>
+                  <span className="text-sm text-[var(--color-ink)] font-semibold">{formatPreferenceValue(value)}</span>
                 </li>
               ))}
             </ul>
@@ -102,17 +108,19 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
           )}
         </article>
 
-        <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">History</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Adoption history</h2>
+        <article className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-8">
+          <p className="text-xs text-[var(--color-ink-faint)] font-medium">History</p>
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mt-1 mb-4">Adoption history</h2>
           {currentAdopter.history.length > 0 ? (
-            <ul className="flex flex-col gap-2 text-sm">
+            <ul className="flex flex-col gap-3 text-sm">
               {currentAdopter.history.map((entry) => (
-                <li key={entry.id}>
-                  <strong>{entry.animalName ?? entry.animalId}:</strong>{" "}
-                  {entry.adoptionDate ?? "Unknown adoption date"}
-                  {entry.returnDate ? ` · Returned ${entry.returnDate}` : ""}
-                  {entry.notes ? ` · ${entry.notes}` : ""}
+                <li key={entry.id} className="flex flex-col gap-0.5">
+                  <span className="text-xs text-[var(--color-ink-faint)]">{entry.animalName ?? entry.animalId}</span>
+                  <span className="text-sm text-[var(--color-ink)] font-semibold">
+                    {entry.adoptionDate ?? "Unknown adoption date"}
+                    {entry.returnDate ? ` · Returned ${entry.returnDate}` : ""}
+                    {entry.notes ? ` · ${entry.notes}` : ""}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -128,9 +136,9 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
             onSuccess={handleSuccess}
           />
         ) : (
-          <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Actions</p>
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Manage this record</h2>
+          <article className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-8 flex flex-col gap-4">
+            <p className="text-xs text-[var(--color-ink-faint)] font-medium">Actions</p>
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)]">Manage this record</h2>
             <Button onClick={() => setEditing(true)}>Edit adopter</Button>
           </article>
         )}

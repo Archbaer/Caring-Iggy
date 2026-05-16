@@ -15,10 +15,10 @@ export function HeaderNav({ dashboardLink }: HeaderNavProps) {
     <Link
       href={dashboardLink}
       className={[
-        "px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200",
+        "px-3 py-1.5 rounded-full text-sm font-bold border transition-all duration-200",
         isOnDashboard
-          ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
-          : "border-[var(--color-border)] text-[var(--color-ink-soft)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]",
+          ? "border-white/40 bg-white/10 text-white"
+          : "border-white/20 text-[var(--color-ink-on-dark)] hover:bg-white/10 hover:text-white",
       ].join(" ")}
     >
       Dashboard

@@ -18,22 +18,22 @@ export default async function AdminStaffPage() {
   const result = await loadAdminStaff();
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-6 py-8 bg-canvas-pattern">
       {/* Back button */}
       <div className="mb-6">
         <a
           href="/dashboard/admin"
-          className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-sm text-[var(--color-accent)] font-semibold transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent-deep)]"
         >
           ← Dashboard
         </a>
       </div>
 
       {/* Hero header */}
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 pt-8 animate-fade-up">
+      <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] mb-8">
         <div className="flex flex-col gap-2">
-          <Eyebrow>Employee records</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-2">
+          <Eyebrow className="text-[var(--color-accent)]">Employee records</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mb-2">
             Staff management
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
@@ -43,19 +43,19 @@ export default async function AdminStaffPage() {
       </section>
 
       {result.kind === "error" ? (
-        <section className="my-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 text-center">
+        <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] text-center">
           <Eyebrow>Directory error</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-2">
             We couldn&apos;t load employee records.
           </h2>
           <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
         </section>
       ) : result.employees.length > 0 ? (
-        <section className="my-6 grid grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 animate-fade-up delay-1">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {result.employees.map((employee) => (
-            <Card key={employee.id} variant="route">
+            <Card key={employee.id} variant="route" className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-6 hover:border-[var(--color-primary)]/50 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1 transition-all duration-300">
               <Eyebrow>{employee.role}</Eyebrow>
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-2">
+              <h2 className="text-xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
                 {employee.name}
               </h2>
               <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
@@ -75,9 +75,9 @@ export default async function AdminStaffPage() {
           ))}
         </section>
       ) : (
-        <section className="my-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 sm:p-8 text-center">
+        <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] p-8 border border-[var(--color-border)] text-center">
           <Eyebrow>No employee records</Eyebrow>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-2">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-2">
             No staff accounts yet.
           </h2>
           <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">

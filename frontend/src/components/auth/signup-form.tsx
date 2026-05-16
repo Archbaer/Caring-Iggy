@@ -94,7 +94,7 @@ export function SignupForm() {
   }
 
   return (
-    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
+    <article className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
       <p className="mb-1 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
         Adopter account
       </p>
@@ -170,13 +170,13 @@ export function SignupForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] rounded-full px-8 py-3 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] disabled:opacity-70 disabled:cursor-wait disabled:transform-none transition-all duration-200"
+            className="w-full rounded-2xl bg-[var(--color-primary)] text-white px-6 py-3.5 text-sm font-bold shadow-[var(--shadow-md)] hover:bg-[var(--color-primary-deep)] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
           >
             {isPending ? "Creating account..." : "Create adopter account"}
           </button>
           <Link
             href="/login"
-            className="rounded-full border border-[var(--color-border)] bg-transparent px-6 py-3 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] hover:text-[var(--color-accent)] transition-all duration-200"
+            className="text-sm text-[var(--color-primary)] font-semibold hover:underline"
           >
             Already have an account?
           </Link>
@@ -212,7 +212,7 @@ function FormField({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-bold text-[var(--color-ink)]">
+      <label htmlFor={id} className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">
         {label}
       </label>
       <input
@@ -221,12 +221,10 @@ function FormField({
         type={type}
         autoComplete={autoComplete}
         className={`
-          w-full appearance-none rounded-xl border bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3
-          placeholder-[var(--color-ink-faint)]
-          focus:outline-none focus:ring-2 transition-all duration-200
+          w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200
           ${errors.length > 0
-            ? "border-[var(--color-danger)]/50 focus:border-[var(--color-danger)] focus:ring-[var(--color-danger)]/20"
-            : "border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-[var(--color-accent)]/20"
+            ? "!border-[var(--color-danger)] focus:ring-[var(--color-danger)]/15"
+            : ""
           }
         `}
         value={value}
@@ -236,7 +234,7 @@ function FormField({
         required
       />
       {errors.length > 0 && (
-        <span id={errorId} className="text-xs text-[var(--color-danger)]">
+        <span id={errorId} className="text-xs text-[var(--color-danger)] mt-1 font-medium">
           {errors[0]}
         </span>
       )}

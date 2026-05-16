@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Donate — Caring Iggy Animal Shelter",
   description:
@@ -9,29 +10,45 @@ export const metadata: Metadata = {
 export default function DonatePage() {
   return (
     <>
-      <section className="py-[var(--space-8)] px-6 bg-[var(--color-surface-warm)]">
-        <div className="max-w-[var(--max-width-content)] mx-auto">
-          <div className="mb-[var(--space-6)]" style={{ textAlign: "center", maxWidth: "70ch", margin: "0 auto" }}>
-            <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.5rem,5vw,4.5rem)] font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]" style={{ fontSize: "clamp(2.6rem, 6vw, 4.8rem)", lineHeight: 1.08, marginBottom: "var(--space-4)" }}>
-              Support the animals who need it most.
-            </h1>
-            <p className="font-[family-name:var(--font-body)] text-[1.0625rem] leading-[1.7] text-[var(--color-ink-soft)]" style={{ color: "var(--color-ink-soft)" }}>
-              Every donation helps Caring Iggy provide medical care, warm shelter, nourishing meals,
-              and patient love while animals wait for their forever homes.
-            </p>
-          </div>
+      {/* ─── Animated Donate Hero ───────────────────────────────────────── */}
+      <section
+        className="relative min-h-[60vh] flex flex-col items-center justify-center text-center px-6 py-20 overflow-hidden"
+        style={{ background: 'var(--gradient-donate-hero)' }}
+      >
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] rounded-full border border-white/5 animate-ping"
+            style={{ animationDuration: '4s' }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full border border-white/8 animate-ping"
+            style={{ animationDuration: '3s', animationDelay: '0.5s' }}
+          />
+        </div>
+
+        <div className="relative z-10">
+          <Eyebrow>Make a difference</Eyebrow>
+          <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl font-extrabold text-white mb-6 leading-tight">
+            Give an animal <span style={{ color: 'var(--color-accent)' }}>a second chance.</span>
+          </h1>
+          <p className="text-blue-200 text-lg max-w-xl mx-auto mb-8">
+            Every donation helps Caring Iggy provide medical care, warm shelter, nourishing meals,
+            and patient love while animals wait for their forever homes.
+          </p>
+          <div className="animate-bounce text-white/50 mt-4">↓</div>
         </div>
       </section>
 
-      <section className="py-[var(--space-8)] px-6">
+      {/* ─── Ways to Give ───────────────────────────────────────────────── */}
+      <section className="py-16 px-6 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
-          <div className="mb-[var(--space-6)]" style={{ textAlign: "center" }}>
-            <p className="font-[family-name:var(--font-mono)] text-[0.6875rem] tracking-[0.12em] uppercase text-[var(--color-accent)] mb-[var(--space-2)]">Ways to give</p>
-            <h2 className="font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.02em] text-[var(--color-ink)] mb-[var(--space-3)] leading-[1.1]">Choose the support path that fits you.</h2>
+          <div className="mb-12" style={{ textAlign: "center" }}>
+            <Eyebrow>Ways to give</Eyebrow>
+            <h2 className="font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-[-0.02em] text-[var(--color-ink)] mb-6 leading-[1.1]">Choose the support path that fits you.</h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-5)" }}>
-            <article className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-card)] transition-transform duration-[180ms] ease hover:-translate-y-[3px] hover:shadow-[var(--shadow-card-hover)]" style={{ padding: "var(--space-6)" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <article className="rounded-3xl bg-white shadow-[var(--shadow-lg)] border border-[var(--color-border)] p-6 flex flex-col items-center text-center hover:scale-105 hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
               <div
                 aria-hidden="true"
                 style={{
@@ -40,20 +57,20 @@ export default function DonatePage() {
                   borderRadius: "999px",
                   display: "grid",
                   placeItems: "center",
-                  background: "var(--color-primary-pale)",
-                  color: "var(--color-primary)",
-                  marginBottom: "var(--space-4)",
+                  background: "var(--color-accent-pale)",
+                  color: "var(--color-accent)",
+                  marginBottom: "2rem",
                 }}
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
-              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-medium leading-[1.2] text-[var(--color-ink)]" style={{ marginBottom: "var(--space-2)" }}>One-time donation</h3>
+              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-[1.2] text-[var(--color-ink)] mb-4">One-time donation</h3>
               <p className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.7] text-[var(--color-ink-soft)]">Any amount helps provide food, medicine, and care.</p>
             </article>
 
-            <article className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-card)] transition-transform duration-[180ms] ease hover:-translate-y-[3px] hover:shadow-[var(--shadow-card-hover)]" style={{ padding: "var(--space-6)" }}>
+            <article className="rounded-3xl bg-white shadow-[var(--shadow-lg)] border border-[var(--color-border)] p-6 flex flex-col items-center text-center hover:scale-105 hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
               <div
                 aria-hidden="true"
                 style={{
@@ -62,9 +79,9 @@ export default function DonatePage() {
                   borderRadius: "999px",
                   display: "grid",
                   placeItems: "center",
-                  background: "var(--color-primary-pale)",
-                  color: "var(--color-primary)",
-                  marginBottom: "var(--space-4)",
+                  background: "var(--color-accent-pale)",
+                  color: "var(--color-accent)",
+                  marginBottom: "2rem",
                 }}
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -74,11 +91,11 @@ export default function DonatePage() {
                   <path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14" />
                 </svg>
               </div>
-              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-medium leading-[1.2] text-[var(--color-ink)]" style={{ marginBottom: "var(--space-2)" }}>Monthly giving</h3>
+              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-[1.2] text-[var(--color-ink)] mb-4">Monthly giving</h3>
               <p className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.7] text-[var(--color-ink-soft)]">Become a sustaining supporter and help us plan ahead.</p>
             </article>
 
-            <article className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-card)] transition-transform duration-[180ms] ease hover:-translate-y-[3px] hover:shadow-[var(--shadow-card-hover)]" style={{ padding: "var(--space-6)" }}>
+            <article className="rounded-3xl bg-white shadow-[var(--shadow-lg)] border border-[var(--color-border)] p-6 flex flex-col items-center text-center hover:scale-105 hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
               <div
                 aria-hidden="true"
                 style={{
@@ -87,9 +104,9 @@ export default function DonatePage() {
                   borderRadius: "999px",
                   display: "grid",
                   placeItems: "center",
-                  background: "var(--color-primary-pale)",
-                  color: "var(--color-primary)",
-                  marginBottom: "var(--space-4)",
+                  background: "var(--color-accent-pale)",
+                  color: "var(--color-accent)",
+                  marginBottom: "2rem",
                 }}
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -98,22 +115,28 @@ export default function DonatePage() {
                   <path d="M12 22V12" />
                 </svg>
               </div>
-              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-medium leading-[1.2] text-[var(--color-ink)]" style={{ marginBottom: "var(--space-2)" }}>In-kind gifts</h3>
+              <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-[1.2] text-[var(--color-ink)] mb-4">In-kind gifts</h3>
               <p className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.7] text-[var(--color-ink-soft)]">Supplies, equipment, and services make a real difference.</p>
             </article>
           </div>
         </div>
       </section>
 
-      <div className="bg-[var(--color-primary)] py-[var(--space-8)] px-6 text-center">
-        <h2 className="font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3rem)] font-medium text-white mb-[var(--space-4)]">Want to help right now?</h2>
-        <p className="text-white/80 text-[1.0625rem] max-w-[50ch] mx-auto mb-[var(--space-6)]">
-          Our donation intake page is almost ready. Reach out and our team will guide your support.
-        </p>
-        <a href="mailto:hello@caringiggy.org?subject=Donation%20inquiry" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-white text-[var(--color-primary)] border-[1.5px] border-white hover:bg-[var(--color-primary-pale)] hover:border-[var(--color-primary-pale)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7">
-          Email our team
-        </a>
-      </div>
+      {/* ─── CTA Band ───────────────────────────────────────────────────── */}
+      <section className="px-6 py-24 relative overflow-hidden" style={{ background: 'var(--gradient-cta)' }}>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/10 blur-[80px]" />
+        </div>
+        <div className="relative max-w-[var(--max-width-content)] mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl font-[family-name:var(--font-display)] font-extrabold text-white mb-4">Want to help right now?</h2>
+          <p className="text-white/80 text-lg mb-8 max-w-md mx-auto">
+            Our donation page is almost ready. Reach out and our team will guide your support.
+          </p>
+          <a href="mailto:hello@caringiggy.org?subject=Donation%20inquiry" className="inline-flex items-center gap-2 rounded-2xl bg-white text-[var(--color-accent)] px-10 py-4 text-base font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300">
+            Email our team
+          </a>
+        </div>
+      </section>
     </>
   );
 }

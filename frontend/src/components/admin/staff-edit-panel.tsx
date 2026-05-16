@@ -97,43 +97,43 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
   }
 
   return (
-    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-      <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Edit</p>
+    <article className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+      <p className="text-xs text-[var(--color-ink-faint)] font-medium">Edit</p>
       <h2 className="text-lg font-semibold text-[var(--color-ink)]">Update staff record</h2>
 
       <form className="grid gap-6" onSubmit={handleSubmit}>
         <label className="flex flex-col gap-1.5" htmlFor="staff-name">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Name</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Name</span>
           <input
             id="staff-name"
             name="name"
             type="text"
             autoComplete="name"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.name}
             onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="staff-telephone">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Telephone</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Telephone</span>
           <input
             id="staff-telephone"
             name="telephone"
             type="tel"
             autoComplete="tel"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.telephone}
             onChange={(e) => setFields((f) => ({ ...f, telephone: e.target.value }))}
           />
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="staff-role">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Role</span>
+          <span className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Role</span>
           <select
             id="staff-role"
             name="role"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.role}
             onChange={(e) =>
               setFields((f) => ({ ...f, role: e.target.value as "STAFF" | "ADMIN" }))

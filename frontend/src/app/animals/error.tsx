@@ -1,28 +1,28 @@
 "use client";
 
-import Link from "next/link";
+import { EmptyState } from "@/components/ui/empty-state";
 
-type ErrorProps = {
+export default function AnimalsError({
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-};
-
-export default function AnimalsError({ error, reset }: ErrorProps) {
+}) {
   return (
-    <section className="support-shell">
-      <p className="eyebrow">Catalog error</p>
-      <h1 className="not-found-title">The public animal routes could not finish rendering.</h1>
-      <p className="support-copy">
-        {error.message || "An unexpected error interrupted the public catalog."}
-      </p>
-      <div className="support-actions">
-        <button type="button" className="primary-link" onClick={reset}>
-          Try catalog again
+    <div className="max-w-[var(--max-width-content)] mx-auto px-4 sm:px-6 pt-20 pb-8">
+      <EmptyState
+        variant="error"
+        eyebrow="Catalog error"
+        title="The animal catalog is unavailable."
+        body={error.message || "Please try again."}
+        cta={{ href: "/", label: "Return home" }}
+      />
+      <div className="mt-4 text-center">
+        <button type="button" onClick={reset} className="text-[var(--color-primary)] font-semibold text-sm underline-offset-4 hover:underline">
+          Try again
         </button>
-        <Link href="/animals" className="secondary-link">
-          Reload catalog
-        </Link>
       </div>
-    </section>
+    </div>
   );
 }

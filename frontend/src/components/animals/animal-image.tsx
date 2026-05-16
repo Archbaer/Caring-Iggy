@@ -12,13 +12,13 @@ type AnimalImageProps = {
 
 const imageVariants = {
   card: {
-    className: "animal-card-image",
+    className: "w-full h-full object-cover",
     sizes: "(max-width: 900px) 100vw, 33vw",
     width: 800,
     height: 600,
   },
   detail: {
-    className: "animal-detail-image",
+    className: "w-full h-full object-cover rounded-2xl",
     sizes: "(max-width: 900px) 100vw, 50vw",
     width: 1000,
     height: 800,
@@ -32,8 +32,8 @@ export function AnimalImage({ imageUrl, name, animalType, variant }: AnimalImage
 
   if (!src || failedSrc === src) {
     return (
-      <div className={`${imageVariant.className} ${imageVariant.className}--empty`} aria-hidden="true">
-        <span>{animalType}</span>
+      <div className="w-full h-full bg-[var(--color-primary-pale)] flex items-center justify-center" aria-hidden="true">
+        <span className="text-[var(--color-primary)] font-bold text-lg">{animalType}</span>
       </div>
     );
   }
