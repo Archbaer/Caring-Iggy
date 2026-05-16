@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -11,6 +10,7 @@ import { fetchAdopterProfile } from "@/lib/api/adopter";
 import { fetchAnimalForView } from "@/lib/api/animals";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { MAX_INTERESTS } from "@/lib/types";
+import Link from "next/link";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -63,8 +63,8 @@ function statusToBadgeVariant(
 
 function DetailPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-4">
-      <Eyebrow className="mb-3">{title}</Eyebrow>
+    <div className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-6">
+      <h3 className="text-sm font-bold text-[var(--color-ink)] mb-3 uppercase tracking-wide">{title}</h3>
       <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
@@ -79,9 +79,9 @@ function DetailItem({
 }) {
   if (!value) return null;
   return (
-    <div className="flex justify-between gap-3 text-sm">
-      <span className="text-[var(--color-ink-faint)]">{label}</span>
-      <span className="text-[var(--color-ink)] font-medium">{value}</span>
+    <div className="flex justify-between gap-3">
+      <span className="text-xs text-[var(--color-ink-faint)]">{label}</span>
+      <span className="text-sm text-[var(--color-ink)] font-semibold">{value}</span>
     </div>
   );
 }
@@ -102,7 +102,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
 
   if (result.kind === "error") {
     return (
-      <div className="max-w-[var(--max-width-content)] mx-auto px-6 py-8">
+      <div className="max-w-[86rem] mx-auto px-6 py-8">
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 text-center">
           <Eyebrow className="mb-3">Profile error</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-4 tracking-[-0.02em] leading-[1.05]">
@@ -110,7 +110,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] mb-5">{result.message}</p>
           <Button asChild variant="default">
-            <a href="/animals">Back to animals</a>
+            <Link href="/animals">Back to animals</Link>
           </Button>
         </div>
       </div>
@@ -126,19 +126,16 @@ export default async function AnimalDetailPage({ params }: PageProps) {
     : undefined;
 
   return (
-    <div className="max-w-[var(--max-width-content)] mx-auto px-6 pt-8 pb-8">
-      <Link
-        href="/animals"
-        className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--color-ink-soft)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-pale)] transition-all duration-200 mb-5"
-      >
-        Back to animals
+    <div className="max-w-[86rem] mx-auto px-6 pt-8 pb-8">
+      <Link href="/animals" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold text-sm hover:underline mb-6">
+        ← Back to animals
       </Link>
 
       <div
         className="grid gap-7 mb-7 items-start"
-        style={{ gridTemplateColumns: "1fr 1fr" }}
+        style={{ gridTemplateColumns: "1.1fr 0.9fr" }}
       >
-        <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] shadow-xl">
+        <div className="overflow-hidden rounded-3xl border border-[var(--color-border)] shadow-xl">
           <AnimalImage
             imageUrl={animal.imageUrl}
             name={animal.name}
@@ -154,7 +151,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           >
             {animal.statusLabel}
           </Badge>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-3 tracking-[-0.02em] leading-[1.05]">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-[var(--color-ink)] tracking-tight mb-3">
             {animal.name}
           </h1>
           <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
@@ -174,8 +171,8 @@ export default async function AnimalDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="max-w-[65ch] mb-7">
-        <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-3 tracking-[-0.02em] leading-[1.2]">
+      <div className="max-w-[80ch] mb-7">
+        <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-3 tracking-tight">
           About {animal.name}
         </h2>
         <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
@@ -184,10 +181,7 @@ export default async function AnimalDetailPage({ params }: PageProps) {
         </p>
       </div>
 
-      <div
-        className="grid gap-5 mb-7"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}
-      >
+      <div className="grid gap-5 mb-7 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <DetailPanel title="Details">
           <DetailItem label="Breed" value={animal.breed} />
           <DetailItem label="Type" value={animal.animalType} />

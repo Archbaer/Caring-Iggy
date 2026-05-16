@@ -24,21 +24,21 @@ export default async function AdminStaffDetailPage({ params }: PageProps) {
 
   if (result.kind === "error") {
     return (
-      <div className="max-w-[var(--max-width-content)] mx-auto p-6 sm:p-8">
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Admin route</p>
-          <h1 className="page-title">Staff record unavailable</h1>
-          <p className="page-copy">The protected staff detail route could not be loaded.</p>
+      <div className="max-w-[80rem] mx-auto px-6 py-8">
+        <section className="rounded-3xl bg-white shadow-[var(--shadow-lg)] border border-[var(--color-border)] p-8">
+          <p className="text-xs text-[var(--color-ink-faint)] font-medium">Admin route</p>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)] mt-2 mb-2">Staff record unavailable</h1>
+          <p className="text-sm text-[var(--color-ink-soft)]">The protected staff detail route could not be loaded.</p>
         </section>
 
-        <nav className="flex items-center gap-2">
-          <Link href="/dashboard/admin/staff" className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+        <nav className="flex items-center gap-2 mt-6">
+          <Link href="/dashboard/admin/staff" className="text-[var(--color-accent)] font-semibold text-sm hover:underline">
             ← Staff
           </Link>
         </nav>
 
         <section className="flex flex-col gap-3 py-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Detail error</p>
+          <p className="text-xs text-[var(--color-ink-faint)] font-medium">Detail error</p>
           <h2 className="text-lg font-semibold text-[var(--color-ink)]">We couldn&apos;t load this employee record.</h2>
           <p className="text-sm text-[var(--color-ink-soft)]">{result.message}</p>
         </section>

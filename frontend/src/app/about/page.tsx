@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -55,7 +57,7 @@ export default function AboutPage() {
   return (
     <>
       {/* ─── Hero ───────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[60vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-[var(--color-surface-warm)]">
+      <section className="relative min-h-[60vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-[var(--color-primary-pale)]">
         {/* Atmospheric background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-pale)]/50 via-[var(--color-surface-warm)] to-[var(--color-accent-pale)]/30" />
         <div className="absolute -top-20 -right-20 w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-[var(--color-primary-pale)] to-transparent opacity-40 blur-3xl" />
@@ -69,12 +71,10 @@ export default function AboutPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-[var(--max-width-wide)] mx-auto px-6 py-16 sm:py-20">
-          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              San Francisco Animal Shelter
-            </p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
+        <div className="relative z-10 w-full max-w-[var(--max-width-content)] mx-auto px-6 py-16 sm:py-20">
+          <div className="animate-hero-reveal">
+            <Eyebrow>San Francisco Animal Shelter</Eyebrow>
+            <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our Story
             </h1>
           </div>
@@ -82,14 +82,14 @@ export default function AboutPage() {
       </section>
 
       {/* ─── Mission Quote ───────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+      <section className="px-6 py-20 sm:py-24 bg-white">
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-hero-reveal">
           <div className="relative inline-flex flex-col items-center">
             {/* Decorative quote marks */}
             <span className="absolute -top-6 -left-8 font-[family-name:var(--font-display)] text-[8rem] text-[var(--color-primary-pale)] leading-none select-none pointer-events-none">
               &ldquo;
             </span>
-            <blockquote className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl lg:text-4xl font-normal italic leading-[1.4] tracking-[-0.01em] text-[var(--color-ink)] max-w-[22ch] mx-auto mb-6">
+            <blockquote className="border-l-4 border-[var(--color-accent)] bg-[var(--color-accent-pale)]/30 p-6 rounded-r-2xl italic text-[var(--color-ink)] font-[family-name:var(--font-display)] text-2xl sm:text-3xl lg:text-4xl leading-[1.4] tracking-[-0.01em] max-w-[22ch] mx-auto mb-6">
               Every animal deserves a home where they are loved, safe, and understood.
             </blockquote>
             <cite className="not-italic text-sm text-[var(--color-ink-faint)] font-[family-name:var(--font-mono)] uppercase tracking-[0.1em]">
@@ -100,13 +100,11 @@ export default function AboutPage() {
       </section>
 
       {/* ─── Story ────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              Founded in 2018
-            </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
+      <section className="px-6 py-20 sm:py-24 bg-white">
+        <div className="max-w-[var(--max-width-content)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+          <div className="animate-hero-reveal">
+            <Eyebrow>Founded in 2018</Eyebrow>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
               From one rescue to a community mission.
             </h2>
             <div className="space-y-5">
@@ -123,7 +121,7 @@ export default function AboutPage() {
           </div>
 
           {/* Visual */}
-          <div className="animate-[hero-image-reveal_900ms_cubic-bezier(0.22,1,0.36,1)_200ms_both] relative">
+          <div className="animate-hero-image-reveal delay-2 relative">
             <div className="relative aspect-[5/4] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-[var(--color-primary-pale)] via-[var(--color-accent-pale)] to-[var(--color-canvas)]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="font-[family-name:var(--font-display)] text-7xl text-[var(--color-primary)] opacity-20">
@@ -139,39 +137,33 @@ export default function AboutPage() {
       </section>
 
       {/* ─── Values ───────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-surface-warm)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
-          <div className="mb-14 text-center delay-1">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              What guides us
-            </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
+      <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
+        <div className="max-w-[var(--max-width-content)] mx-auto">
+          <div className="mb-14 text-center">
+            <Eyebrow>What guides us</Eyebrow>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our values
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {VALUES.map((value, i) => (
-              <div
+              <Card variant="panel" as="section"
                 key={value.title}
-                className={`
-                  group relative rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8
-                  shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300
-                  delay-${i + 1}
-                `}
+                className="group relative hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"
               >
-                <div className="mb-6 w-12 h-12 rounded-xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
+                <div className="mb-6 w-12 h-12 rounded-2xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
                   {value.icon}
                 </div>
                 <div>
-                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] mb-3">
+                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-3">
                     {value.title}
                   </h3>
                   <p className="text-[var(--color-ink-soft)] leading-relaxed text-sm">
                     {value.copy}
                   </p>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
@@ -179,56 +171,50 @@ export default function AboutPage() {
 
       {/* ─── Team ─────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto">
+        <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              The people
-            </p>
-            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
+            <Eyebrow>The people</Eyebrow>
+            <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Meet the team
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {TEAM_MEMBERS.map((member, i) => (
-              <div
+              <Card variant="panel" as="section"
                 key={member.name}
-                className={`
-                  group flex flex-col items-center text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8
-                  hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300
-                  delay-${i + 1}
-                `}
+                className="group flex flex-col items-center text-center hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Avatar */}
                 <div className="mb-5 w-20 h-20 rounded-full bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center text-3xl font-[family-name:var(--font-display)] font-medium group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
                   {member.name.charAt(0)}
                 </div>
-                <p className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-1">
+                <p className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-ink)] mb-1">
                   {member.name}
                 </p>
                 <p className="text-sm text-[var(--color-ink-faint)]">{member.role}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
       {/* ─── CTA Band ────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary)]">
-        <div className="max-w-[var(--max-width-wide)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-          <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-white mb-5">
+      <section className="px-6 py-20 sm:py-24" style={{ background: 'var(--gradient-cta)' }}>
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-hero-reveal">
+          <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-white mb-5">
             Come visit us.
           </h2>
           <p className="text-base text-white/75 max-w-[50ch] mx-auto mb-10">
             Mon–Sat 9AM–6PM at 742 Evergreen Terrace, San Francisco. No appointment needed for browsing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/animals" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-white text-[var(--color-primary)] border-[1.5px] border-white hover:bg-[var(--color-primary-pale)] hover:border-[var(--color-primary-pale)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold hover:bg-[var(--color-canvas)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link href="/animals" className="inline-flex items-center justify-center rounded-full bg-white text-[var(--color-accent)] text-base font-semibold px-10 py-4 hover:bg-[var(--color-accent-pale)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               Meet our animals
             </Link>
             <a
               href="mailto:hello@caringiggy.org"
-              className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none text-[1.0625rem] py-[0.9375rem] px-7 rounded-full px-10 py-4 text-base font-semibold border-2 border-white/50 text-white hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+              className="inline-flex items-center justify-center rounded-full border-2 border-white/50 text-white text-base font-semibold px-10 py-4 hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
             >
               Contact us
             </a>

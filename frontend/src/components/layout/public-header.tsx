@@ -5,44 +5,46 @@ import { getCurrentSession } from "@/lib/auth/server-session";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
 import { Badge } from "@/components/ui/badge";
 import { HeaderNav } from "./header-nav";
+import { MobileMenu } from "./mobile-menu";
 
 export async function PublicHeader() {
   const session = await getCurrentSession();
   const dashboardLink = session ? defaultRouteForRole(session.role) : "/dashboard";
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[var(--color-canvas)]/90 border-b border-[var(--color-border)]">
+    <header className="sticky top-0 z-50 w-full bg-[var(--color-surface-deep)] shadow-lg h-16">
       <div className="w-full max-w-[var(--max-width-wide)] mx-auto px-6 h-16 flex items-center justify-between gap-6">
         {/* Brand */}
         <Link
           href="/"
-          className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-ink)] hover:text-[var(--color-primary)] transition-colors duration-200 tracking-[-0.02em] flex-shrink-0"
+          className="flex items-center gap-2.5 text-2xl font-extrabold text-white tracking-tight flex-shrink-0"
+          style={{ fontFamily: 'var(--font-display)' }}
         >
-          Caring Iggy
+          <span aria-hidden="true">🐾</span> Caring Iggy
         </Link>
 
         {/* Nav — client component handles active state */}
         <nav className="hidden sm:flex items-center gap-2" aria-label="Primary">
           <Link
             href="/animals"
-            className="px-4 py-2 rounded-full text-sm font-medium text-[var(--color-ink-soft)] border border-transparent hover:border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-all duration-200"
+            className="px-4 py-2 rounded-full text-sm font-bold text-[var(--color-ink-on-dark)] border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
             Animals
           </Link>
           <Link
             href="/about"
-            className="px-4 py-2 rounded-full text-sm font-medium text-[var(--color-ink-soft)] border border-transparent hover:border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-all duration-200"
+            className="px-4 py-2 rounded-full text-sm font-bold text-[var(--color-ink-on-dark)] border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all duration-200"
           >
             About
           </Link>
           <Link
             href="/donate"
-            className="px-4 py-2 rounded-full text-sm font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-deep)] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] transition-all duration-200"
+            className="px-5 py-2 rounded-full text-sm font-bold bg-[var(--color-accent)] text-white shadow-[var(--shadow-coral)] hover:bg-[var(--color-accent-deep)] hover:scale-105 active:scale-95 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
-            Donate
+            <span aria-hidden="true">❤️</span> Donate
           </Link>
 
-          <div className="w-px h-5 bg-[var(--color-border)] mx-1" />
+          <div className="w-px h-5 bg-white/20 mx-1" />
 
           {session ? (
             <>
@@ -56,13 +58,13 @@ export async function PublicHeader() {
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 rounded-full text-sm font-medium text-[var(--color-ink-soft)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-all duration-200"
+                className="px-4 py-2 rounded-full text-sm font-bold text-white border border-white/20 hover:bg-white/10 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 rounded-full text-sm font-semibold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] transition-all duration-200"
+                className="px-4 py-2 rounded-full text-sm font-bold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
               >
                 Sign up
               </Link>
@@ -70,20 +72,7 @@ export async function PublicHeader() {
           )}
         </nav>
 
-        {/* Mobile menu hint */}
-        {/* TODO: implement mobile menu toggle */}
-        <button
-          disabled
-          aria-disabled="true"
-          aria-label="Open menu"
-          className="sm:hidden p-2 rounded-lg text-[var(--color-ink-soft)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] transition-colors duration-200"
-        >
-          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
+        <MobileMenu session={session} dashboardLink={dashboardLink} />
       </div>
     </header>
   );

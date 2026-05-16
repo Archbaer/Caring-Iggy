@@ -14,7 +14,7 @@ export function Eyebrow({ children, className }: EyebrowProps) {
   return (
     <p
       className={[
-        "font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-ink-soft)]",
+        "font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]",
         className,
       ]
         .filter(Boolean)

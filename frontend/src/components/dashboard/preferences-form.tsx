@@ -130,21 +130,22 @@ export function PreferencesForm({
     <form className="grid gap-6" onSubmit={handleSubmit}>
       {/* Row 1: Animal types + Age range — 50/50 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Animal types</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred profiles</h2>
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+          <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Animal types</label>
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred profiles</h2>
           <p className="text-sm text-[var(--color-ink-soft)]">
             Select the species you are most interested in adopting.
           </p>
 
           {sortedTypes.length > 0 ? (
-            <div className="grid grid-cols-[repeat(auto_fit,minmax(8rem,1fr))] gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {sortedTypes.map((animalType) => {
                 const checked = selectedTypes.includes(animalType);
 
                 return (
-                  <label key={animalType} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
+                  <label key={animalType} htmlFor={`pref-type-${animalType}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-type-${animalType}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -155,7 +156,7 @@ export function PreferencesForm({
                         );
                       }}
                     />
-                    <span>{animalType}</span>
+                    <span className="ml-2 text-sm text-[var(--color-ink)]">{animalType}</span>
                   </label>
                 );
               })}
@@ -165,22 +166,22 @@ export function PreferencesForm({
           )}
 
           {fieldErrors.preferredAnimalTypes[0] ? (
-            <p className="text-sm text-red-600">{fieldErrors.preferredAnimalTypes[0]}</p>
+            <p className="text-sm text-[var(--color-danger)]">{fieldErrors.preferredAnimalTypes[0]}</p>
           ) : null}
         </section>
 
-        <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Age range</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred age window</h2>
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+          <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Age range</label>
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred age window</h2>
           <div className="grid grid-cols-2 gap-4">
             <label className="flex flex-col gap-1.5" htmlFor="preference-min-age">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Minimum age</span>
+              <span className="text-sm font-semibold text-[var(--color-ink)]">Minimum age</span>
               <input
                 id="preference-min-age"
                 type="number"
                 min="0"
                 step="1"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={minAge}
                 aria-invalid={fieldErrors.minAge.length > 0}
                 onChange={(event) => {
@@ -188,18 +189,18 @@ export function PreferencesForm({
                 }}
               />
               {fieldErrors.minAge[0] ? (
-                <span className="text-sm text-red-600">{fieldErrors.minAge[0]}</span>
+                <span className="text-sm text-[var(--color-danger)]">{fieldErrors.minAge[0]}</span>
               ) : null}
             </label>
 
             <label className="flex flex-col gap-1.5" htmlFor="preference-max-age">
-              <span className="text-sm font-medium text-[var(--color-ink)]">Maximum age</span>
+              <span className="text-sm font-semibold text-[var(--color-ink)]">Maximum age</span>
               <input
                 id="preference-max-age"
                 type="number"
                 min="0"
                 step="1"
-                className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
                 value={maxAge}
                 aria-invalid={fieldErrors.maxAge.length > 0}
                 onChange={(event) => {
@@ -207,7 +208,7 @@ export function PreferencesForm({
                 }}
               />
               {fieldErrors.maxAge[0] ? (
-                <span className="text-sm text-red-600">{fieldErrors.maxAge[0]}</span>
+                <span className="text-sm text-[var(--color-danger)]">{fieldErrors.maxAge[0]}</span>
               ) : null}
             </label>
           </div>
@@ -216,21 +217,22 @@ export function PreferencesForm({
 
       {/* Row 2: Breeds + Gender+Size — 50/50 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Breeds</p>
-          <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred breeds</h2>
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+          <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Breeds</label>
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred breeds</h2>
           <p className="text-sm text-[var(--color-ink-soft)]">
             Select any specific breeds you are interested in. Leave all unchecked to see all breeds.
           </p>
 
           {availableBreeds.length > 0 ? (
-            <div className="grid grid-cols-[repeat(auto_fit,minmax(8rem,1fr))] gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {availableBreeds.map((breed) => {
                 const checked = selectedBreeds.includes(breed);
 
                 return (
-                  <label key={breed} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
+                  <label key={breed} htmlFor={`pref-breed-${breed}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-breed-${breed}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -241,7 +243,7 @@ export function PreferencesForm({
                         );
                       }}
                     />
-                    <span>{breed}</span>
+                    <span className="ml-2 text-sm text-[var(--color-ink)]">{breed}</span>
                   </label>
                 );
               })}
@@ -252,15 +254,16 @@ export function PreferencesForm({
         </section>
 
         <div className="flex flex-col gap-6 flex-1 items-stretch">
-          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4 flex-1 justify-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Gender</p>
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred gender</h2>
-            <div className="grid grid-cols-3 gap-2">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4 flex-1 justify-center">
+            <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Gender</label>
+            <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred gender</h2>
+            <div className="grid grid-cols-3 gap-3">
               {GENDER_OPTIONS.map((gender) => {
                 const checked = selectedGenders.includes(gender);
                 return (
-                  <label key={gender} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
+                  <label key={gender} htmlFor={`pref-gender-${gender}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-gender-${gender}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -271,22 +274,23 @@ export function PreferencesForm({
                         );
                       }}
                     />
-                    <span>{gender}</span>
+                    <span className="ml-2 text-sm text-[var(--color-ink)]">{gender}</span>
                   </label>
                 );
               })}
             </div>
           </section>
 
-          <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4 flex-1 justify-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Size</p>
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred size</h2>
-            <div className="grid grid-cols-3 gap-2">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4 flex-1 justify-center">
+            <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Size</label>
+            <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred size</h2>
+            <div className="grid grid-cols-3 gap-3">
               {SIZE_OPTIONS.map((size) => {
                 const checked = selectedSizes.includes(size);
                 return (
-                  <label key={size} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
+                  <label key={size} htmlFor={`pref-size-${size}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                     <input
+                      id={`pref-size-${size}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -297,7 +301,7 @@ export function PreferencesForm({
                         );
                       }}
                     />
-                    <span>{size}</span>
+                    <span className="ml-2 text-sm text-[var(--color-ink)]">{size}</span>
                   </label>
                 );
               })}
@@ -307,15 +311,16 @@ export function PreferencesForm({
       </div>
 
       {/* Row 3: Temperament — full width */}
-      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Temperament</p>
-        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Preferred temperament</h2>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-2">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+        <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Temperament</label>
+        <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Preferred temperament</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {TEMPERAMENT_OPTIONS.map((temperament) => {
             const checked = selectedTemperaments.includes(temperament);
             return (
-              <label key={temperament} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] hover:border-[var(--color-accent)]">
+              <label key={temperament} htmlFor={`pref-temperament-${temperament}`} className={`rounded-2xl border-2 border-[var(--color-border)] p-3 cursor-pointer hover:border-[var(--color-primary)] transition-all ${checked ? "border-[var(--color-primary)] bg-[var(--color-primary-pale)]" : ""}`}>
                 <input
+                  id={`pref-temperament-${temperament}`}
                   type="checkbox"
                   checked={checked}
                   onChange={() => {
@@ -326,7 +331,7 @@ export function PreferencesForm({
                     );
                   }}
                 />
-                <span className="capitalize">{temperament}</span>
+                <span className="ml-2 text-sm text-[var(--color-ink)] capitalize">{temperament}</span>
               </label>
             );
           })}
@@ -334,17 +339,17 @@ export function PreferencesForm({
       </section>
 
       {/* Row 4: Notes — full width */}
-      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 flex flex-col gap-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Additional context</p>
-        <h2 className="text-lg font-semibold text-[var(--color-ink)]">Tell us about your home</h2>
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-canvas)] p-6 flex flex-col gap-4">
+        <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1.5">Additional context</label>
+        <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">Tell us about your home</h2>
         <p className="text-sm text-[var(--color-ink-soft)]">
           Include relevant details about your living situation, schedule, other pets, and what you are looking for in a companion. The more specific you are, the better we can match you.
         </p>
         <label className="flex flex-col gap-1.5" htmlFor="preference-notes">
-          <span className="text-sm font-medium text-[var(--color-ink)]">Additional notes <span className="text-xs text-[var(--color-ink-soft)]">(max 500 characters)</span></span>
+          <span className="text-sm font-semibold text-[var(--color-ink)]">Additional notes <span className="text-xs text-[var(--color-ink-soft)]">(max 500 characters)</span></span>
           <textarea
             id="preference-notes"
-            className="w-full appearance-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)] text-sm px-4 py-3 placeholder-[var(--color-ink-faint)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200 resize-none"
+            className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200 resize-none"
             rows={5}
             maxLength={500}
             value={notes}
@@ -359,26 +364,26 @@ export function PreferencesForm({
               {notes.length}/500
             </span>
             {fieldErrors.notes[0] ? (
-              <span className="text-sm text-red-600">{fieldErrors.notes[0]}</span>
+              <span className="text-sm text-[var(--color-danger)]">{fieldErrors.notes[0]}</span>
             ) : null}
           </div>
         </label>
       </section>
 
       {errorMessage ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border border-[var(--color-danger-bg)] bg-[var(--color-danger-bg)] p-4 text-sm text-[var(--color-danger)]" aria-live="polite" role="status">
           {errorMessage}
         </p>
       ) : null}
 
       {successMessage ? (
-        <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" aria-live="polite" role="status">
+        <p className="rounded-2xl border border-[var(--color-primary-pale)] bg-[var(--color-primary-pale)] p-4 text-sm text-[var(--color-primary)]" aria-live="polite" role="status">
           {successMessage}
         </p>
       ) : null}
 
       <div className="flex flex-wrap gap-3 items-center justify-center">
-        <button type="submit" className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-full font-[family-name:var(--font-body)] font-semibold text-[0.9375rem] cursor-pointer transition-all duration-[180ms] no-underline border-none leading-none bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-deep)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]" disabled={isPending}>
+        <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 disabled:pointer-events-none disabled:opacity-50 bg-[var(--color-primary)] text-white shadow-[var(--shadow-sm)] hover:bg-[var(--color-primary-deep)] hover:shadow-[var(--shadow-md)] active:scale-[0.97] h-10 px-5" disabled={isPending}>
           {isPending ? "Saving..." : "Save preferences"}
         </button>
       </div>

@@ -1,29 +1,28 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
-import { PublicFooter } from "@/components/layout/public-footer";
-import { PublicHeader } from "@/components/layout/public-header";
 import "./globals.css";
+import { Nunito, Plus_Jakarta_Sans, Space_Mono } from "next/font/google";
+import { PublicHeader } from "@/components/layout/public-header";
+import { PublicFooter } from "@/components/layout/public-footer";
 
-const cormorant = Cormorant_Garamond({
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-nunito",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
   display: "swap",
+  variable: "--font-plus-jakarta-sans",
 });
 
-const dmSans = DM_Sans({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-dm-sans",
+  weight: ["400", "700"],
   display: "swap",
-});
-
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-dm-mono",
-  display: "swap",
+  variable: "--font-space-mono",
 });
 
 export const metadata: Metadata = {
@@ -32,25 +31,26 @@ export const metadata: Metadata = {
     template: "%s | Caring Iggy",
   },
   description:
-    "Caring Iggy connects adopters, staff, and administrators through one calm, role-aware adoption platform.",
+    "Connecting rescue animals with loving forever homes. Browse adoptable dogs, cats, and small pets, register your interest, and manage your adoption journey.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
+      className={`${nunito.variable} ${plusJakartaSans.variable} ${spaceMono.variable}`}
     >
-      <body className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.7] text-[var(--color-ink-soft)] min-h-screen">
+      <body className="font-[family-name:var(--font-body)] text-base font-normal leading-[1.75] text-[var(--color-ink-soft)] bg-[var(--color-canvas)] min-h-screen">
         <div className="flex flex-col min-h-screen">
           <PublicHeader />
-
-          <main className="flex-1 pb-[var(--space-7)] mx-auto w-[min(calc(100%-var(--space-6)),var(--max-width-content))]">{children}</main>
-
+          {/* MAIN: NO width constraint — each page sets its own max-w */}
+          <main className="flex-1 py-8">
+            {children}
+          </main>
           <PublicFooter />
         </div>
       </body>
