@@ -5,6 +5,7 @@ import { getCurrentSession } from "@/lib/auth/server-session";
 import { defaultRouteForRole } from "@/lib/auth/role-check";
 import { Badge } from "@/components/ui/badge";
 import { HeaderNav } from "./header-nav";
+import { MobileMenu } from "./mobile-menu";
 
 export async function PublicHeader() {
   const session = await getCurrentSession();
@@ -71,20 +72,7 @@ export async function PublicHeader() {
           )}
         </nav>
 
-        {/* Mobile menu hint */}
-        {/* TODO: implement mobile menu toggle */}
-        <button type="button"
-          disabled
-          aria-disabled="true"
-          aria-label="Open menu"
-          className="sm:hidden p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors duration-200"
-        >
-          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
+        <MobileMenu session={session} dashboardLink={dashboardLink} />
       </div>
     </header>
   );
