@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -71,9 +73,7 @@ export default function AboutPage() {
         {/* Content */}
         <div className="relative z-10 w-full max-w-[var(--max-width-content)] mx-auto px-6 py-16 sm:py-20">
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              San Francisco Animal Shelter
-            </p>
+            <Eyebrow>San Francisco Animal Shelter</Eyebrow>
             <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our Story
             </h1>
@@ -103,9 +103,7 @@ export default function AboutPage() {
       <section className="px-6 py-20 sm:py-24 bg-white">
         <div className="max-w-[var(--max-width-content)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              Founded in 2018
-            </p>
+            <Eyebrow>Founded in 2018</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
               From one rescue to a community mission.
             </h2>
@@ -142,9 +140,7 @@ export default function AboutPage() {
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14 text-center delay-1">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              What guides us
-            </p>
+            <Eyebrow>What guides us</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our values
             </h2>
@@ -152,12 +148,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {VALUES.map((value, i) => (
-              <div
+              <Card variant="panel" as="section"
                 key={value.title}
-                className={`
-                  group relative rounded-3xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)] p-8 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300
-                  delay-${i + 1}
-                `}
+                className={`group relative hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300 delay-${i + 1}`}
               >
                 <div className="mb-6 w-12 h-12 rounded-2xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
                   {value.icon}
@@ -170,7 +163,7 @@ export default function AboutPage() {
                     {value.copy}
                   </p>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
@@ -180,9 +173,7 @@ export default function AboutPage() {
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.12em] text-[var(--color-accent)]">
-              The people
-            </p>
+            <Eyebrow>The people</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Meet the team
             </h2>
@@ -190,12 +181,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {TEAM_MEMBERS.map((member, i) => (
-              <div
+              <Card variant="panel" as="section"
                 key={member.name}
-                className={`
-                  group flex flex-col items-center text-center rounded-3xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)] p-8 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300
-                  delay-${i + 1}
-                `}
+                className={`group flex flex-col items-center text-center hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300 delay-${i + 1}`}
               >
                 {/* Avatar */}
                 <div className="mb-5 w-20 h-20 rounded-full bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center text-3xl font-[family-name:var(--font-display)] font-medium group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
@@ -205,7 +193,7 @@ export default function AboutPage() {
                   {member.name}
                 </p>
                 <p className="text-sm text-[var(--color-ink-faint)]">{member.role}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

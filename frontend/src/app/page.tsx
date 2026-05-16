@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Eyebrow } from "@/components/ui/eyebrow";
 
 import { AnimalCard } from "@/components/animals/animal-card";
 import { fetchAnimalsForView } from "@/lib/api/animals";
@@ -96,9 +97,7 @@ export default async function Home() {
         <div className="relative z-10 lg:grid lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-[var(--max-width-content)] w-full">
           {/* Left text column */}
           <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-6">
-              Welcome to Caring Iggy
-            </p>
+            <Eyebrow>Welcome to Caring Iggy</Eyebrow>
             <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-white mb-6">
               Every animal deserves a <span style={{ color: 'var(--color-accent)' }}>loving home</span>.
             </h1>
@@ -177,9 +176,7 @@ export default async function Home() {
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-12 text-center">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
-              Meet our animals
-            </p>
+            <Eyebrow>Meet our animals</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)] mb-12 text-center">
               Animals looking for homes.
             </h2>
@@ -214,9 +211,7 @@ export default async function Home() {
       >
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-12 text-center">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
-              How it works
-            </p>
+            <Eyebrow>How it works</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-white text-center mb-12">
               How adoption works.
             </h2>
@@ -245,9 +240,7 @@ export default async function Home() {
       <section className="px-6 py-20 sm:py-24 bg-white">
         <div className="max-w-[var(--max-width-content)] mx-auto">
           <div className="mb-14 text-center">
-            <p className="mb-3 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
-              Testimonials
-            </p>
+            <Eyebrow>Testimonials</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)]">
               Families who found their companion.
             </h2>
@@ -278,9 +271,7 @@ export default async function Home() {
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-primary-pale)]">
         <div className="lg:grid lg:grid-cols-2 gap-12 items-center max-w-[var(--max-width-content)] mx-auto">
           <div>
-            <p className="mb-4 font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)]">
-              Our commitment
-            </p>
+            <Eyebrow>Our commitment</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-extrabold text-[var(--color-ink)] mb-4">
               Every animal deserves care.
             </h2>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalFilters } from "@/components/animals/animal-filters";
 import { fetchAnimals, fetchAnimalForView } from "@/lib/api/animals";
@@ -110,7 +111,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
       {/* Page header — left-aligned with count badge */}
       <div className="flex items-center justify-between mb-6 pb-5 border-b border-[var(--color-border)]">
         <div>
-          <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.15em] text-[var(--color-accent)] mb-1">Shelter catalog</p>
+          <Eyebrow>Shelter catalog</Eyebrow>
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[var(--color-ink)]">Find your companion</h1>
         </div>
         <span className="rounded-full bg-[var(--color-primary)] text-white text-sm font-bold px-4 py-1.5">
