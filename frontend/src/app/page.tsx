@@ -96,7 +96,7 @@ export default async function Home() {
 
         <div className="relative z-10 lg:grid lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-[var(--max-width-content)] w-full">
           {/* Left text column */}
-          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+          <div className="animate-hero-reveal">
             <Eyebrow>Welcome to Caring Iggy</Eyebrow>
             <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-white mb-6">
               Every animal deserves a <span style={{ color: 'var(--color-accent)' }}>loving home</span>.
@@ -161,7 +161,7 @@ export default async function Home() {
       <div className="px-6 py-6 bg-white border-b border-[var(--color-border)] shadow-sm">
         <div className="max-w-[var(--max-width-content)] mx-auto flex flex-wrap items-center justify-center gap-8 sm:gap-16">
           {trustPoints.map((point, i) => (
-            <div key={point.title} className={`flex items-center gap-3 delay-${i + 1}`}>
+            <div key={point.title} className="flex items-center gap-3">
               <span className="text-3xl">🐾</span>
               <div>
                 <p className="text-xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)]">{point.title}</p>
@@ -219,7 +219,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {processSteps.map((step, index) => (
-              <div key={step.title} className={`rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center delay-${index + 1}`}>
+              <div key={step.title} className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center">
                 <span
                   className="text-7xl font-[family-name:var(--font-display)] font-black leading-none select-none"
                   style={{ color: 'var(--color-accent)' }}
@@ -248,7 +248,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <div key={t.adopter} className={`rounded-2xl border-l-4 border-[var(--color-accent)] bg-[var(--color-accent-pale)]/30 p-6 delay-${i + 1}`}>
+              <div key={t.adopter} className="rounded-2xl border-l-4 border-[var(--color-accent)] bg-[var(--color-accent-pale)]/30 p-6">
                 <p className="text-[var(--color-ink)] italic leading-relaxed mb-4">
                   &ldquo;{t.quote}&rdquo;
                 </p>
@@ -278,7 +278,7 @@ export default async function Home() {
             <div className="w-12 h-1.5 rounded-full bg-[var(--color-accent)] mb-6" />
             <div className="space-y-6">
               {values.map((value, i) => (
-                <div key={value.title} className={`delay-${i + 1}`}>
+                <div key={value.title}>
                   <p className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-1">
                     {value.title}
                   </p>

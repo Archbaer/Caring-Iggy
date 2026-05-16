@@ -72,7 +72,7 @@ export default function AboutPage() {
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-[var(--max-width-content)] mx-auto px-6 py-16 sm:py-20">
-          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+          <div className="animate-hero-reveal">
             <Eyebrow>San Francisco Animal Shelter</Eyebrow>
             <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our Story
@@ -83,7 +83,7 @@ export default function AboutPage() {
 
       {/* ─── Mission Quote ───────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-white">
-        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-hero-reveal">
           <div className="relative inline-flex flex-col items-center">
             {/* Decorative quote marks */}
             <span className="absolute -top-6 -left-8 font-[family-name:var(--font-display)] text-[8rem] text-[var(--color-primary-pale)] leading-none select-none pointer-events-none">
@@ -102,7 +102,7 @@ export default function AboutPage() {
       {/* ─── Story ────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-white">
         <div className="max-w-[var(--max-width-content)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-          <div className="animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+          <div className="animate-hero-reveal">
             <Eyebrow>Founded in 2018</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)] mb-8">
               From one rescue to a community mission.
@@ -139,7 +139,7 @@ export default function AboutPage() {
       {/* ─── Values ───────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24 bg-[var(--color-canvas)]">
         <div className="max-w-[var(--max-width-content)] mx-auto">
-          <div className="mb-14 text-center delay-1">
+          <div className="mb-14 text-center">
             <Eyebrow>What guides us</Eyebrow>
             <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--color-ink)]">
               Our values
@@ -150,7 +150,7 @@ export default function AboutPage() {
             {VALUES.map((value, i) => (
               <Card variant="panel" as="section"
                 key={value.title}
-                className={`group relative hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300 delay-${i + 1}`}
+                className="group relative hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"
               >
                 <div className="mb-6 w-12 h-12 rounded-2xl bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
                   {value.icon}
@@ -183,7 +183,7 @@ export default function AboutPage() {
             {TEAM_MEMBERS.map((member, i) => (
               <Card variant="panel" as="section"
                 key={member.name}
-                className={`group flex flex-col items-center text-center hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300 delay-${i + 1}`}
+                className="group flex flex-col items-center text-center hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Avatar */}
                 <div className="mb-5 w-20 h-20 rounded-full bg-[var(--color-primary-pale)] text-[var(--color-primary)] flex items-center justify-center text-3xl font-[family-name:var(--font-display)] font-medium group-hover:bg-[var(--color-accent-pale)] group-hover:text-[var(--color-accent)] transition-all duration-300">
@@ -201,7 +201,7 @@ export default function AboutPage() {
 
       {/* ─── CTA Band ────────────────────────────────────────────────────── */}
       <section className="px-6 py-20 sm:py-24" style={{ background: 'var(--gradient-cta)' }}>
-        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-[hero-reveal_800ms_cubic-bezier(0.22,1,0.36,1)_both]">
+        <div className="max-w-[var(--max-width-content)] mx-auto text-center animate-hero-reveal">
           <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-white mb-5">
             Come visit us.
           </h2>
