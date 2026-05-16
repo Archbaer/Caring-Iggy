@@ -1,13 +1,14 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 export default function Loading() {
   return (
-    <section className="support-shell" aria-live="polite">
-      <p className="eyebrow">Loading</p>
-      <h1 className="not-found-title">Preparing the Caring Iggy shell.</h1>
-      <div className="skeleton-grid">
-        <div className="skeleton-card" />
-        <div className="skeleton-card" />
-        <div className="skeleton-card" />
+    <div className="max-w-[var(--max-width-wide)] mx-auto px-4 sm:px-6 pt-20 pb-8" aria-busy="true" aria-live="polite">
+      <Skeleton variant="hero" className="mb-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Skeleton variant="card" />
+        <Skeleton variant="card" />
+        <Skeleton variant="card" />
       </div>
-    </section>
+    </div>
   );
 }
