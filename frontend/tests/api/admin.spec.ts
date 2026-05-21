@@ -355,8 +355,9 @@ test.describe("Malformed JSON", () => {
 
   test("POST malformed JSON returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
+    // Use Buffer — Playwright JSON-serializes strings when content-type is application/json
     const resp = await request.post("/api/admin/staff", {
-      data: "{broken-json",
+      data: Buffer.from("{broken-json"),
       headers: {
         "content-type": "application/json",
         "x-csrf-token": csrfToken,

@@ -107,7 +107,7 @@ test.describe("POST /api/auth/login", () => {
     expect(body.user.role).toBe("STAFF");
   });
 
-  test("session cookies include Max-Age or Expires", async ({
+  test("ci_csrf cookie has Max-Age or Expires on login", async ({
     request,
   }) => {
     const csrfToken = await getCsrfToken(request);
@@ -120,34 +120,23 @@ test.describe("POST /api/auth/login", () => {
     });
     expect(resp.status()).toBe(200);
 
-    // Check Set-Cookie headers for session cookies
-    const setCookieHeaders = resp.headersArray();
-
-    // Should have set-cookie headers
+    const setCookieHeaders = resp.headersArray().filter(
+      (h) => h.name.toLowerCase() === "set-cookie",
+    );
     expect(setCookieHeaders.length).toBeGreaterThan(0);
 
-    // Log what cookies are set for debugging
-    console.log("Set-Cookie headers:", setCookieHeaders.map((h) => h.value));
-
-    // Check that at least the CSRF cookie has an expiry
     const csrfCookie = setCookieHeaders.find((h) =>
       h.value.startsWith("ci_csrf="),
     );
-    if (csrfCookie) {
-      // Cookie should have Max-Age or Expires for non-session lifetime
-      const hasExpiry =
-        csrfCookie.value.includes("Max-Age") ||
-        csrfCookie.value.includes("Expires");
+    expect(csrfCookie, "ci_csrf cookie should be set on login").toBeDefined();
 
-      // Log whether expiry is present (this is a security concern if missing)
-      if (!hasExpiry) {
-        console.warn(
-          "SECURITY: ci_csrf cookie has no Max-Age/Expires — persists beyond browser close",
-        );
-      }
-      // Test is informational — logs warning but doesn't fail
-      // Remove .not.toBe when fix is applied
-    }
+    const hasExpiry =
+      csrfCookie!.value.includes("Max-Age") ||
+      csrfCookie!.value.includes("Expires");
+    expect(
+      hasExpiry,
+      "ci_csrf cookie must have Max-Age or Expires — missing expiry is a security bug",
+    ).toBe(true);
   });
 
   test("wrong password returns 401", async ({ request }) => {
@@ -460,30 +449,30 @@ test.describe("Password complexity", () => {
 // ── Malformed JSON ────────────────────────────────────────────────
 
 test.describe("Malformed JSON", () => {
-  test("login with malformed JSON body returns error", async ({ request }) => {
+  test("login with malformed JSON body returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
+    // Use Buffer — Playwright JSON-serializes strings when content-type is application/json
     const resp = await request.post("/api/auth/login", {
-      data: "{broken-json",
+      data: Buffer.from("{broken-json"),
       headers: {
         "content-type": "application/json",
         "x-csrf-token": csrfToken,
         origin: "http://localhost:3000",
       },
     });
-    // BFF may return 422 or 500 — either means request was rejected
-    expect([422, 500]).toContain(resp.status());
+    expect(resp.status()).toBe(422);
   });
 
-  test("signup with malformed JSON body returns error", async ({ request }) => {
+  test("signup with malformed JSON body returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
     const resp = await request.post("/api/auth/signup", {
-      data: "{broken-json",
+      data: Buffer.from("{broken-json"),
       headers: {
         "content-type": "application/json",
         "x-csrf-token": csrfToken,
         origin: "http://localhost:3000",
       },
     });
-    expect([422, 500]).toContain(resp.status());
+    expect(resp.status()).toBe(422);
   });
 });

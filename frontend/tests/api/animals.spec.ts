@@ -299,8 +299,9 @@ test.describe("Malformed JSON", () => {
 
   test("POST malformed JSON returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
+    // Use Buffer — Playwright JSON-serializes strings when content-type is application/json
     const resp = await request.post("/api/animals/create", {
-      data: "{broken-json",
+      data: Buffer.from("{broken-json"),
       headers: {
         "content-type": "application/json",
         "x-csrf-token": csrfToken,
@@ -320,35 +321,32 @@ test.describe("Enum coverage", () => {
     await loginAsStaff(request);
   });
 
-  test("all status values accepted", async ({ request }) => {
-    const statuses = ["AVAILABLE", "PENDING", "ADOPTED", "IN_TREATMENT", "DECEASED"];
-    for (const status of statuses) {
+  for (const status of ["AVAILABLE", "PENDING", "ADOPTED", "IN_TREATMENT", "DECEASED"]) {
+    test(`status ${status} accepted`, async ({ request }) => {
       const resp = await createAnimal(request, { name: `Status ${status}`, status });
-      expect(resp.status(), `status=${status} should be 201`).toBe(201);
+      expect(resp.status()).toBe(201);
       const body = await resp.json();
       expect(body.status).toBe(status);
-    }
-  });
+    });
+  }
 
-  test("all gender values accepted", async ({ request }) => {
-    const genders = ["MALE", "FEMALE", "UNKNOWN"];
-    for (const gender of genders) {
+  for (const gender of ["MALE", "FEMALE", "UNKNOWN"]) {
+    test(`gender ${gender} accepted`, async ({ request }) => {
       const resp = await createAnimal(request, { name: `Gender ${gender}`, gender });
-      expect(resp.status(), `gender=${gender} should be 201`).toBe(201);
+      expect(resp.status()).toBe(201);
       const body = await resp.json();
       expect(body.gender).toBe(gender);
-    }
-  });
+    });
+  }
 
-  test("all size values accepted", async ({ request }) => {
-    const sizes = ["SMALL", "MEDIUM", "LARGE"];
-    for (const size of sizes) {
+  for (const size of ["SMALL", "MEDIUM", "LARGE"]) {
+    test(`size ${size} accepted`, async ({ request }) => {
       const resp = await createAnimal(request, { name: `Size ${size}`, size });
-      expect(resp.status(), `size=${size} should be 201`).toBe(201);
+      expect(resp.status()).toBe(201);
       const body = await resp.json();
       expect(body.size).toBe(size);
-    }
-  });
+    });
+  }
 });
 
 // ── Derived fields ────────────────────────────────────────────────
@@ -439,14 +437,8 @@ test.describe("Edge cases", () => {
     expect(body.previousOwner).toMatchObject({
       name: "Jane Doe",
       telephone: "+1-555-1234",
+    });
   });
-});
-
-// Cleanup: runs after all tests in file
-test.afterAll(async ({ request }) => {
-  // No-op: API tests use the built-in request fixture which auto-disposes
-  // Created resources are cleaned up by the DELETE test describe
-});
 
   test("invalid intakeDate format returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
@@ -461,10 +453,4 @@ test.afterAll(async ({ request }) => {
     const body = await resp.json();
     expect(body).toMatchObject(ERROR_SHAPE);
   });
-});
-
-// Cleanup: runs after all tests in file
-test.afterAll(async ({ request }) => {
-  // No-op: API tests use the built-in request fixture which auto-disposes
-  // Created resources are cleaned up by the DELETE test describe
 });
