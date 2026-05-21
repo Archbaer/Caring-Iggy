@@ -2,11 +2,9 @@
 
 > **Audience:** LLM agents (and humans) doing frontend work in `frontend/`.
 > **How to use:** Before touching frontend code, read Part 1. Consult Part 2 only when
-> doing redesign-polish work. Supersedes the deleted `FRONTEND_DESIGN.md` (that
-> file documented the old earth-tone palette and is wrong — current palette is
-> ocean-coral).
+> doing redesign-polish work. Current palette is ocean-coral (blue canvas + coral accent).
 >
-> Last updated: 2026-05-16. Branch context: `feature/redesign-ocean-coral-theme`.
+> Last updated: 2026-05-22.
 
 ---
 
