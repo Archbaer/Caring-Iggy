@@ -64,7 +64,7 @@ public class AdopterController {
     @PutMapping("/{id}")
     public ResponseEntity<AdopterDto> updateAdopter(
             @PathVariable UUID id,
-            @RequestBody UpdateAdopterRequest request) {
+            @Valid @RequestBody UpdateAdopterRequest request) {
         return ResponseEntity.ok(adopterService.updateAdopter(id, request));
     }
 

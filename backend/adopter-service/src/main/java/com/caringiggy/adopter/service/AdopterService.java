@@ -1,6 +1,7 @@
 package com.caringiggy.adopter.service;
 
 import com.caringiggy.adopter.dto.*;
+import com.caringiggy.adopter.exception.NotFoundException;
 import com.caringiggy.adopter.model.Adopter;
 import com.caringiggy.adopter.model.AdopterStatus;
 import com.caringiggy.adopter.model.AdoptionHistory;
@@ -33,7 +34,7 @@ public class AdopterService {
 
     public AdopterDto getAdopterById(UUID id) {
         Adopter adopter = adopterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with id: " + id));
         return toDto(adopter);
     }
 
@@ -46,7 +47,7 @@ public class AdopterService {
 
     public AdopterRestrictedDto getAdopterRestricted(UUID id) {
         Adopter adopter = adopterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with id: " + id));
         
         UUID firstInterestedAnimal = adopter.getInterestedAnimals() != null && !adopter.getInterestedAnimals().isEmpty()
                 ? adopter.getInterestedAnimals().get(0)
@@ -79,7 +80,7 @@ public class AdopterService {
 
     public AdopterRestrictedDto getAdopterByNameAndTelephone(String name, String telephone) {
         Adopter adopter = adopterRepository.findByNameAndTelephone(name, telephone)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with name: " + name + " and telephone: " + telephone));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with name: " + name + " and telephone: " + telephone));
         
         UUID firstInterestedAnimal = adopter.getInterestedAnimals() != null && !adopter.getInterestedAnimals().isEmpty()
                 ? adopter.getInterestedAnimals().get(0)
@@ -95,7 +96,7 @@ public class AdopterService {
 
     public AdopterDto getAdopterProfileByNameAndTelephone(String name, String telephone) {
         Adopter adopter = adopterRepository.findByNameAndTelephone(name, telephone)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with name: " + name + " and telephone: " + telephone));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with name: " + name + " and telephone: " + telephone));
         return toDto(adopter);
     }
 
@@ -121,7 +122,7 @@ public class AdopterService {
     @Transactional
     public AdopterDto updateAdopter(UUID id, UpdateAdopterRequest request) {
         Adopter existingAdopter = adopterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with id: " + id));
 
         if (request.getName() != null) {
             existingAdopter.setName(request.getName());
@@ -150,7 +151,7 @@ public class AdopterService {
     @Transactional
     public AdopterDto updateInterests(UUID id, UpdateInterestsRequest request) {
         Adopter existingAdopter = adopterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adopter not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Adopter not found with id: " + id));
 
         if (request.getInterestedAnimals() != null) {
             if (request.getInterestedAnimals().size() > 3) {
@@ -167,7 +168,7 @@ public class AdopterService {
     @Transactional
     public void deleteAdopter(UUID id) {
         if (adopterRepository.findById(id).isEmpty()) {
-            throw new RuntimeException("Adopter not found with id: " + id);
+            throw new NotFoundException("Adopter not found with id: " + id);
         }
         adopterRepository.deleteById(id);
         log.info("Deleted adopter with id: {}", id);
@@ -175,7 +176,7 @@ public class AdopterService {
 
     public List<AdoptionHistoryDto> getAdoptionHistoryByAdopter(UUID adopterId) {
         if (adopterRepository.findById(adopterId).isEmpty()) {
-            throw new RuntimeException("Adopter not found with id: " + adopterId);
+            throw new NotFoundException("Adopter not found with id: " + adopterId);
         }
         
         return adoptionHistoryRepository.findByAdopterId(adopterId).stream()
@@ -186,7 +187,7 @@ public class AdopterService {
     @Transactional
     public AdoptionHistoryDto createAdoptionHistory(CreateAdoptionHistoryRequest request) {
         if (adopterRepository.findById(request.getAdopterId()).isEmpty()) {
-            throw new RuntimeException("Adopter not found with id: " + request.getAdopterId());
+            throw new NotFoundException("Adopter not found with id: " + request.getAdopterId());
         }
 
         AdoptionHistory history = AdoptionHistory.builder()

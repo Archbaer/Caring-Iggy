@@ -20,6 +20,7 @@ public class CreateAdopterRequest {
     @NotBlank(message = "Telephone is required")
     private String telephone;
     
+    @jakarta.validation.constraints.Email(message = "Email must be valid")
     private String email;
     private String address;
     private String status;
