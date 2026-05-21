@@ -49,19 +49,17 @@ test.describe("Login page", () => {
     await expect(passwordInput).toHaveAttribute("required", "");
   });
 
-  test("XSS in email is escaped", async ({ page }) => {
+  test("XSS in email is rejected — login fails", async ({ page }) => {
     await page.getByRole("textbox", { name: "Email" }).fill('<script>alert("xss")</script>');
     await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: /log in|sign in/i }).click();
-    // Script should not execute — page should not crash
-    await expect(page.locator("body")).toBeVisible();
+    await expect(page).not.toHaveURL(/\/dashboard/);
   });
 
-  test("SQL injection in email does not cause 500", async ({ page }) => {
+  test("SQL injection in email is rejected — login fails", async ({ page }) => {
     await page.getByRole("textbox", { name: "Email" }).fill("' OR '1'='1");
     await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: /log in|sign in/i }).click();
-    // Should not be a 500 error page
-    await expect(page.locator("body")).toBeVisible();
+    await expect(page).not.toHaveURL(/\/dashboard/);
   });
 });

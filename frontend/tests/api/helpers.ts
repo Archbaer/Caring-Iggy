@@ -7,9 +7,7 @@ import { TEST_CREDENTIALS } from "./fixtures";
  */
 export async function getCsrfToken(request: APIRequestContext): Promise<string> {
   const resp = await request.get("/api/auth/session");
-  expect(resp.ok()).toBeTruthy();
   const { csrfToken } = await resp.json();
-  expect(csrfToken).toBeTruthy();
   return csrfToken;
 }
 

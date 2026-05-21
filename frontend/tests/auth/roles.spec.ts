@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 
 const TEST_ADMIN = { email: "testadmin@caringiggy.test", password: "password123" };
 const TEST_STAFF = { email: "teststaff@caringiggy.test", password: "password123" };
 const TEST_ADOPTER = { email: "testadopter@caringiggy.test", password: "password123" };
 
-async function loginAs(page: any, email: string, password: string) {
+async function loginAs(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Password" }).fill(password);
