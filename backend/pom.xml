@@ -31,6 +31,7 @@
         <resilience4j.version>2.2.0</resilience4j.version>
         <bucket4j.version>8.7.0</bucket4j.version>
         <flyway.version>10.4.1</flyway.version>
+        <lombok.version>1.18.36</lombok.version>
     </properties>
 
     <dependencyManagement>
