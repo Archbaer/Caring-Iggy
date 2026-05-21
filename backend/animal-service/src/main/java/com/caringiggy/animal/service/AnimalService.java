@@ -1,6 +1,7 @@
 package com.caringiggy.animal.service;
 
 import com.caringiggy.animal.dto.*;
+import com.caringiggy.animal.exception.NotFoundException;
 import com.caringiggy.animal.model.Animal;
 import com.caringiggy.animal.model.AnimalGender;
 import com.caringiggy.animal.model.AnimalSize;
@@ -34,7 +35,7 @@ public class AnimalService {
 
     public AnimalDetailDto getAnimalById(UUID id) {
         Animal animal = animalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Animal not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Animal not found with id: " + id));
         return toDetailDto(animal);
     }
 
@@ -106,7 +107,7 @@ public class AnimalService {
     @Transactional
     public AnimalDetailDto updateAnimal(UUID id, UpdateAnimalRequest request) {
         Animal existingAnimal = animalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Animal not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Animal not found with id: " + id));
 
         if (request.getName() != null) {
             existingAnimal.setName(request.getName());
@@ -154,7 +155,7 @@ public class AnimalService {
     @Transactional
     public void deleteAnimal(UUID id) {
         if (animalRepository.findById(id).isEmpty()) {
-            throw new RuntimeException("Animal not found with id: " + id);
+            throw new NotFoundException("Animal not found with id: " + id);
         }
         animalRepository.deleteById(id);
         log.info("Deleted animal with id: {}", id);

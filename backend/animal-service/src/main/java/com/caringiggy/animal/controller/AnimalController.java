@@ -50,7 +50,7 @@ public class AnimalController {
     @PutMapping("/{id}")
     public ResponseEntity<AnimalDetailDto> updateAnimal(
             @PathVariable UUID id,
-            @RequestBody UpdateAnimalRequest request) {
+            @Valid @RequestBody UpdateAnimalRequest request) {
         return ResponseEntity.ok(animalService.updateAnimal(id, request));
     }
 
