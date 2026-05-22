@@ -249,4 +249,56 @@ class AnimalControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors['previousOwner.name']").value("Name is required"));
     }
+
+    @Test
+    void createAnimal_withEmptyBody_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void createAnimal_withWhitespaceOnlyName_returns400WithErrorBody() throws Exception {
+        // @NotBlank rejects strings that are only whitespace
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"   \"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void createAnimal_withMissingName_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"breed\":\"Poodle\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void updateAnimal_notFound_returns404WithErrorBody() throws Exception {
+        UUID animalId = UUID.randomUUID();
+        when(animalService.updateAnimal(eq(animalId), any(UpdateAnimalRequest.class)))
+                .thenThrow(new NotFoundException("Animal not found with id: " + animalId));
+
+        mockMvc.perform(put("/api/animals/" + animalId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PENDING\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Animal not found with id: " + animalId));
+    }
+
+    @Test
+    void updateAnimal_withInvalidSize_returns400WithErrorBody() throws Exception {
+        UUID animalId = UUID.randomUUID();
+        mockMvc.perform(put("/api/animals/" + animalId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"size\":\"GIGANTIC\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.size").value("size must be SMALL, MEDIUM, or LARGE"));
+    }
 }
