@@ -184,4 +184,69 @@ class AnimalControllerTest {
                         .content("{\"name\":\"Test\"}"))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    void createAnimal_withInvalidAnimalType_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"animalType\":\"DRAGON\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.animalType").value("animalType must be DOG, CAT, or BIRD"));
+    }
+
+    @Test
+    void createAnimal_withInvalidGender_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"gender\":\"NEUTRAL\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.gender").value("gender must be MALE, FEMALE, or UNKNOWN"));
+    }
+
+    @Test
+    void createAnimal_withInvalidSize_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"size\":\"ENORMOUS\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.size").value("size must be SMALL, MEDIUM, or LARGE"));
+    }
+
+    @Test
+    void createAnimal_withInvalidStatus_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"status\":\"LOST\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.status").value("status must be AVAILABLE, PENDING, ADOPTED, IN_TREATMENT, or DECEASED"));
+    }
+
+    @Test
+    void createAnimal_withFutureDateOfBirth_returns400WithErrorBody() throws Exception {
+        String futureDate = LocalDate.now().plusYears(1).toString();
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"dateOfBirth\":\"" + futureDate + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.dateOfBirth").value("dateOfBirth must not be in the future"));
+    }
+
+    @Test
+    void createAnimal_withFutureIntakeDate_returns400WithErrorBody() throws Exception {
+        String futureDate = LocalDate.now().plusYears(1).toString();
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"intakeDate\":\"" + futureDate + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.intakeDate").value("intakeDate must not be in the future"));
+    }
+
+    @Test
+    void createAnimal_withPreviousOwnerMissingName_returns400WithNestedErrorBody() throws Exception {
+        mockMvc.perform(post("/api/animals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Mochi\",\"previousOwner\":{\"telephone\":\"555-0100\"}}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors['previousOwner.name']").value("Name is required"));
+    }
 }
