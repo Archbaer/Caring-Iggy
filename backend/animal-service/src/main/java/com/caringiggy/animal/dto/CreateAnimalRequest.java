@@ -23,20 +23,20 @@ public class CreateAnimalRequest {
     @PastOrPresent(message = "dateOfBirth must not be in the future")
     private LocalDate dateOfBirth;
 
-    @Pattern(regexp = "DOG|CAT|BIRD", message = "animalType must be DOG, CAT, or BIRD")
+    @Pattern(regexp = "(?i)DOG|CAT|BIRD", message = "animalType must be DOG, CAT, or BIRD")
     private String animalType;
 
     private String breed;
 
-    @Pattern(regexp = "MALE|FEMALE|UNKNOWN", message = "gender must be MALE, FEMALE, or UNKNOWN")
+    @Pattern(regexp = "(?i)MALE|FEMALE|UNKNOWN", message = "gender must be MALE, FEMALE, or UNKNOWN")
     private String gender;
 
-    @Pattern(regexp = "SMALL|MEDIUM|LARGE", message = "size must be SMALL, MEDIUM, or LARGE")
+    @Pattern(regexp = "(?i)SMALL|MEDIUM|LARGE", message = "size must be SMALL, MEDIUM, or LARGE")
     private String size;
 
     private String temperament;
 
-    @Pattern(regexp = "AVAILABLE|PENDING|ADOPTED|IN_TREATMENT|DECEASED",
+    @Pattern(regexp = "(?i)AVAILABLE|PENDING|ADOPTED|IN_TREATMENT|DECEASED",
              message = "status must be AVAILABLE, PENDING, ADOPTED, IN_TREATMENT, or DECEASED")
     private String status;
 

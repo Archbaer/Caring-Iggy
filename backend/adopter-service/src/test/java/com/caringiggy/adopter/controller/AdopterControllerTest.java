@@ -103,6 +103,26 @@ class AdopterControllerTest {
     }
 
     @Test
+    void updateAdopter_withInvalidEmail_returns400WithErrorBody() throws Exception {
+        UUID adopterId = UUID.randomUUID();
+        mockMvc.perform(put("/api/adopters/" + adopterId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"not-an-email\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Invalid email format"));
+    }
+
+    @Test
+    void updateAdopter_withInvalidStatus_returns400WithErrorBody() throws Exception {
+        UUID adopterId = UUID.randomUUID();
+        mockMvc.perform(put("/api/adopters/" + adopterId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"BANNED\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.status").value("status must be ACTIVE, PENDING_REVIEW, APPROVED, REJECTED, or INACTIVE"));
+    }
+
+    @Test
     void getAdopterById_notFound_returns404() throws Exception {
         UUID adopterId = UUID.randomUUID();
         when(adopterService.getAdopterById(adopterId))
