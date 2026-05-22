@@ -18,7 +18,9 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -144,5 +146,86 @@ class AdopterControllerTest {
         mockMvc.perform(get("/api/adopters/" + adopterId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void createAdopter_withWhitespaceOnlyName_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/adopters")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"   \",\"telephone\":\"555-0100\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void createAdopter_withMissingName_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/adopters")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"telephone\":\"555-0100\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void createAdopter_withInvalidEmail_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/adopters")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Ava\",\"telephone\":\"555-0100\",\"email\":\"bad-email\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Email must be valid"));
+    }
+
+    @Test
+    void updateAdopter_notFound_returns404WithErrorBody() throws Exception {
+        UUID adopterId = UUID.randomUUID();
+        when(adopterService.updateAdopter(eq(adopterId), any(UpdateAdopterRequest.class)))
+                .thenThrow(new NotFoundException("Adopter not found with id: " + adopterId));
+
+        mockMvc.perform(put("/api/adopters/" + adopterId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"New Name\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deleteAdopter_notFound_returns404WithErrorBody() throws Exception {
+        UUID adopterId = UUID.randomUUID();
+        doThrow(new NotFoundException("Adopter not found with id: " + adopterId))
+                .when(adopterService).deleteAdopter(adopterId);
+
+        mockMvc.perform(delete("/api/adopters/" + adopterId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void createAdoptionHistory_withMissingAdopterId_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/adopters/history")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"animalId\":\"" + UUID.randomUUID() + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.adopterId").value("Adopter ID is required"));
+    }
+
+    @Test
+    void createAdoptionHistory_withMissingAnimalId_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/adopters/history")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"adopterId\":\"" + UUID.randomUUID() + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.animalId").value("Animal ID is required"));
+    }
+
+    @Test
+    void updateInterests_withFourAnimals_returns400WithErrorBody() throws Exception {
+        UUID adopterId = UUID.randomUUID();
+        String fourUuids = "\"" + UUID.randomUUID() + "\",\"" + UUID.randomUUID() + "\"," +
+                           "\"" + UUID.randomUUID() + "\",\"" + UUID.randomUUID() + "\"";
+        mockMvc.perform(put("/api/adopters/" + adopterId + "/interests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"interestedAnimals\":[" + fourUuids + "]}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.interestedAnimals").value("Maximum 3 animals allowed"));
     }
 }
