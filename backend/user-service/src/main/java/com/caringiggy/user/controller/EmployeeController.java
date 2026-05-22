@@ -59,7 +59,7 @@ public class EmployeeController {
     @PutMapping("/{id}")
     public ResponseEntity<EmployeeDto> updateEmployee(
             @PathVariable UUID id,
-            @RequestBody UpdateEmployeeRequest request,
+            @Valid @RequestBody UpdateEmployeeRequest request,
             @CookieValue(name = AuthService.SESSION_COOKIE_NAME, required = false) String sessionToken) {
         authService.requireAdminSession(sessionToken);
         return ResponseEntity.ok(employeeService.updateEmployee(id, request));
