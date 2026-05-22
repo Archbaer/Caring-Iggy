@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -15,22 +16,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Map<String, Object>> handleMissingParam(MissingServletRequestParameterException ex) {
+        String paramName = ex.getParameterName();
+        Map<String, String> errors = new LinkedHashMap<>();
+        errors.put(paramName, paramName + " is required");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "status", HttpStatus.BAD_REQUEST.value(),
-                "message", ex.getMessage()
+                "message", "Validation failed",
+                "errors", errors
         ));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        ex.getConstraintViolations().forEach(v -> {
+            String path = v.getPropertyPath().toString();
+            String field = path.contains(".") ? path.substring(path.lastIndexOf('.') + 1) : path;
+            errors.putIfAbsent(field, v.getMessage());
+        });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "status", HttpStatus.BAD_REQUEST.value(),
                 "message", "Validation failed",
-                "errors", ex.getConstraintViolations().stream()
-                        .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
-                        .toList()
+                "errors", errors
         ));
     }
 
