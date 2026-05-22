@@ -66,4 +66,13 @@ class MatchingControllerTest {
                         .param("telephone", "555-0100"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void findMatches_withBlankName_returns400WithErrorBodyField() throws Exception {
+        mockMvc.perform(post("/api/matching/adopter")
+                        .param("name", "")
+                        .param("telephone", "555-0100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("name is required"));
+    }
 }
