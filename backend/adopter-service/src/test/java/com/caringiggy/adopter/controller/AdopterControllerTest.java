@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -120,6 +121,18 @@ class AdopterControllerTest {
                         .content("{\"status\":\"BANNED\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.status").value("status must be ACTIVE, PENDING_REVIEW, APPROVED, REJECTED, or INACTIVE"));
+    }
+
+    @Test
+    void createAdoptionHistory_withFutureAdoptionDate_returns400WithErrorBody() throws Exception {
+        String futureDate = LocalDate.now().plusYears(1).toString();
+        mockMvc.perform(post("/api/adopters/history")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"adopterId\":\"" + UUID.randomUUID() + "\"," +
+                                 "\"animalId\":\"" + UUID.randomUUID() + "\"," +
+                                 "\"adoptionDate\":\"" + futureDate + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.adoptionDate").value("adoptionDate must not be in the future"));
     }
 
     @Test
