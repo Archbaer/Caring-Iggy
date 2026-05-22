@@ -192,4 +192,13 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.user.role").value("ADMIN"))
                 .andExpect(jsonPath("$.user.profileType").value("EMPLOYEE"));
     }
+
+    @Test
+    void login_withInvalidEmailFormat_returns400WithErrorBodyField() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"not-an-email\",\"password\":\"supersecret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Invalid email format"));
+    }
 }
