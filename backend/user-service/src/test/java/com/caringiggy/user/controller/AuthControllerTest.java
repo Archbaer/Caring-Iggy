@@ -192,4 +192,98 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.user.role").value("ADMIN"))
                 .andExpect(jsonPath("$.user.profileType").value("EMPLOYEE"));
     }
+
+    @Test
+    void login_withInvalidEmailFormat_returns400WithErrorBodyField() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"not-an-email\",\"password\":\"supersecret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Invalid email format"));
+    }
+
+    @Test
+    void login_withMissingEmail_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"password\":\"supersecret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Email is required"));
+    }
+
+    @Test
+    void login_withMissingPassword_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"admin@example.com\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.password").value("Password is required"));
+    }
+
+    @Test
+    void signup_withMissingFirstName_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/signup")
+                        .header("X-Forwarded-For", "10.0.1.1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lastName\":\"Adopter\",\"email\":\"ava@example.com\"," +
+                                 "\"telephone\":\"123456\",\"password\":\"supersecret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.firstName").value("First name is required"));
+    }
+
+    @Test
+    void signup_withShortPassword_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/signup")
+                        .header("X-Forwarded-For", "10.0.1.2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"firstName\":\"Ava\",\"lastName\":\"Adopter\"," +
+                                 "\"email\":\"ava@example.com\",\"telephone\":\"123456\"," +
+                                 "\"password\":\"short\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.password").value("Password must be at least 8 characters"));
+    }
+
+    @Test
+    void signup_withInvalidEmail_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/signup")
+                        .header("X-Forwarded-For", "10.0.1.3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"firstName\":\"Ava\",\"lastName\":\"Adopter\"," +
+                                 "\"email\":\"not-an-email\",\"telephone\":\"123456\"," +
+                                 "\"password\":\"supersecret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Invalid email format"));
+    }
+
+    @Test
+    void provision_withMissingName_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/provision")
+                        .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"staff@example.com\",\"password\":\"supersecret\",\"role\":\"STAFF\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name is required"));
+    }
+
+    @Test
+    void provision_withShortPassword_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/provision")
+                        .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Staff\",\"email\":\"staff@example.com\"," +
+                                 "\"password\":\"short\",\"role\":\"STAFF\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.password").value("Password must be at least 8 characters"));
+    }
+
+    @Test
+    void provision_withInvalidEmail_returns400WithErrorBody() throws Exception {
+        mockMvc.perform(post("/api/auth/provision")
+                        .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Staff\",\"email\":\"not-an-email\"," +
+                                 "\"password\":\"supersecret\",\"role\":\"STAFF\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").value("Invalid email format"));
+    }
 }
