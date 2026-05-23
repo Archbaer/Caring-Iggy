@@ -254,6 +254,103 @@ class AuthServiceTest {
     }
 
     @Test
+    void signupAdopter_throwsWhenEmailAlreadyExists() {
+        when(accountRepository.findByEmail("ava@example.com"))
+                .thenReturn(Optional.of(Account.builder()
+                        .id(UUID.randomUUID())
+                        .email("ava@example.com")
+                        .role(AccountRole.ADOPTER)
+                        .build()));
+
+        assertThatThrownBy(() -> authService.signupAdopter(SignupRequest.builder()
+                        .firstName("Ava").lastName("Adopter")
+                        .email("ava@example.com").telephone("123456")
+                        .password("supersecret").build()))
+                .isInstanceOf(ApiException.class)
+                .extracting(e -> ((ApiException) e).getStatus())
+                .isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void login_throwsUnauthorizedWhenEmailNotFound() {
+        when(accountRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.login(LoginRequest.builder()
+                        .email("ghost@example.com").password("supersecret").build()))
+                .isInstanceOf(ApiException.class)
+                .extracting(e -> ((ApiException) e).getStatus())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void validateSession_returnsEmptyWhenSessionIsExpired() {
+        UUID accountId = UUID.randomUUID();
+        UserSession expiredSession = UserSession.builder()
+                .id(UUID.randomUUID())
+                .accountId(accountId)
+                .tokenHash("ignored")
+                .expiresAt(LocalDateTime.now().minusHours(1))
+                .build();
+
+        when(userSessionRepository.findByTokenHash(any())).thenReturn(Optional.of(expiredSession));
+
+        Optional<AuthResponse> result = authService.validateSession("some-opaque-token");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void provisionAdminAccount_createsEmployeeWithAdminRole() {
+        UUID callerAccountId = UUID.randomUUID();
+        UUID newEmployeeId = UUID.randomUUID();
+
+        Account callerAccount = Account.builder()
+                .id(callerAccountId)
+                .email("superadmin@example.com")
+                .passwordHash("hash")
+                .role(AccountRole.ADMIN)
+                .profileType(AccountProfileType.EMPLOYEE)
+                .profileId(UUID.randomUUID())
+                .build();
+        UserSession callerSession = UserSession.builder()
+                .id(UUID.randomUUID())
+                .accountId(callerAccountId)
+                .tokenHash("ignored")
+                .expiresAt(LocalDateTime.now().plusHours(1))
+                .build();
+
+        when(userSessionRepository.findByTokenHash(any())).thenReturn(Optional.of(callerSession));
+        when(accountRepository.findById(callerAccountId)).thenReturn(Optional.of(callerAccount));
+        when(accountRepository.findByEmail("newadmin@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("supersecret")).thenReturn("hashed-password");
+        when(employeeRepository.save(any(Employee.class))).thenAnswer(inv -> {
+            Employee e = inv.getArgument(0);
+            e.setId(newEmployeeId);
+            return e;
+        });
+        when(accountRepository.insert(any(Account.class))).thenAnswer(inv -> {
+            Account a = inv.getArgument(0);
+            a.setId(UUID.randomUUID());
+            return a;
+        });
+
+        AuthResponse response = authService.provisionAdminAccount(ProvisionAccountRequest.builder()
+                        .name("New Admin").email("newadmin@example.com")
+                        .telephone("555-0102").password("supersecret").role("ADMIN").build(),
+                "caller-session");
+
+        ArgumentCaptor<Employee> employeeCaptor = ArgumentCaptor.forClass(Employee.class);
+        ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
+        verify(employeeRepository).save(employeeCaptor.capture());
+        verify(accountRepository).insert(accountCaptor.capture());
+
+        assertThat(employeeCaptor.getValue().getRole()).isEqualTo(EmployeeRole.ADMIN);
+        assertThat(accountCaptor.getValue().getRole()).isEqualTo(AccountRole.ADMIN);
+        assertThat(accountCaptor.getValue().getProfileType()).isEqualTo(AccountProfileType.EMPLOYEE);
+        assertThat(response.getUser().getRole()).isEqualTo(AccountRole.ADMIN.name());
+    }
+
+    @Test
     void signupAdopter_rollsBackRemoteProfileWhenAccountInsertFails() {
         SignupRequest request = SignupRequest.builder()
                 .firstName("Ava")
