@@ -13,7 +13,6 @@ import type {
   AnimalGender,
   AnimalSize,
   AnimalStatusCode,
-  BffError,
 } from "@/lib/types";
 import { readErrorMessage } from "@/lib/utils/animal-editor";
 import { SuccessCard } from "@/components/ui/success-card";
