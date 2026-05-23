@@ -47,6 +47,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [updatedAnimal, setUpdatedAnimal] = useState<{ id: string; name: string; animalType: string; breed: string; status: string } | null>(null);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
     setIsUpdating(true);
     setErrorMessage(null);
     setSuccessMessage(null);
+    setFieldErrors({});
 
     try {
       const updated = await updateAnimalFromEditor(
@@ -203,6 +205,11 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
               }}
               onChange={handleFieldChange}
             />
+            {fieldErrors.animalType && <p className="text-sm text-red-500 mt-1">{fieldErrors.animalType}</p>}
+            {fieldErrors.size && <p className="text-sm text-red-500 mt-1">{fieldErrors.size}</p>}
+            {fieldErrors.status && <p className="text-sm text-red-500 mt-1">{fieldErrors.status}</p>}
+            {fieldErrors.dateOfBirth && <p className="text-sm text-red-500 mt-1">{fieldErrors.dateOfBirth}</p>}
+            {fieldErrors.intakeDate && <p className="text-sm text-red-500 mt-1">{fieldErrors.intakeDate}</p>}
 
             <div className="space-y-5">
               <label htmlFor="previousOwnerId">
@@ -267,11 +274,21 @@ export function AnimalEditor({ animal, userRole }: AnimalEditorProps) {
   async function handleMutationError(error: unknown) {
     setErrorMessage(toEditorMessage(error));
 
-    if (error instanceof AnimalEditorApiError && error.responseError.code === "FORBIDDEN") {
-      const nextToken = await refreshCsrfToken();
+    if (error instanceof AnimalEditorApiError) {
+      if (error.responseError.fieldErrors) {
+        const fe: Record<string, string> = {};
+        for (const [k, v] of Object.entries(error.responseError.fieldErrors)) {
+          fe[k] = Array.isArray(v) ? (v[0] ?? "") : v;
+        }
+        setFieldErrors(fe);
+      }
 
-      if (nextToken) {
-        setCsrfToken(nextToken);
+      if (error.responseError.code === "FORBIDDEN") {
+        const nextToken = await refreshCsrfToken();
+
+        if (nextToken) {
+          setCsrfToken(nextToken);
+        }
       }
     }
   }

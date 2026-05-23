@@ -13,7 +13,6 @@ import type {
   AnimalGender,
   AnimalSize,
   AnimalStatusCode,
-  BffError,
 } from "@/lib/types";
 import { readErrorMessage } from "@/lib/utils/animal-editor";
 import { SuccessCard } from "@/components/ui/success-card";
@@ -49,6 +48,7 @@ export function AnimalCreator() {
   const [isCreating, setIsCreating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [createdAnimalData, setCreatedAnimalData] = useState<{ id: string; name: string; animalType: string; breed: string; status: string } | null>(null);
 
   useEffect(() => {
@@ -87,6 +87,18 @@ export function AnimalCreator() {
     setIsCreating(true);
     setErrorMessage(null);
     setSuccessMessage(null);
+    setFieldErrors({});
+
+    const hasAnyOwnerField = createForm.previousOwnerName.trim() ||
+      createForm.previousOwnerTelephone.trim() ||
+      createForm.previousOwnerEmail?.trim() ||
+      createForm.previousOwnerAddress?.trim();
+
+    if (hasAnyOwnerField && !createForm.previousOwnerName.trim()) {
+      setFieldErrors({ 'previousOwner.name': 'Name is required' });
+      setIsCreating(false);
+      return;
+    }
 
     try {
       const requestBody = {
@@ -190,6 +202,9 @@ export function AnimalCreator() {
           }}
           onChange={handleFieldChange}
         />
+        {fieldErrors.animalType && <p className="text-sm text-red-500 mt-1">{fieldErrors.animalType}</p>}
+        {fieldErrors.dateOfBirth && <p className="text-sm text-red-500 mt-1">{fieldErrors.dateOfBirth}</p>}
+        {fieldErrors.intakeDate && <p className="text-sm text-red-500 mt-1">{fieldErrors.intakeDate}</p>}
 
         <h3 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-4 mt-8">Previous owner</h3>
 
@@ -206,6 +221,7 @@ export function AnimalCreator() {
                 }
               />
             </label>
+            {fieldErrors['previousOwner.name'] && <p className="text-sm text-red-500 mt-1">{fieldErrors['previousOwner.name']}</p>}
           </div>
 
           <div className="space-y-5">
@@ -288,11 +304,21 @@ export function AnimalCreator() {
   async function handleMutationError(error: unknown) {
     setErrorMessage(toEditorMessage(error));
 
-    if (error instanceof AnimalEditorApiError && error.responseError.code === "FORBIDDEN") {
-      const nextToken = await refreshCsrfToken();
+    if (error instanceof AnimalEditorApiError) {
+      if (error.responseError.fieldErrors) {
+        const fe: Record<string, string> = {};
+        for (const [k, v] of Object.entries(error.responseError.fieldErrors)) {
+          fe[k] = Array.isArray(v) ? (v[0] ?? "") : v;
+        }
+        setFieldErrors(fe);
+      }
 
-      if (nextToken) {
-        setCsrfToken(nextToken);
+      if (error.responseError.code === "FORBIDDEN") {
+        const nextToken = await refreshCsrfToken();
+
+        if (nextToken) {
+          setCsrfToken(nextToken);
+        }
       }
     }
   }

@@ -277,7 +277,7 @@ function readFieldErrors(error: unknown): Record<keyof SignupRequest, string[]> 
 }
 
 function toGenericFieldErrors(
-  messages: string[] | undefined,
+  messages: string | string[] | undefined,
   field: keyof SignupRequest,
 ): string[] {
   if (!messages || messages.length === 0) return [];
