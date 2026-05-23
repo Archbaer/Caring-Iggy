@@ -47,7 +47,7 @@ interface BackendAuthResponse {
 
 interface BackendValidationError {
   message?: string;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string | string[]>;
 }
 
 export interface AdminAdopterSummary {
@@ -346,22 +346,21 @@ export async function deleteStaff(employeeId: string): Promise<void> {
 
 export function readAdminFieldErrors(
   error: AdminApiError,
-): Record<string, string[]> | undefined {
+): Record<string, string> | undefined {
   const body = error.body as BackendValidationError | null;
 
   if (!body || typeof body !== "object" || !body.errors || typeof body.errors !== "object") {
     return undefined;
   }
 
-  return Object.entries(body.errors).reduce<Record<string, string[]>>((output, [key, value]) => {
-    if (!Array.isArray(value)) {
-      return output;
-    }
-
-    const messages = value.filter((entry): entry is string => typeof entry === "string");
-
-    if (messages.length > 0) {
-      output[key] = messages;
+  return Object.entries(body.errors).reduce<Record<string, string>>((output, [key, value]) => {
+    if (typeof value === "string") {
+      output[key] = value;
+    } else if (Array.isArray(value)) {
+      const first = value.find((entry): entry is string => typeof entry === "string");
+      if (first !== undefined) {
+        output[key] = first;
+      }
     }
 
     return output;

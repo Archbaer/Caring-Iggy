@@ -397,16 +397,22 @@ function readFieldErrors(error: unknown): Record<PreferencesField, string[]> {
     return EMPTY_FIELD_ERRORS;
   }
 
+  const fe = error.responseError.fieldErrors;
   return {
-    preferredAnimalTypes: error.responseError.fieldErrors?.preferredAnimalTypes ?? [],
-    preferredBreeds: error.responseError.fieldErrors?.preferredBreeds ?? [],
-    minAge: error.responseError.fieldErrors?.minAge ?? [],
-    maxAge: error.responseError.fieldErrors?.maxAge ?? [],
-    preferredGenders: error.responseError.fieldErrors?.preferredGenders ?? [],
-    preferredSizes: error.responseError.fieldErrors?.preferredSizes ?? [],
-    preferredTemperaments: error.responseError.fieldErrors?.preferredTemperaments ?? [],
-    notes: error.responseError.fieldErrors?.notes ?? [],
+    preferredAnimalTypes: toStringArray(fe?.preferredAnimalTypes),
+    preferredBreeds: toStringArray(fe?.preferredBreeds),
+    minAge: toStringArray(fe?.minAge),
+    maxAge: toStringArray(fe?.maxAge),
+    preferredGenders: toStringArray(fe?.preferredGenders),
+    preferredSizes: toStringArray(fe?.preferredSizes),
+    preferredTemperaments: toStringArray(fe?.preferredTemperaments),
+    notes: toStringArray(fe?.notes),
   };
+}
+
+function toStringArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
 }
 
 function toDisplayMessage(error: unknown): string {

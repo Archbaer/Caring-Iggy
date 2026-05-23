@@ -52,12 +52,17 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
         <div className={FIELD_WRAPPER_CLASS}>
           <label htmlFor="animalType">
             <span className={LABEL_TEXT_CLASS}>Animal type</span>
-            <input
+            <select
               id="animalType"
               className={INPUT_CLASS}
               value={formState.animalType}
               onChange={(event) => onChange("animalType", event.target.value)}
-            />
+            >
+              <option value="">Select type</option>
+              <option value="DOG">DOG</option>
+              <option value="CAT">CAT</option>
+              <option value="BIRD">BIRD</option>
+            </select>
           </label>
         </div>
 
@@ -143,6 +148,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
               type="date"
               className={INPUT_CLASS}
               value={formState.dateOfBirth}
+              max={new Date().toISOString().split('T')[0]}
               onChange={(event) => onChange("dateOfBirth", event.target.value)}
             />
           </label>
@@ -156,6 +162,7 @@ export function AnimalFormFields({ formState, onChange }: AnimalFormFieldsProps)
               type="date"
               className={INPUT_CLASS}
               value={formState.intakeDate}
+              max={new Date().toISOString().split('T')[0]}
               onChange={(event) => onChange("intakeDate", event.target.value)}
             />
           </label>

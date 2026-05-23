@@ -35,6 +35,7 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
   const csrfTokenRef = useRef<string | null>(null);
   const [csrfToken, setCsrfTokenState] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
 
     setIsPending(true);
     setErrorMessage(null);
+    setFieldErrors({});
 
     try {
       const response = await fetch(`/api/admin/adopters/${adopter.id}`, {
@@ -90,13 +92,21 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
 
       if (!response.ok) {
         const error = (await response.json()) as BffError;
-        throw new Error(error.message ?? "Update failed.");
+        if (error.fieldErrors) {
+          const fe: Record<string, string> = {};
+          for (const [k, v] of Object.entries(error.fieldErrors)) {
+            fe[k] = Array.isArray(v) ? (v[0] ?? "") : v;
+          }
+          setFieldErrors(fe);
+        }
+        setErrorMessage(error.message ?? "Update failed.");
+        return;
       }
 
       const updated = (await response.json()) as AdminAdopterDetail;
       onSuccess(updated);
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Update failed. Please try again.");
+    } catch {
+      setErrorMessage("Update failed. Please try again.");
     } finally {
       setIsPending(false);
     }
@@ -145,6 +155,7 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
             value={fields.email}
             onChange={(e) => setFields((f) => ({ ...f, email: e.target.value }))}
           />
+          {fieldErrors.email && <p className="text-sm text-red-500 mt-1">{fieldErrors.email}</p>}
         </label>
 
         <label className="flex flex-col gap-1.5" htmlFor="adopter-address">
@@ -175,6 +186,7 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
               </option>
             ))}
           </select>
+          {fieldErrors.status && <p className="text-sm text-red-500 mt-1">{fieldErrors.status}</p>}
         </label>
 
         {errorMessage ? (

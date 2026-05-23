@@ -39,7 +39,7 @@ export interface BffError {
   /** Human-readable message safe for display. */
   message: string;
   /** Per-field validation errors when code === "VALIDATION". */
-  fieldErrors?: Record<string, string[]>;
+  fieldErrors?: Record<string, string | string[]>;
 }
 
 /** Login request body sent to /api/auth/login. */
