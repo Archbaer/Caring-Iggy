@@ -80,7 +80,7 @@ async function parseProvisionBody(
   const email = readRequiredString(body.email);
   const password = readRequiredString(body.password);
   const telephone = readOptionalString(body.telephone);
-  const role = body.role === "ADMIN" ? "ADMIN" : body.role === "STAFF" ? "STAFF" : null;
+  const role = body.role === "STAFF" ? "STAFF" : null;
 
   if (!name || !email || !password || !role) {
     return {
