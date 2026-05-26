@@ -11,7 +11,7 @@ import type { BffError } from "@/lib/types";
 type EditFields = {
   name: string;
   telephone: string;
-  role: "STAFF" | "ADMIN";
+  role: "STAFF";
 };
 
 type Props = {
@@ -20,13 +20,13 @@ type Props = {
   onSuccess: (updated: AdminEmployeeDetail) => void;
 };
 
-const ROLE_OPTIONS: Array<"STAFF" | "ADMIN"> = ["STAFF", "ADMIN"];
+const ROLE_OPTIONS: Array<"STAFF"> = ["STAFF"];
 
 export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
   const [fields, setFields] = useState<EditFields>({
     name: employee.name,
     telephone: employee.telephone ?? "",
-    role: employee.role,
+    role: "STAFF",
   });
   const csrfTokenRef = useRef<string | null>(null);
   const [csrfToken, setCsrfTokenState] = useState<string | null>(null);
@@ -136,7 +136,7 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
             className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-ink)] text-sm px-4 py-3 focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary-glow)] focus:outline-none transition-all duration-200"
             value={fields.role}
             onChange={(e) =>
-              setFields((f) => ({ ...f, role: e.target.value as "STAFF" | "ADMIN" }))
+              setFields((f) => ({ ...f, role: e.target.value as "STAFF" }))
             }
           >
             {ROLE_OPTIONS.map((r) => (

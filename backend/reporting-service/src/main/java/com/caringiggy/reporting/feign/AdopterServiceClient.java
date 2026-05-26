@@ -2,6 +2,7 @@ package com.caringiggy.reporting.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -11,4 +12,7 @@ public interface AdopterServiceClient {
 
     @GetMapping("/api/adopters")
     List<Map<String, Object>> getAllAdopters();
+
+    @GetMapping("/api/adopters/history")
+    List<Map<String, Object>> getAdoptionHistoryByMonth(@RequestParam("month") String month);
 }

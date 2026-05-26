@@ -110,7 +110,7 @@ async function parseUpdateBody(
     };
   }
 
-  const role = body.role === "ADMIN" ? "ADMIN" : body.role === "STAFF" ? "STAFF" : undefined;
+  const role = body.role === "STAFF" ? "STAFF" : undefined;
   const nextBody: UpdateStaffRequest = {
     ...(readOptionalString(body.name) ? { name: readOptionalString(body.name) } : {}),
     ...(readOptionalString(body.email) ? { email: readOptionalString(body.email) } : {}),
