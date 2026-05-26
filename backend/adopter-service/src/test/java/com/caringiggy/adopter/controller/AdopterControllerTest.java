@@ -1,6 +1,7 @@
 package com.caringiggy.adopter.controller;
 
 import com.caringiggy.adopter.dto.AdopterDto;
+import com.caringiggy.adopter.dto.AdoptionHistoryDto;
 import com.caringiggy.adopter.dto.CreateAdopterRequest;
 import com.caringiggy.adopter.dto.UpdateAdopterRequest;
 import com.caringiggy.adopter.exception.NotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -215,6 +217,52 @@ class AdopterControllerTest {
                         .content("{\"adopterId\":\"" + UUID.randomUUID() + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.animalId").value("Animal ID is required"));
+    }
+
+    // ─── GET /api/adopters/history?month= ────────────────────────────────────
+
+    @Test
+    void getAdoptionHistoryByMonth_withValidMonth_returns200WithList() throws Exception {
+        AdoptionHistoryDto record = AdoptionHistoryDto.builder()
+                .id(UUID.randomUUID())
+                .adopterId(UUID.randomUUID())
+                .animalId(UUID.randomUUID())
+                .adoptionDate(java.time.LocalDate.of(2026, 1, 15))
+                .build();
+
+        when(adopterService.getAdoptionHistoryByMonth("2026-01")).thenReturn(List.of(record));
+
+        mockMvc.perform(get("/api/adopters/history").param("month", "2026-01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].adoptionDate").value("2026-01-15"));
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withNoRecordsInMonth_returns200WithEmptyList() throws Exception {
+        when(adopterService.getAdoptionHistoryByMonth("2026-01")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/adopters/history").param("month", "2026-01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withMissingMonthParam_returns400() throws Exception {
+        mockMvc.perform(get("/api/adopters/history"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withInvalidMonthFormat_returns400() throws Exception {
+        mockMvc.perform(get("/api/adopters/history").param("month", "January-2026"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withPartialDate_returns400() throws Exception {
+        mockMvc.perform(get("/api/adopters/history").param("month", "2026"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -106,4 +106,13 @@ public class AdoptionHistoryRepository {
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
         return count != null ? count : 0;
     }
+    public List<AdoptionHistory> findByMonth(LocalDate start, LocalDate end) {
+        String sql = """
+            SELECT ah.* FROM adoption_history ah
+            WHERE ah.adoption_date BETWEEN ? AND ?
+            ORDER BY ah.adoption_date
+            """;
+        return jdbcTemplate.query(sql, rowMapper, Date.valueOf(start), Date.valueOf(end));
+    }
+
 }
