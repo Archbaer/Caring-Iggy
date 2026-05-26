@@ -226,4 +226,25 @@ public class AdopterService {
                 .notes(history.getNotes())
                 .build();
     }
+    public List<AdoptionHistoryDto> getAdoptionHistoryByMonth(String month) {
+        if (month == null || !month.matches("^\\d{4}-\\d{2}$")) {
+            throw new IllegalArgumentException("Invalid month format. Expected YYYY-MM, got: " + month);
+        }
+
+        String[] parts = month.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int monthNum = Integer.parseInt(parts[1]);
+
+        if (monthNum < 1 || monthNum > 12) {
+            throw new IllegalArgumentException("Invalid month. Expected 01-12, got: " + monthNum);
+        }
+
+        LocalDate start = LocalDate.of(year, monthNum, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+
+        return adoptionHistoryRepository.findByMonth(start, end).stream()
+                .map(this::toHistoryDto)
+                .collect(Collectors.toList());
+    }
+
 }

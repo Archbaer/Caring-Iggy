@@ -86,6 +86,19 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdoptionHistoryByAdopter(id));
     }
 
+    @GetMapping("/history")
+    public ResponseEntity<List<AdoptionHistoryDto>> getAdoptionHistoryByMonth(
+            @RequestParam(required = false) String month) {
+        if (month == null || month.isBlank()) {
+            throw new IllegalArgumentException("Month parameter is required");
+        }
+        if (!month.matches("^\\d{4}-\\d{2}$")) {
+            throw new IllegalArgumentException("Invalid month format. Expected YYYY-MM, got: " + month);
+        }
+        return ResponseEntity.ok(adopterService.getAdoptionHistoryByMonth(month));
+    }
+
+
     @PostMapping("/history")
     public ResponseEntity<AdoptionHistoryDto> createAdoptionHistory(
             @Valid @RequestBody CreateAdoptionHistoryRequest request) {

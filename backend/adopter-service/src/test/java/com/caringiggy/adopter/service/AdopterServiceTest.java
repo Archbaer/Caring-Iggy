@@ -174,11 +174,58 @@ class AdopterServiceTest {
                 .hasMessageContaining(adopterId.toString());
     }
 
+    // ─── getAdoptionHistoryByMonth ───────────────────────────────────────────
+
+    @Test
+    void getAdoptionHistoryByMonth_returnsRecordsMappedToDtos() {
+        LocalDate jan15 = LocalDate.of(2026, 1, 15);
+        LocalDate jan20 = LocalDate.of(2026, 1, 20);
+        UUID h1 = UUID.randomUUID();
+        UUID h2 = UUID.randomUUID();
+        UUID a1 = UUID.randomUUID();
+        UUID a2 = UUID.randomUUID();
+
+        when(adoptionHistoryRepository.findByMonth(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31)))
+                .thenReturn(List.of(
+                        history(h1, UUID.randomUUID(), a1, jan15),
+                        history(h2, UUID.randomUUID(), a2, jan20)
+                ));
+
+        List<com.caringiggy.adopter.dto.AdoptionHistoryDto> result =
+                adopterService.getAdoptionHistoryByMonth("2026-01");
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getAdoptionDate()).isEqualTo(jan15);
+        assertThat(result.get(1).getAdoptionDate()).isEqualTo(jan20);
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withNoRecordsInMonth_returnsEmptyList() {
+        when(adoptionHistoryRepository.findByMonth(LocalDate.of(2026, 3, 1), LocalDate.of(2026, 3, 31)))
+                .thenReturn(List.of());
+
+        List<com.caringiggy.adopter.dto.AdoptionHistoryDto> result =
+                adopterService.getAdoptionHistoryByMonth("2026-03");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getAdoptionHistoryByMonth_withInvalidMonthFormat_throwsIllegalArgumentException() {
+        assertThatThrownBy(() -> adopterService.getAdoptionHistoryByMonth("January-2026"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     // ─── helpers ─────────────────────────────────────────────────────────────
 
     private Adopter adopter(UUID id, String name, String telephone, AdopterStatus status) {
         return Adopter.builder()
                 .id(id).name(name).telephone(telephone).status(status)
                 .interestedAnimals(List.of()).build();
+    }
+
+    private AdoptionHistory history(UUID id, UUID adopterId, UUID animalId, LocalDate date) {
+        return AdoptionHistory.builder()
+                .id(id).adopterId(adopterId).animalId(animalId).adoptionDate(date).build();
     }
 }
