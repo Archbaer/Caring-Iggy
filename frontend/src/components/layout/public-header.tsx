@@ -41,7 +41,7 @@ export async function PublicHeader() {
             href="/donate"
             className="px-5 py-2 rounded-full text-sm font-bold bg-[var(--color-accent)] text-white shadow-[var(--shadow-coral)] hover:bg-[var(--color-accent-deep)] hover:scale-105 active:scale-95 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]/70 focus-visible:outline-offset-2"
           >
-            <span aria-hidden="true">❤️</span> Donate
+            Donate
           </Link>
 
           <div className="w-px h-5 bg-white/20 mx-1" />

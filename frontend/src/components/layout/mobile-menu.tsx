@@ -147,7 +147,7 @@ export function MobileMenu({ session, dashboardLink }: MobileMenuProps) {
               href="/donate"
               className="px-4 py-3 rounded-2xl text-base font-bold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-deep)] transition-colors mt-1"
             >
-              <span aria-hidden="true">❤️ </span>Donate
+              Donate
             </Link>
 
             <div className="border-t border-white/10 my-3" />
