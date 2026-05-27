@@ -7,35 +7,22 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build:
+  backend:
+    name: Backend Tests
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
-    
+
     services:
-      postgres-animals:
+      postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: animals_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
         ports:
-          - 5433:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      
-      postgres-users:
-        image: postgres:15
-        env:
-          POSTGRES_DB: users_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5434:5432
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -53,6 +40,12 @@ jobs:
           cache: 'maven'
           cache-dependency-path: 'backend/pom.xml'
 
+      - name: Create databases
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE animals_db;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE adopters_db;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE users_db;"
+
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
         env:
@@ -63,20 +56,64 @@ jobs:
         env:
           MAVEN_OPTS: -Xmx1024m
           DB_HOST: localhost
-          DB_PORT: 5433
-          DB_NAME: animals_db
+          DB_PORT: 5432
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: 'backend/**/target/*.jar'
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: backend-test-results
           path: 'backend/**/target/surefire-reports/*.xml'
+
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Start backend stack
+        run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait
+        timeout-minutes: 10
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run API tests
+        working-directory: frontend
+        run: npx playwright test --project=setup --project=api
+        env:
+          CI: true
+          ANIMAL_SERVICE_URL: http://localhost:8081
+          USER_SERVICE_URL: http://localhost:8085
+          ADOPTER_SERVICE_URL: http://localhost:8082
+          REPORTING_SERVICE_URL: http://localhost:8084
+          INTERNAL_BASE_URL: http://localhost:3000
+          APP_ORIGIN: http://localhost:3000
+          AUTH_SESSION_STATE_SECRET: ci-test-session-secret-long-enough-for-ci
+          AUTH_CSRF_SECRET: ci-test-csrf-secret-long-enough-for-ci
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose -f infrastructure/docker-compose.yml logs
