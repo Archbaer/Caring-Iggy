@@ -227,7 +227,7 @@ class AdopterControllerTest {
                 .id(UUID.randomUUID())
                 .adopterId(UUID.randomUUID())
                 .animalId(UUID.randomUUID())
-                .adoptionDate(java.time.LocalDate.of(2026, 1, 15))
+                .adoptionDate(LocalDate.of(2026, 1, 15))
                 .build();
 
         when(adopterService.getAdoptionHistoryByMonth("2026-01")).thenReturn(List.of(record));
