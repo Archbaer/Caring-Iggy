@@ -96,6 +96,22 @@ test.describe("Staff endpoints (as ADMIN)", () => {
     expect(body).toMatchObject(ERROR_SHAPE);
   });
 
+  test("POST with role ADMIN returns 422 — only STAFF role allowed", async ({ request }) => {
+    const csrfToken = await getCsrfToken(request);
+    const resp = await request.post("/api/admin/staff", {
+      data: {
+        name: "Attempted Admin",
+        email: `admin-attempt-${Date.now()}@caringiggy.test`,
+        password: "password123",
+        role: "ADMIN",
+      },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    expect(resp.status()).toBe(422);
+    const body = await resp.json();
+    expect(body).toMatchObject(ERROR_SHAPE);
+  });
+
   test("GET /api/admin/staff/{id} returns 200 with detail shape", async ({
     request,
   }) => {
@@ -153,6 +169,22 @@ test.describe("Staff endpoints (as ADMIN)", () => {
     expect(resp.status()).toBe(422);
     const body = await resp.json();
     expect(body).toMatchObject(ERROR_SHAPE);
+  });
+
+  test("PUT with role ADMIN is silently dropped — role stays STAFF", async ({ request }) => {
+    const listResp = await request.get("/api/admin/staff");
+    const list = await listResp.json();
+    const staffMember = list.find((e: { role: string }) => e.role === "STAFF");
+    const firstId = staffMember?.id ?? list[0].id;
+
+    const csrfToken = await getCsrfToken(request);
+    const resp = await request.put(`/api/admin/staff/${firstId}`, {
+      data: { role: "ADMIN" },
+      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    });
+    // role:"ADMIN" is stripped by the BFF — only STAFF is valid.
+    // With role the only field, the body becomes empty → 422
+    expect(resp.status()).toBe(422);
   });
 
   test("DELETE /api/admin/staff/{id} returns 200 with ok:true", async ({
