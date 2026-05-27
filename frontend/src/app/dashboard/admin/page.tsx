@@ -113,6 +113,21 @@ export default async function AdminDashboardPage() {
             </ActionLink>
           </div>
         </Card>
+
+        <Card variant="route" className="rounded-3xl bg-white border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 hover:border-[var(--color-primary)]/50 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1 transition-all duration-300">
+          <Eyebrow>Analytics</Eyebrow>
+          <h2 className="text-lg font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
+            Reports
+          </h2>
+          <p className="text-sm text-[var(--color-ink-soft)] mt-1">
+            Monthly intake and adoption data
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <ActionLink href="/dashboard/admin/reports" variant="chip">
+              View reports
+            </ActionLink>
+          </div>
+        </Card>
       </section>
     </div>
   );
