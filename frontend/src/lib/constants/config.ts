@@ -22,6 +22,9 @@ export const SERVICES = {
   get ADOPTER() {
     return requiredEnv("ADOPTER_SERVICE_URL");
   },
+  get REPORTING() {
+    return requiredEnv("REPORTING_SERVICE_URL");
+  },
 } as const;
 
 export const INTERNAL_BASE_URL =
