@@ -212,8 +212,12 @@ class AdopterServiceTest {
 
     @Test
     void getAdoptionHistoryByMonth_withInvalidMonthFormat_throwsIllegalArgumentException() {
+        // YearMonth.parse throws DateTimeParseException — service must wrap it in
+        // IllegalArgumentException to match the pattern used elsewhere in this service
+        // (e.g. AdopterStatus.valueOf throws IllegalArgumentException for bad status)
         assertThatThrownBy(() -> adopterService.getAdoptionHistoryByMonth("January-2026"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("YYYY-MM");
     }
 
     // ─── helpers ─────────────────────────────────────────────────────────────
