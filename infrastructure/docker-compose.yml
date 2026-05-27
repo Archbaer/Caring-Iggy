@@ -138,6 +138,8 @@ services:
       context: ../backend
       dockerfile: reporting-service/Dockerfile
     container_name: caring-iggy-reporting-service
+    ports:
+      - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
@@ -145,6 +147,11 @@ services:
     depends_on:
       - animal-service
       - adopter-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # frontend:
   #   build:
