@@ -40,6 +40,10 @@ auth:
     ttl: ${AUTH_SESSION_TTL:PT168H}
     cookie-secure: ${AUTH_SESSION_COOKIE_SECURE:false}
 
+rate-limit:
+  login-per-minute: ${RATE_LIMIT_LOGIN_PER_MINUTE:5}
+  signup-per-minute: ${RATE_LIMIT_SIGNUP_PER_MINUTE:3}
+
 services:
   adopter:
     url: ${ADOPTER_SERVICE_URL:http://localhost:8082}
