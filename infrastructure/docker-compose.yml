@@ -111,6 +111,8 @@ services:
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+      RATE_LIMIT_LOGIN_PER_MINUTE: ${RATE_LIMIT_LOGIN_PER_MINUTE:-5}
+      RATE_LIMIT_SIGNUP_PER_MINUTE: ${RATE_LIMIT_SIGNUP_PER_MINUTE:-3}
     depends_on:
       postgres-users:
         condition: service_healthy
