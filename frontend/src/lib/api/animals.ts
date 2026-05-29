@@ -6,6 +6,8 @@ import type {
   AnimalStatusLabel,
   AnimalUpdateRequest,
   PreviousOwner,
+  AnimalGender,
+  AnimalSize,
 } from "@/lib/types";
 import { toStatusLabel } from "@/lib/constants/status-map";
 import { serviceUrl } from "./client";
@@ -61,7 +63,10 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
   if (params?.sex) url.searchParams.set("sex", params.sex);
   if (params?.size) url.searchParams.set("size", params.size);
 
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    next: { tags: ["animals"] },
+  });
   if (!res.ok) {
     throw new AnimalServiceError(
       `Failed to fetch animals: ${res.status}`,
@@ -69,7 +74,32 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
       await safeReadJson(res),
     );
   }
-  return res.json();
+
+  const raw = (await res.json()) as Array<{
+    id: string;
+    name: string;
+    animalType: string;
+    breed: string;
+    status: AnimalSummary["status"];
+    imageUrl: string | null;
+    gender?: string;
+    size?: string;
+  }>;
+
+  return raw.map((a) => ({
+    id: a.id,
+    name: a.name,
+    animalType: a.animalType,
+    breed: a.breed,
+    status: a.status,
+    imageUrl: a.imageUrl,
+    ...(a.gender === "MALE" || a.gender === "FEMALE" || a.gender === "UNKNOWN"
+      ? { gender: a.gender as AnimalGender }
+      : {}),
+    ...(a.size === "SMALL" || a.size === "MEDIUM" || a.size === "LARGE"
+      ? { size: a.size as AnimalSize }
+      : {}),
+  }));
 }
 
 export async function fetchAnimal(id: string): Promise<AnimalDetail> {

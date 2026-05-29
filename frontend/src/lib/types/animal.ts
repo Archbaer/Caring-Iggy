@@ -33,6 +33,8 @@ export interface AnimalSummary {
   breed: string;
   status: AnimalStatusCode;
   imageUrl: string | null;
+  gender?: AnimalGender;
+  size?: AnimalSize;
 }
 
 /** Full animal detail — extends summary with additional fields when available. */
