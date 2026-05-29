@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -19,4 +18,6 @@ public class AnimalSummaryDto {
     private String breed;
     private String status;
     private String imageUrl;
+    private String gender;
+    private String size;
 }
