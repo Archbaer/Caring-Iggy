@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { revalidateTag } from "next/cache";
+
 import { createAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
 import { checkTestSimulateFailure } from "@/lib/auth/server";
@@ -34,7 +36,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   try {
-    return jsonResponse(await createAnimal(parsedBody.body), { status: 201 });
+    const result = await createAnimal(parsedBody.body);
+    revalidateTag("animals", "default");
+    return jsonResponse(result, { status: 201 });
   } catch (error) {
     return errorResponse(
       toAnimalBffError(error, "Animal creation could not be completed right now."),
