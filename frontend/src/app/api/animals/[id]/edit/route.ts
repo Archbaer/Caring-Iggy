@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { revalidateTag } from "next/cache";
+
 import { updateAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
 import { checkTestSimulateFailure } from "@/lib/auth/server";
@@ -42,7 +44,9 @@ export async function PUT(
 
   try {
     const { id } = await context.params;
-    return jsonResponse(await updateAnimal(id, parsedBody.body), { status: 200 });
+    const result = await updateAnimal(id, parsedBody.body);
+    revalidateTag("animals", "default");
+    return jsonResponse(result, { status: 200 });
   } catch (error) {
     return errorResponse(
       toAnimalBffError(error, "Animal updates could not be saved right now."),
