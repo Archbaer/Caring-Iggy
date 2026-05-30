@@ -94,9 +94,9 @@ function MultiChipRow({
           ? selected.filter((s) => s !== opt)
           : [...selected, opt];
         return (
-          <button type="button"
+          <Link
             key={opt}
-            onClick={() => buildHref(next)}
+            href={buildHref(next)}
             className={`
               rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200
               ${isActive
@@ -106,7 +106,7 @@ function MultiChipRow({
             `}
           >
             {opt}
-          </button>
+          </Link>
         );
       })}
     </>
