@@ -175,6 +175,8 @@ public class AnimalService {
                 .breed(animal.getBreed())
                 .status(animal.getStatus() != null ? animal.getStatus().name() : null)
                 .imageUrl(animal.getImageUrl())
+                .gender(animal.getGender() != null ? animal.getGender().name() : null)
+                .size(animal.getSize() != null ? animal.getSize().name() : null)
                 .build();
     }
 

@@ -26,13 +26,11 @@ export const dynamic = "force-dynamic";
 async function loadAnimal(id: string): Promise<AnimalDetailResult> {
   try {
     const animal = await fetchAnimalForView(id);
-
     return { kind: "success", animal };
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {
       return { kind: "not-found" };
     }
-
     return {
       kind: "error",
       message:
@@ -47,48 +45,38 @@ function statusToBadgeVariant(
   status: string,
 ): "available" | "pending" | "adopted" | "muted" {
   switch (status) {
-    case "AVAILABLE":
-      return "available";
-    case "PENDING":
-      return "pending";
-    case "ADOPTED":
-      return "adopted";
+    case "AVAILABLE": return "available";
+    case "PENDING": return "pending";
+    case "ADOPTED": return "adopted";
     case "WITHDRAWN":
-    case "NOT_AVAILABLE":
-      return "muted";
-    default:
-      return "muted";
+    case "NOT_AVAILABLE": return "muted";
+    default: return "muted";
   }
 }
 
-function DetailPanel({ title, children }: { title: string; children: ReactNode }) {
+function DetailCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-border)] p-6">
-      <h3 className="text-sm font-bold text-[var(--color-ink)] mb-3 uppercase tracking-wide">{title}</h3>
-      <div className="flex flex-col gap-1">{children}</div>
+    <div className="rounded-2xl bg-white border border-[var(--color-border)] shadow-sm p-4">
+      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-faint)] mb-3">
+        {title}
+      </h3>
+      {children}
     </div>
   );
 }
 
-function DetailItem({
-  label,
-  value,
-}: {
-  label: string;
-  value?: string | null;
-}) {
+function DetailRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
-    <div className="flex justify-between gap-3">
+    <div className="flex justify-between gap-3 mb-1.5 last:mb-0">
       <span className="text-xs text-[var(--color-ink-faint)]">{label}</span>
-      <span className="text-sm text-[var(--color-ink)] font-semibold">{value}</span>
+      <span className="text-xs font-semibold text-[var(--color-ink)]">{value}</span>
     </div>
   );
 }
 
 export default async function AnimalDetailPage({ params }: PageProps) {
   const { id } = await params;
-
   const session = await getCurrentSession();
 
   const [result, profile] = await Promise.all([
@@ -96,16 +84,14 @@ export default async function AnimalDetailPage({ params }: PageProps) {
     session?.profileId ? fetchAdopterProfile(session.profileId) : null,
   ]);
 
-  if (result.kind === "not-found") {
-    notFound();
-  }
+  if (result.kind === "not-found") notFound();
 
   if (result.kind === "error") {
     return (
       <div className="max-w-[86rem] mx-auto px-6 py-8">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] p-6 text-center">
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm p-6 text-center">
           <Eyebrow className="mb-3">Profile error</Eyebrow>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-medium text-[var(--color-ink)] mb-4 tracking-[-0.02em] leading-[1.05]">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl font-medium text-[var(--color-ink)] mb-4">
             Animal profile unavailable.
           </h1>
           <p className="text-sm text-[var(--color-ink-soft)] mb-5">{result.message}</p>
@@ -125,17 +111,29 @@ export default async function AnimalDetailPage({ params }: PageProps) {
     ? await renderEditorSlot(animal, session.role === "ADMIN" ? "ADMIN" : "STAFF")
     : undefined;
 
+  const ageLabel = animal.age ? `${animal.age} year${animal.age === 1 ? "" : "s"} old` : null;
+  const sexLabel = animal.sex
+    ? animal.sex.charAt(0) + animal.sex.slice(1).toLowerCase()
+    : null;
+  const sizeLabel = animal.size
+    ? animal.size.charAt(0) + animal.size.slice(1).toLowerCase()
+    : null;
+
   return (
-    <div className="max-w-[86rem] mx-auto px-6 pt-8 pb-8">
-      <Link href="/animals" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold text-sm hover:underline mb-6">
+    <div className="max-w-[86rem] mx-auto px-6 pt-8 pb-12">
+      <Link
+        href="/animals"
+        className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold text-sm hover:underline mb-6"
+      >
         ← Back to animals
       </Link>
 
-      <div
-        className="grid gap-7 mb-7 items-start"
-        style={{ gridTemplateColumns: "1.1fr 0.9fr" }}
+      {/* Hero: fixed image left + detail cards right */}
+      <div className="flex flex-col sm:grid sm:gap-7 sm:items-start mb-8"
+        style={{ gridTemplateColumns: "480px 1fr" }}
       >
-        <div className="overflow-hidden rounded-3xl border border-[var(--color-border)] shadow-xl">
+        {/* Image — fixed frame */}
+        <div className="w-full aspect-[4/3] sm:w-[480px] sm:h-[380px] sm:aspect-auto overflow-hidden rounded-3xl border border-[var(--color-border)] shadow-xl mb-6 sm:mb-0 flex-shrink-0">
           <AnimalImage
             imageUrl={animal.imageUrl}
             name={animal.name}
@@ -144,61 +142,98 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           />
         </div>
 
-        <div>
-          <Badge
-            variant={statusToBadgeVariant(animal.status)}
-            className="mb-3"
-          >
-            {animal.statusLabel}
-          </Badge>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-[var(--color-ink)] tracking-tight mb-3">
-            {animal.name}
-          </h1>
-          <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
-            {animal.breed} · {animal.animalType}
-            {animal.age ? ` · ${animal.age} years old` : ""}
-          </p>
-
-          {animal.temperament && (
-            <p className="mt-4 italic text-base text-[var(--color-ink-soft)] leading-relaxed">
-              &ldquo;{animal.temperament}&rdquo;
+        {/* Right column: header + stacked cards */}
+        <div className="flex flex-col gap-3">
+          <div>
+            <Badge variant={statusToBadgeVariant(animal.status)} className="mb-2">
+              {animal.statusLabel}
+            </Badge>
+            <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-[var(--color-ink)] tracking-tight mb-1">
+              {animal.name}
+            </h1>
+            <p className="text-sm text-[var(--color-ink-soft)]">
+              {animal.breed} · {animal.animalType}
+              {ageLabel ? ` · ${ageLabel}` : ""}
             </p>
+          </div>
+
+          {/* Details card */}
+          <DetailCard title="Details">
+            <DetailRow label="Breed" value={animal.breed} />
+            <DetailRow label="Type" value={animal.animalType} />
+            <DetailRow label="Age" value={ageLabel} />
+            <DetailRow label="Sex" value={sexLabel} />
+            <DetailRow label="Size" value={sizeLabel} />
+            <DetailRow label="Status" value={animal.statusLabel} />
+            <DetailRow label="Intake date" value={animal.intakeDate} />
+          </DetailCard>
+
+          {/* Temperament card — only if present */}
+          {animal.temperament && (
+            <DetailCard title="Temperament">
+              <p className="text-xs text-[var(--color-ink-soft)] leading-relaxed italic">
+                &ldquo;{animal.temperament}&rdquo;
+              </p>
+            </DetailCard>
           )}
 
-          <div className="mt-6 flex gap-3 flex-wrap">
-            <RegisterInterestButton animalId={animal.id} animalName={animal.name} isRegistered={isRegistered} isAtCapacity={isAtCapacity} />
-          </div>
+          {/* About card */}
+          <DetailCard title="About">
+            <p className="text-xs text-[var(--color-ink-soft)] leading-relaxed">
+              {animal.description?.trim() ||
+                `A biography has not been published for ${animal.name} yet.`}
+            </p>
+          </DetailCard>
         </div>
       </div>
 
-      <div className="max-w-[80ch] mb-7">
-        <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--color-ink)] mb-3 tracking-tight">
-          About {animal.name}
-        </h2>
-        <p className="text-base text-[var(--color-ink-soft)] leading-relaxed">
-          {animal.description?.trim() ||
-            `A biography has not been published for ${animal.name} yet. Contact us to learn more.`}
-        </p>
-      </div>
+      {/* Previous owner — only if present */}
+      {animal.previousOwner && (
+        <div className="mb-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-faint)] mb-3">
+            Previous owner
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <DetailCard title="Name">
+              <p className="text-sm font-semibold text-[var(--color-ink)]">
+                {animal.previousOwner.name}
+              </p>
+            </DetailCard>
+            <DetailCard title="Telephone">
+              <p className="text-sm font-semibold text-[var(--color-ink)]">
+                {animal.previousOwner.telephone}
+              </p>
+            </DetailCard>
+            {animal.previousOwner.email && (
+              <DetailCard title="Email">
+                <p className="text-sm font-semibold text-[var(--color-ink)]">
+                  {animal.previousOwner.email}
+                </p>
+              </DetailCard>
+            )}
+            {animal.previousOwner.address && (
+              <DetailCard title="Address">
+                <p className="text-sm font-semibold text-[var(--color-ink)]">
+                  {animal.previousOwner.address}
+                </p>
+              </DetailCard>
+            )}
+          </div>
+        </div>
+      )}
 
-      <div className="grid gap-5 mb-7 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <DetailPanel title="Details">
-          <DetailItem label="Breed" value={animal.breed} />
-          <DetailItem label="Type" value={animal.animalType} />
-          {animal.age && <DetailItem label="Age" value={`${animal.age} years`} />}
-          {animal.sex && <DetailItem label="Sex" value={animal.sex} />}
-          <DetailItem label="Status" value={animal.statusLabel} />
-        </DetailPanel>
-        {animal.temperament && (
-          <DetailPanel title="Temperament">
-            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
-              {animal.temperament}
-            </p>
-          </DetailPanel>
-        )}
-      </div>
-
+      {/* Editor slot (staff/admin only) */}
       {editorSlot}
+
+      {/* CTA — centered at bottom */}
+      <div className="flex justify-center pt-4">
+        <RegisterInterestButton
+          animalId={animal.id}
+          animalName={animal.name}
+          isRegistered={isRegistered}
+          isAtCapacity={isAtCapacity}
+        />
+      </div>
     </div>
   );
 }
@@ -210,6 +245,5 @@ async function renderEditorSlot(
   const { AnimalEditorSlot } = await import(
     "@/components/animals/animal-editor-slot"
   );
-
   return <AnimalEditorSlot animal={animal} userRole={userRole} />;
 }
