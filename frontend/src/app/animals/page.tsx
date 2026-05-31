@@ -3,8 +3,7 @@ import Link from "next/link";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalFilters } from "@/components/animals/animal-filters";
-import { fetchAnimals } from "@/lib/api/animals";
-import type { AnimalSummaryView } from "@/lib/api/animals";
+import { fetchAnimalsForView } from "@/lib/api/animals";
 import { isAnimalStatusCode } from "@/lib/constants/status-map";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { readQueryValue } from "@/lib/utils/url";
@@ -47,7 +46,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
 
   const [session, animalsResult] = await Promise.all([
     getCurrentSession(),
-    fetchAnimals().then((animals) => ({ kind: "success" as const, animals })).catch((error) => ({
+    fetchAnimalsForView().then((animals) => ({ kind: "success" as const, animals })).catch((error) => ({
       kind: "error" as const,
       message: error instanceof Error ? error.message : "The catalog is temporarily unavailable.",
     })),
@@ -104,7 +103,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
           ) : visibleAnimals.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               {visibleAnimals.map((animal, index) => (
-                <AnimalCard key={animal.id} animal={animal as AnimalSummaryView} enterIndex={index} canEdit={canEditAnimal} />
+                <AnimalCard key={animal.id} animal={animal} enterIndex={index} canEdit={canEditAnimal} />
               ))}
             </div>
           ) : (
