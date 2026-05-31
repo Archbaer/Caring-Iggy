@@ -46,6 +46,7 @@ export function AnimalImage({ imageUrl, name, animalType, variant }: AnimalImage
       sizes={imageVariant.sizes}
       width={imageVariant.width}
       height={imageVariant.height}
+      unoptimized
       onError={() => setFailedSrc(src)}
     />
   );
