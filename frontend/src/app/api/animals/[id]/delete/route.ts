@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { revalidateTag } from "next/cache";
+
 import { deleteAnimal } from "@/lib/api/animals";
 import { errorResponse, jsonResponse } from "@/lib/api/client";
 import { checkTestSimulateFailure } from "@/lib/auth/server";
@@ -36,6 +38,7 @@ export async function DELETE(
   try {
     const { id } = await context.params;
     await deleteAnimal(id);
+    revalidateTag("animals", "default");
     return jsonResponse({ ok: true }, { status: 200 });
   } catch (error) {
     return errorResponse(

@@ -1,6 +1,7 @@
 package com.caringiggy.animal.controller;
 
 import com.caringiggy.animal.dto.AnimalDetailDto;
+import com.caringiggy.animal.dto.AnimalSummaryDto;
 import com.caringiggy.animal.dto.CreateAnimalRequest;
 import com.caringiggy.animal.dto.PreviousOwnerDto;
 import com.caringiggy.animal.dto.PreviousOwnerRequest;
@@ -300,5 +301,28 @@ class AnimalControllerTest {
                         .content("{\"size\":\"GIGANTIC\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.size").value("size must be SMALL, MEDIUM, or LARGE"));
+    }
+
+    @Test
+    void getAllAnimals_returnsSummariesWithGenderAndSize() throws Exception {
+        UUID animalId = UUID.randomUUID();
+        AnimalSummaryDto summary =
+                AnimalSummaryDto.builder()
+                        .id(animalId)
+                        .name("Mochi")
+                        .animalType("CAT")
+                        .breed("Maine Coon")
+                        .status("AVAILABLE")
+                        .imageUrl("https://example.com/mochi.jpg")
+                        .gender("FEMALE")
+                        .size("LARGE")
+                        .build();
+
+        when(animalService.getAllAnimals()).thenReturn(java.util.List.of(summary));
+
+        mockMvc.perform(get("/api/animals"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].gender").value("FEMALE"))
+                .andExpect(jsonPath("$[0].size").value("LARGE"));
     }
 }
