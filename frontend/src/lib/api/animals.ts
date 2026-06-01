@@ -64,7 +64,6 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
   if (params?.size) url.searchParams.set("size", params.size);
 
   const res = await fetch(url.toString(), {
-    cache: "no-store",
     next: { tags: ["animals"] },
   });
   if (!res.ok) {
@@ -104,7 +103,7 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
 
 export async function fetchAnimal(id: string): Promise<AnimalDetail> {
   const res = await fetch(serviceUrl("ANIMAL", `/api/animals/${id}`), {
-    cache: "no-store",
+    next: { tags: ["animals", `animal-${id}`] },
   });
   if (!res.ok) {
     throw new AnimalServiceError(
