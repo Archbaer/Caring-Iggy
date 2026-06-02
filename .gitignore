@@ -22,8 +22,6 @@
 **/.settings/
 .idea/
 .vscode/
-.sisyphus/
-.playwright-mcp/
 
 # Logs and local runtime files
 **/*.log
@@ -35,14 +33,6 @@
 .env
 opencode.json
 CLAUDE.md
-docs/superpowers/plans/
-docs/superpowers/specs/
 
-# Test directories
-**/src/test/*
-
-# Test plans
-*IMPLEMENTATION_PLAN.md
-FRONTEND_DESIGN.md
-test-results/
+# Test output
 **/test-results/
