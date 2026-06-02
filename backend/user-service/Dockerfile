@@ -7,7 +7,7 @@ RUN mvn -f user-service/pom.xml -B \
     -Dmaven.wagon.httpconnectionManager.ttlSeconds=60 \
     dependency:go-offline
 COPY user-service/src user-service/src
-RUN mvn -f user-service/pom.xml -B -o clean package -DskipTests
+RUN mvn -f user-service/pom.xml -B -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
