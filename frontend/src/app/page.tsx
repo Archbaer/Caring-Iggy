@@ -5,8 +5,6 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { fetchAnimalsForView } from "@/lib/api/animals";
 
-export const dynamic = "force-dynamic";
-
 const trustPoints = [
   {
     title: "No-kill shelter",

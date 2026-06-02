@@ -8,8 +8,6 @@ import { isAnimalStatusCode } from "@/lib/constants/status-map";
 import { getCurrentSession } from "@/lib/auth/server-session";
 import { readQueryValue } from "@/lib/utils/url";
 
-export const dynamic = "force-dynamic";
-
 type PageProps = {
   searchParams: Promise<{
     status?: string | string[];

@@ -21,8 +21,6 @@ type AnimalDetailResult =
   | { kind: "not-found" }
   | { kind: "error"; message: string };
 
-export const dynamic = "force-dynamic";
-
 async function loadAnimal(id: string): Promise<AnimalDetailResult> {
   try {
     const animal = await fetchAnimalForView(id);
