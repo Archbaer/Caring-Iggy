@@ -10,6 +10,10 @@
  * The invalidation tests explicitly warm the cache with a first render, then
  * mutate, then assert the next render reflects the change. Without the warm-up
  * step these would merely re-test CRUD behaviour already covered elsewhere.
+ *
+ * Note: existing form tests (animal-create, animal-edit) only assert form-level
+ * success messages — they do not check that rendered list/detail pages reflect
+ * the mutation. That gap is covered here as part of cache invalidation.
  */
 
 import { test, expect } from "@playwright/test";
@@ -104,9 +108,27 @@ test.describe("Fetch config — pages must not disable caching", () => {
 // Pattern: warm cache → mutate via BFF → re-render must reflect mutation.
 // If revalidateTag is not called (or tags are not registered), the second
 // render returns the cached (stale) response and the assertion fails.
+//
+// Note: existing tests only assert form-level success messages — none navigate
+// back to /animals or /animals/:id to verify rendered page content. These tests
+// fill that gap while also being the primary regression guard for cache tags.
 
 test.describe("Tag invalidation — cached pages reflect mutations", () => {
-  test("edit invalidates the animals list cache", async ({ page }) => {
+  test("create: new animal appears on /animals list", async ({ page }) => {
+    const name = unique("Tag Inv Create");
+
+    // Warm
+    await page.goto("/animals");
+
+    const createResp = await createAnimal(page.request, { name, status: "AVAILABLE" });
+    expect(createResp.status()).toBe(201);
+
+    // Stale cache would not include the new animal
+    await page.goto("/animals");
+    await expect(page.getByRole("heading", { name, level: 2 })).toBeVisible();
+  });
+
+  test("edit: updated name appears on /animals list", async ({ page }) => {
     const original = unique("Tag Inv List Original");
     const updated = unique("Tag Inv List Updated");
 
@@ -114,21 +136,22 @@ test.describe("Tag invalidation — cached pages reflect mutations", () => {
     expect(createResp.status()).toBe(201);
     const { id } = await createResp.json();
 
-    // Warm: render list so it is in Data Cache
+    // Warm
     await page.goto("/animals");
     await expect(page.getByRole("heading", { name: original, level: 2 })).toBeVisible();
 
-    // Mutate via BFF (triggers revalidateTag("animals"))
     const editResp = await editAnimal(page.request, id, { name: updated });
     expect(editResp.status()).toBe(200);
 
-    // Re-render: must be fresh — stale cache would still show original name
+    // Stale cache would still show original name
     await page.goto("/animals");
     await expect(page.getByRole("heading", { name: updated, level: 2 })).toBeVisible();
     await expect(page.getByRole("heading", { name: original, level: 2 })).toHaveCount(0);
   });
 
-  test("edit invalidates the animal detail cache", async ({ page }) => {
+  test("edit: updated name appears on /animals/:id detail page", async ({
+    page,
+  }) => {
     const original = unique("Tag Inv Detail Original");
     const updated = unique("Tag Inv Detail Updated");
 
@@ -136,21 +159,42 @@ test.describe("Tag invalidation — cached pages reflect mutations", () => {
     expect(createResp.status()).toBe(201);
     const { id } = await createResp.json();
 
-    // Warm: render detail so it is in Data Cache
+    // Warm
     await page.goto(`/animals/${id}`);
     await expect(page.getByRole("heading", { name: original, level: 1 })).toBeVisible();
 
-    // Mutate
     const editResp = await editAnimal(page.request, id, { name: updated });
     expect(editResp.status()).toBe(200);
 
-    // Re-render: stale cache would still show original name
+    // Stale cache would still show original name
     await page.goto(`/animals/${id}`);
     await expect(page.getByRole("heading", { name: updated, level: 1 })).toBeVisible();
     await expect(page.getByRole("heading", { name: original, level: 1 })).toHaveCount(0);
   });
 
-  test("delete invalidates the animals list cache", async ({ page }) => {
+  test("edit: updated status appears on /animals/:id detail page", async ({
+    page,
+  }) => {
+    const name = unique("Tag Inv Status");
+
+    const createResp = await createAnimal(page.request, { name, status: "AVAILABLE" });
+    expect(createResp.status()).toBe(201);
+    const { id } = await createResp.json();
+
+    // Warm
+    await page.goto(`/animals/${id}`);
+    await expect(page.getByText("Available")).toBeVisible();
+
+    const editResp = await editAnimal(page.request, id, { status: "PENDING" });
+    expect(editResp.status()).toBe(200);
+
+    // Stale cache would still show Available
+    await page.goto(`/animals/${id}`);
+    await expect(page.getByText("Pending")).toBeVisible();
+    await expect(page.getByText("Available")).toHaveCount(0);
+  });
+
+  test("delete: animal removed from /animals list", async ({ page }) => {
     const name = unique("Tag Inv Delete List");
 
     const createResp = await createAnimal(page.request, { name });
@@ -161,16 +205,15 @@ test.describe("Tag invalidation — cached pages reflect mutations", () => {
     await page.goto("/animals");
     await expect(page.getByRole("heading", { name, level: 2 })).toBeVisible();
 
-    // Mutate
     const delResp = await deleteAnimal(page.request, id);
     expect(delResp.status()).toBe(200);
 
-    // Re-render: stale cache would still show the deleted animal
+    // Stale cache would still show the deleted animal
     await page.goto("/animals");
     await expect(page.getByRole("heading", { name, level: 2 })).toHaveCount(0);
   });
 
-  test("delete invalidates the animal detail cache", async ({ page }) => {
+  test("delete: /animals/:id detail returns 404", async ({ page }) => {
     const name = unique("Tag Inv Delete Detail");
 
     const createResp = await createAnimal(page.request, { name });
@@ -181,12 +224,36 @@ test.describe("Tag invalidation — cached pages reflect mutations", () => {
     await page.goto(`/animals/${id}`);
     await expect(page.getByRole("heading", { name, level: 1 })).toBeVisible();
 
-    // Mutate
     const delResp = await deleteAnimal(page.request, id);
     expect(delResp.status()).toBe(200);
 
-    // Re-render: stale cache would serve the old page — must now 404
+    // Stale cache would serve the old page — must now 404
     const afterResp = await page.goto(`/animals/${id}`);
     expect(afterResp?.status()).toBe(404);
+  });
+
+  test("delete: sibling animals remain visible on /animals list", async ({
+    page,
+  }) => {
+    const keep = unique("Tag Inv Keep");
+    const remove = unique("Tag Inv Remove");
+
+    const [keepResp, removeResp] = await Promise.all([
+      createAnimal(page.request, { name: keep }),
+      createAnimal(page.request, { name: remove }),
+    ]);
+    expect(keepResp.status()).toBe(201);
+    expect(removeResp.status()).toBe(201);
+    const { id: removeId } = await removeResp.json();
+
+    // Warm
+    await page.goto("/animals");
+
+    const delResp = await deleteAnimal(page.request, removeId);
+    expect(delResp.status()).toBe(200);
+
+    await page.goto("/animals");
+    await expect(page.getByRole("heading", { name: keep, level: 2 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: remove, level: 2 })).toHaveCount(0);
   });
 });
