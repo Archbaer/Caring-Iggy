@@ -87,8 +87,6 @@ export async function parseCreateAnimalBody(
 > {
   const body = await readJsonBody(request);
 
-  console.log("[DEBUG parseCreateAnimalBody] raw body:", JSON.stringify(body));
-
   if (!body) {
     return {
       ok: false,
@@ -101,7 +99,6 @@ export async function parseCreateAnimalBody(
   const name = readRequiredString(body.name);
 
   if (!name) {
-    console.log("[DEBUG parseCreateAnimalBody] name missing or empty");
     return {
       ok: false,
       error: bffError(422, "VALIDATION_ERROR", "Animal name is required."),
@@ -111,7 +108,6 @@ export async function parseCreateAnimalBody(
   const previousOwner = readPreviousOwner(body.previousOwner, fieldErrors);
 
   if (body.previousOwner && !previousOwner) {
-    console.log("[DEBUG parseCreateAnimalBody] previousOwner invalid");
     return {
       ok: false,
       error: bffError(
@@ -144,8 +140,6 @@ export async function parseCreateAnimalBody(
       error: bffError(422, "VALIDATION_ERROR", "One or more fields contain invalid values.", fieldErrors),
     };
   }
-
-  console.log("[DEBUG parseCreateAnimalBody] parsed body:", JSON.stringify(parsedBody));
 
   return { ok: true, body: parsedBody };
 }
