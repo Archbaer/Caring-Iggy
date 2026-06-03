@@ -139,8 +139,6 @@ export function AnimalCreator() {
             }
           : {}),
       };
-      console.log("[DEBUG AnimalCreator] request body:", JSON.stringify(requestBody));
-      console.log("[DEBUG AnimalCreator] CSRF token:", token);
       const createdAnimal = await createAnimalFromEditor(requestBody, token);
 
       setCreateForm(createEmptyForm());
