@@ -76,7 +76,6 @@ function FilterSection({
   );
 }
 
-// Multi-select chip row (Size, Breed)
 function MultiChipRow({
   options,
   selected,
