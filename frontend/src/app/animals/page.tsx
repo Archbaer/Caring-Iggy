@@ -55,10 +55,8 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
   const allAnimals = animalsResult.kind === "success" ? animalsResult.animals : [];
   const totalCount = allAnimals.length;
 
-  // Derive available breeds from summary data (breed is in summary)
   const availableBreeds = [...new Set(allAnimals.map((a) => a.breed).filter(Boolean))].sort();
 
-  // Filter using fields now present on summary
   let visibleAnimals = allAnimals;
   if (status) visibleAnimals = visibleAnimals.filter((a) => a.status === status);
   if (type) visibleAnimals = visibleAnimals.filter((a) => a.animalType === type);

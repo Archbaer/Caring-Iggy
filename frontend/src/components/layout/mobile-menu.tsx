@@ -22,7 +22,6 @@ export function MobileMenu({ session, dashboardLink }: MobileMenuProps) {
     return () => clearTimeout(timer);
   }, [pathname]);
 
-  // ESC to close
   useEffect(() => {
     if (!open) return;
     const handleKey = (e: KeyboardEvent) => {

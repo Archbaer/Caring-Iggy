@@ -328,9 +328,8 @@ function getSessionMaxAge(request: NextRequest, role: string): number {
     if (!isNaN(parsed) && parsed > 0) return parsed;
   }
 
-  // Role-based TTL
-  if (role === "ADOPTER") return 35 * 60; // 35 minutes
-  return 20 * 60; // 20 minutes (STAFF, ADMIN)
+  if (role === "ADOPTER") return 35 * 60;
+  return 20 * 60;
 }
 
 async function applySessionCookies(
@@ -340,7 +339,6 @@ async function applySessionCookies(
 ): Promise<void> {
   const nowInSeconds = Math.floor(Date.now() / 1000);
   const expiresAt = session.expiresAt ?? nowInSeconds + DEFAULT_SESSION_TTL_SECONDS;
-  // Use override if provided, otherwise compute from backend expiry (capped)
   const maxAge = maxAgeOverride !== undefined
     ? Math.min(maxAgeOverride, Math.max(expiresAt - nowInSeconds, 60))
     : Math.max(expiresAt - nowInSeconds, 60);
