@@ -320,12 +320,18 @@ async function fetchSessionUser(
   };
 }
 
-function getSessionMaxAge(request: NextRequest, role: string): number {
+function testHooksEnabled(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
+export function getSessionMaxAge(request: NextRequest, role: string): number {
   // Test-only: allow short TTL via x-test-session-ttl header
-  const testTtl = request.headers.get("x-test-session-ttl");
-  if (testTtl) {
-    const parsed = parseInt(testTtl, 10);
-    if (!isNaN(parsed) && parsed > 0) return parsed;
+  if (testHooksEnabled()) {
+    const testTtl = request.headers.get("x-test-session-ttl");
+    if (testTtl) {
+      const parsed = parseInt(testTtl, 10);
+      if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
   }
 
   if (role === "ADOPTER") return 35 * 60;
@@ -856,6 +862,7 @@ class UpstreamAuthError extends Error {
  * Call this before making upstream requests in route handlers.
  */
 export function checkTestSimulateFailure(request: NextRequest): NextResponse | null {
+  if (!testHooksEnabled()) return null;
   const failure = request.headers.get("x-test-simulate-failure");
     if (failure === "upstream") {
       return NextResponse.json(
