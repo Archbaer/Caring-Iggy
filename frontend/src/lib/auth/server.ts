@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 import {
   bffError,
   errorResponse,
-  serviceUrl,
 } from "@/lib/api/client";
+import { gatewayFetch } from "@/lib/gateway";
 import {
   CSRF_COOKIE_NAME,
   extractCsrfToken,
@@ -427,8 +427,9 @@ async function parseRequestBody<T>(
 
 async function fetchAuthService(path: string, init?: RequestInit): Promise<Response> {
   try {
-    return await fetch(serviceUrl("USER", path), {
+    return await gatewayFetch(path, {
       ...init,
+      public: true,
       cache: "no-store",
     });
   } catch {
