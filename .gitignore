@@ -33,7 +33,6 @@
 .env
 opencode.json
 CLAUDE.md
-infrastructure/kong/kong.yml
 
 # Test output
 **/test-results/
