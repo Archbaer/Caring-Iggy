@@ -64,6 +64,13 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['setup'],
     },
+
+    // Kong gateway integration tests — hit Kong directly, no Next dev server or storageState needed
+    {
+      name: 'infra',
+      testDir: './tests/infra',
+      use: { baseURL: process.env.KONG_URL ?? 'http://localhost:8000' },
+    },
   ],
   webServer: {
     command: 'npm run dev',
