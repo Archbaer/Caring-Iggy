@@ -3,11 +3,14 @@ package com.caringiggy.reporting.service;
 import com.caringiggy.reporting.dto.AdoptionReport;
 import com.caringiggy.reporting.feign.AdopterServiceClient;
 import com.caringiggy.reporting.feign.AnimalServiceClient;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +28,14 @@ class ReportingServiceTest {
     @Mock
     private AdopterServiceClient adopterServiceClient;
 
-    @InjectMocks
     private ReportingService reportingService;
+
+    @BeforeEach
+    void setUp() {
+        reportingService = new ReportingService(animalServiceClient, adopterServiceClient,
+                new Resilience4JCircuitBreakerFactory(CircuitBreakerRegistry.ofDefaults(),
+                        TimeLimiterRegistry.ofDefaults(), null));
+    }
 
     // ─── getAdoptionReport ───────────────────────────────────────────────────
 

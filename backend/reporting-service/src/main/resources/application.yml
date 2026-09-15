@@ -10,6 +10,24 @@ spring:
         jwt:
           jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8085/.well-known/jwks.json}
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      animalClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      adopterClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    instances:
+      animalClient:
+        timeoutDuration: 5s
+      adopterClient:
+        timeoutDuration: 5s
+
 management:
   endpoints:
     web:
