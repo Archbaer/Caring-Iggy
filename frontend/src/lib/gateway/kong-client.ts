@@ -5,7 +5,7 @@ export interface KongClientOptions {
 }
 
 export interface CallOptions extends RequestInit {
-  clientIp: string;
+  clientIp?: string;
   public?: boolean;
 }
 
@@ -15,12 +15,16 @@ export function createKongClient(opts: KongClientOptions) {
   async function call(path: string, options: CallOptions): Promise<Response> {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
-      "X-Forwarded-For": options.clientIp,
     };
+    if (options.clientIp !== undefined) {
+      headers["X-Forwarded-For"] = options.clientIp;
+    }
     if (!options.public) {
       headers["Authorization"] = `Bearer ${await opts.getToken()}`;
     }
-    const { clientIp, public: _pub, ...init } = options;
+    const init: CallOptions = { ...options };
+    delete init.clientIp;
+    delete init.public;
     return doFetch(`${opts.baseUrl}${path}`, { ...init, headers });
   }
 

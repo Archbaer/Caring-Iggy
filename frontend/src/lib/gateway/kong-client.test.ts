@@ -31,4 +31,18 @@ describe("kong client", () => {
     const init = fetchSpy.mock.calls[0][1];
     expect((init.headers as Record<string, string>)["Authorization"]).toBeUndefined();
   });
+
+  it("omits X-Forwarded-For when clientIp is undefined", async () => {
+    const fetchSpy = vi.fn().mockResolvedValue(new Response("{}", { status: 200 }));
+    const client = createKongClient({
+      baseUrl: "http://kong:8000",
+      fetchImpl: fetchSpy,
+      getToken: async () => "jwt-xyz",
+    });
+
+    await client.call("/api/animals", {});
+
+    const init = fetchSpy.mock.calls[0][1];
+    expect((init.headers as Record<string, string>)["X-Forwarded-For"]).toBeUndefined();
+  });
 });

@@ -5,6 +5,7 @@ import { createKongClient } from "./kong-client";
 import { createTokenExchanger, type ExchangeResult } from "./token-exchange";
 
 export const KONG_URL = process.env.KONG_URL ?? "http://localhost:8000";
+const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === "true";
 
 async function exchangeToken(sessionToken: string): Promise<ExchangeResult> {
   const response = await fetch(`${KONG_URL}/internal/token`, {
@@ -45,7 +46,8 @@ export async function gatewayFetch(
     throw new GatewayAuthError();
   }
 
-  const resolvedClientIp = clientIp ?? resolveClientIp(await headers());
+  const resolvedClientIp =
+    clientIp ?? resolveClientIp(await headers(), { trustProxyHeaders: TRUST_PROXY_HEADERS });
 
   const client = createKongClient({
     baseUrl: KONG_URL,
