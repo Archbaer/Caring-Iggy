@@ -19,6 +19,28 @@ management:
     health:
       show-details: when-authorized
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      animalClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      adopterClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    instances:
+      animalClient:
+        timeoutDuration: 5s
+      adopterClient:
+        timeoutDuration: 5s
+
 logging:
   level:
     com.caringiggy: DEBUG
