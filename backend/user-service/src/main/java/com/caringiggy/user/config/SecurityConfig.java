@@ -9,7 +9,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
@@ -47,10 +46,7 @@ public class SecurityConfig {
     }
 
     private JwtAuthenticationConverter converter() {
-        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();
         // maps the "role" claim (e.g. "STAFF") to authority "ROLE_STAFF"
-        roles.setAuthoritiesClaimName("role");
-        roles.setAuthorityPrefix("ROLE_");
         JwtAuthenticationConverter conv = new JwtAuthenticationConverter();
         conv.setJwtGrantedAuthoritiesConverter(jwt -> {
             String role = jwt.getClaimAsString("role");
