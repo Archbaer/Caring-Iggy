@@ -43,4 +43,17 @@ public class JwtService {
     public long ttlSeconds() {
         return TTL_SECONDS;
     }
+
+    public String mintServiceToken() {
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(ISSUER)
+                .audience(java.util.List.of(AUDIENCE))
+                .subject("user-service")
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(TTL_SECONDS))
+                .claim("role", "STAFF")
+                .build();
+        return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
 }

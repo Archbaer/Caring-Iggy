@@ -48,4 +48,16 @@ class JwtServiceTest {
         long ttl = decoded.getExpiresAt().getEpochSecond() - decoded.getIssuedAt().getEpochSecond();
         assertThat(ttl).isEqualTo(300);
     }
+
+    @Test
+    void mintsServiceTokenWithStaffRoleAndNoProfileId() {
+        String token = jwtService.mintServiceToken();
+        Jwt decoded = decoder.decode(token);
+
+        assertThat(decoded.getSubject()).isEqualTo("user-service");
+        assertThat(decoded.getClaimAsString("role")).isEqualTo("STAFF");
+        assertThat(decoded.getClaimAsString("profileId")).isNull();
+        assertThat(decoded.getClaimAsString("iss")).isEqualTo("caring-iggy-user-service");
+        assertThat(decoded.getAudience()).contains("caring-iggy-internal");
+    }
 }

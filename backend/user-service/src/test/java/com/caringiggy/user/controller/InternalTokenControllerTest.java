@@ -1,14 +1,16 @@
 package com.caringiggy.user.controller;
 
+import com.caringiggy.user.config.SecurityConfig;
 import com.caringiggy.user.dto.AuthResponse;
 import com.caringiggy.user.service.AuthService;
 import com.caringiggy.user.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -18,12 +20,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = InternalTokenController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(SecurityConfig.class)
 class InternalTokenControllerTest {
 
     @Autowired MockMvc mvc;
     @MockBean AuthService authService;
     @MockBean JwtService jwtService;
+    @MockBean JwtDecoder jwtDecoder;
 
     @Test
     void exchangesValidSessionForToken() throws Exception {
