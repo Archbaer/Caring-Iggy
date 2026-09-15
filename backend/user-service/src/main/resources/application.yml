@@ -24,6 +24,14 @@ resilience4j:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
+      adopterClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    instances:
+      adopterClient:
+        timeoutDuration: 5s
 
 management:
   endpoints:

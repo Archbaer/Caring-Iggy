@@ -18,12 +18,15 @@ import com.caringiggy.user.model.UserSession;
 import com.caringiggy.user.repository.AccountRepository;
 import com.caringiggy.user.repository.EmployeeRepository;
 import com.caringiggy.user.repository.UserSessionRepository;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +64,8 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        Resilience4JCircuitBreakerFactory circuitBreakerFactory = new Resilience4JCircuitBreakerFactory(
+                CircuitBreakerRegistry.ofDefaults(), TimeLimiterRegistry.ofDefaults(), null);
         authService = new AuthService(
                 accountRepository,
                 employeeRepository,
@@ -67,7 +73,8 @@ class AuthServiceTest {
                 adopterServiceClient,
                 passwordEncoder,
                 sessionTokenGenerator,
-                new AuthProperties(Duration.ofHours(24), false)
+                new AuthProperties(Duration.ofHours(24), false),
+                circuitBreakerFactory
         );
     }
 
@@ -371,5 +378,43 @@ class AuthServiceTest {
 
         verify(adopterServiceClient).deleteAdopterProfile(profileId);
         verify(userSessionRepository, never()).insert(any(UserSession.class));
+    }
+
+    @Test
+    void signupAdopter_returnsServiceUnavailableWhenAdopterClientFails() {
+        when(accountRepository.findByEmail("ava@example.com")).thenReturn(Optional.empty());
+        when(adopterServiceClient.createAdopterProfile(any(CreateAdopterProfileRequest.class)))
+                .thenThrow(new RuntimeException("adopter-service down"));
+
+        assertThatThrownBy(() -> authService.signupAdopter(SignupRequest.builder()
+                        .firstName("Ava").lastName("Adopter")
+                        .email("ava@example.com").telephone("123456")
+                        .password("supersecret").build()))
+                .isInstanceOf(ApiException.class)
+                .extracting(e -> ((ApiException) e).getStatus())
+                .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+
+        verify(accountRepository, never()).insert(any(Account.class));
+    }
+
+    @Test
+    void signupAdopter_originalFailureSurvivesWhenCompensatingDeleteAlsoFails() {
+        UUID profileId = UUID.randomUUID();
+
+        when(accountRepository.findByEmail("ava@example.com")).thenReturn(Optional.empty());
+        when(adopterServiceClient.createAdopterProfile(any(CreateAdopterProfileRequest.class)))
+                .thenReturn(AdopterProfileDto.builder().id(profileId).build());
+        when(passwordEncoder.encode("supersecret")).thenReturn("hashed-password");
+        when(accountRepository.insert(any(Account.class))).thenThrow(new RuntimeException("boom"));
+        doThrow(new RuntimeException("delete also down")).when(adopterServiceClient).deleteAdopterProfile(profileId);
+
+        assertThatThrownBy(() -> authService.signupAdopter(SignupRequest.builder()
+                        .firstName("Ava").lastName("Adopter")
+                        .email("ava@example.com").telephone("123456")
+                        .password("supersecret").build()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("boom");
+
+        verify(adopterServiceClient).deleteAdopterProfile(profileId);
     }
 }
