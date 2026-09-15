@@ -1,4 +1,15 @@
-export function resolveClientIp(headers: Headers): string {
+export interface ResolveClientIpOptions {
+  trustProxyHeaders?: boolean;
+}
+
+export function resolveClientIp(
+  headers: Headers,
+  opts?: ResolveClientIpOptions,
+): string | undefined {
+  if (!opts?.trustProxyHeaders) {
+    return undefined;
+  }
+
   const forwardedFor = headers.get("x-forwarded-for");
   if (forwardedFor) {
     const first = forwardedFor.split(",")[0]?.trim();
@@ -12,5 +23,5 @@ export function resolveClientIp(headers: Headers): string {
     return realIp;
   }
 
-  return "127.0.0.1";
+  return undefined;
 }
