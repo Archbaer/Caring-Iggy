@@ -12,7 +12,7 @@ import java.time.Instant;
 @Service
 public class JwtService {
 
-    private static final String ISSUER = "https://caring-iggy-user-service";
+    private static final String ISSUER = "caring-iggy-user-service";
     private static final String AUDIENCE = "caring-iggy-internal";
     private static final long TTL_SECONDS = 300;
 
