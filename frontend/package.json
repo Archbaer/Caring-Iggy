@@ -10,7 +10,8 @@
     "test:e2e": "playwright test",
     "test:api": "playwright test --project=api",
     "test:smoke": "playwright test --grep @smoke",
-    "test:auth": "playwright test --project=anon --project=admin --project=staff"
+    "test:auth": "playwright test --project=anon --project=admin --project=staff",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -31,6 +32,7 @@
     "eslint-config-next": "16.2.2",
     "playwright": "^1.59.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
