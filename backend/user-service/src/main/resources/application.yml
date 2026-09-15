@@ -35,6 +35,9 @@ logging:
   level:
     com.caringiggy: DEBUG
 
+# (env-provided; documented here)
+# JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_KEY_ID=ci-key-1
+
 auth:
   session:
     ttl: ${AUTH_SESSION_TTL:PT168H}

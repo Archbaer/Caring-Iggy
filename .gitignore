@@ -36,3 +36,7 @@ CLAUDE.md
 
 # Test output
 **/test-results/
+
+# Local JWT signing keys (test fixtures stay tracked)
+*-private.pem
+!**/src/test/resources/test-jwt-private.pem
