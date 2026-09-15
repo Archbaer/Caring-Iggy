@@ -37,7 +37,7 @@ class JwtServiceTest {
         assertThat(decoded.getSubject()).isEqualTo("acct-123");
         assertThat(decoded.getClaimAsString("role")).isEqualTo("STAFF");
         assertThat(decoded.getClaimAsString("profileId")).isEqualTo("prof-456");
-        assertThat(decoded.getIssuer().toString()).isEqualTo("https://caring-iggy-user-service");
+        assertThat(decoded.getClaimAsString("iss")).isEqualTo("caring-iggy-user-service");
         assertThat(decoded.getAudience()).contains("caring-iggy-internal");
     }
 
