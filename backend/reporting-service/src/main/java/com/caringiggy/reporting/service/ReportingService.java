@@ -6,6 +6,7 @@ import com.caringiggy.reporting.dto.SummaryReport;
 import com.caringiggy.reporting.feign.AdopterServiceClient;
 import com.caringiggy.reporting.feign.AnimalServiceClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,15 +29,45 @@ public class ReportingService {
 
     private final AnimalServiceClient animalServiceClient;
     private final AdopterServiceClient adopterServiceClient;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
-    public ReportingService(AnimalServiceClient animalServiceClient, AdopterServiceClient adopterServiceClient) {
+    public ReportingService(AnimalServiceClient animalServiceClient, AdopterServiceClient adopterServiceClient,
+            CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
         this.animalServiceClient = animalServiceClient;
         this.adopterServiceClient = adopterServiceClient;
+        this.circuitBreakerFactory = circuitBreakerFactory;
+    }
+
+    private List<Map<String, Object>> getAllAnimalsSafely() {
+        return circuitBreakerFactory.create("animalClient").run(
+                animalServiceClient::getAllAnimals,
+                t -> {
+                    log.warn("animalClient fallback triggered: {}", t.getMessage());
+                    return List.of();
+                });
+    }
+
+    private List<Map<String, Object>> getAllAdoptersSafely() {
+        return circuitBreakerFactory.create("adopterClient").run(
+                adopterServiceClient::getAllAdopters,
+                t -> {
+                    log.warn("adopterClient fallback triggered: {}", t.getMessage());
+                    return List.of();
+                });
+    }
+
+    private List<Map<String, Object>> getAdoptionHistoryByMonthSafely(String month) {
+        return circuitBreakerFactory.create("adopterClient").run(
+                () -> adopterServiceClient.getAdoptionHistoryByMonth(month),
+                t -> {
+                    log.warn("adopterClient fallback triggered: {}", t.getMessage());
+                    return List.of();
+                });
     }
 
     public SummaryReport getSummary() {
-        List<Map<String, Object>> animals = animalServiceClient.getAllAnimals();
-        List<Map<String, Object>> adopters = adopterServiceClient.getAllAdopters();
+        List<Map<String, Object>> animals = getAllAnimalsSafely();
+        List<Map<String, Object>> adopters = getAllAdoptersSafely();
 
         Map<String, Long> animalsByType = new HashMap<>();
         Map<String, Long> animalsByStatus = new HashMap<>();
@@ -67,7 +98,7 @@ public class ReportingService {
 
     public IntakeReport getIntakeReport(String month) {
         YearMonth targetMonth = YearMonth.parse(month);
-        List<Map<String, Object>> animals = animalServiceClient.getAllAnimals();
+        List<Map<String, Object>> animals = getAllAnimalsSafely();
 
         Map<String, Long> byType = new HashMap<>();
         Map<String, Long> byStatus = new HashMap<>();
@@ -102,7 +133,7 @@ public class ReportingService {
     }
 
     public AdoptionReport getAdoptionReport(String month) {
-        List<Map<String, Object>> adoptions = adopterServiceClient.getAdoptionHistoryByMonth(month);
+        List<Map<String, Object>> adoptions = getAdoptionHistoryByMonthSafely(month);
 
         AdoptionReport report = new AdoptionReport();
         report.setMonth(month);
@@ -115,7 +146,7 @@ public class ReportingService {
 
         // Build animalId → animalType lookup from animal-service
         Map<String, String> typeById = new HashMap<>();
-        for (Map<String, Object> animal : animalServiceClient.getAllAnimals()) {
+        for (Map<String, Object> animal : getAllAnimalsSafely()) {
             Object id = animal.get("id");
             Object type = animal.get("animalType");
             if (id != null) {
