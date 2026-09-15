@@ -5,6 +5,7 @@ import com.caringiggy.user.dto.LoginRequest;
 import com.caringiggy.user.dto.ProvisionAccountRequest;
 import com.caringiggy.user.dto.SignupRequest;
 import com.caringiggy.user.service.AuthService;
+import com.caringiggy.user.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,10 +26,12 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtService jwtService;
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
         AuthService.AuthenticatedSession authenticatedSession = authService.signupAdopter(request);
+        authenticatedSession.response().setToken(jwtService.mint(authenticatedSession.response()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, authService.buildSessionCookie(
                         authenticatedSession.sessionToken(),
@@ -41,6 +44,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthService.AuthenticatedSession authenticatedSession = authService.login(request);
+        authenticatedSession.response().setToken(jwtService.mint(authenticatedSession.response()));
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authService.buildSessionCookie(
                         authenticatedSession.sessionToken(),

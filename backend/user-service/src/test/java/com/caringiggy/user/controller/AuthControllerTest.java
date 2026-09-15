@@ -6,6 +6,7 @@ import com.caringiggy.user.dto.ProvisionAccountRequest;
 import com.caringiggy.user.dto.SessionUserDto;
 import com.caringiggy.user.dto.SignupRequest;
 import com.caringiggy.user.service.AuthService;
+import com.caringiggy.user.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
+    @MockBean
+    private JwtService jwtService;
+
     @Test
     void login_setsSessionCookieAndReturnsCanonicalRole() throws Exception {
         AuthResponse response = AuthResponse.builder()
@@ -69,6 +73,31 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Set-Cookie", containsString("session=opaque-token")))
                 .andExpect(jsonPath("$.user.role").value("ADMIN"));
+    }
+
+    @Test
+    void loginReturnsJwt() throws Exception {
+        AuthResponse response = AuthResponse.builder()
+                .user(SessionUserDto.builder()
+                        .accountId(UUID.randomUUID())
+                        .role("ADMIN")
+                        .profileType("EMPLOYEE")
+                        .profileId(UUID.randomUUID())
+                        .build())
+                .expiresAtEpochSeconds(1_900_000_000L)
+                .build();
+
+        when(authService.login(any(LoginRequest.class)))
+                .thenReturn(new AuthService.AuthenticatedSession("opaque-token", response));
+        when(authService.buildSessionCookie(eq("opaque-token"), any(LocalDateTime.class)))
+                .thenReturn(ResponseCookie.from("session", "opaque-token").httpOnly(true).path("/").build());
+        when(jwtService.mint(any())).thenReturn("jwt-x");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"a@b.com\",\"password\":\"supersecret\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("jwt-x"));
     }
 
     @Test
