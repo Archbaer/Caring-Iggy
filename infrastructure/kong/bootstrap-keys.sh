@@ -63,38 +63,33 @@ else
     echo "JWT_KEY_ID=$KID" >> "$ENV_FILE"
 fi
 
-# Step 4: Create kong.yml skeleton if it doesn't exist
+# Step 4: kong.yml is tracked in git — it must already exist
 if [ ! -f "$KONG_FILE" ]; then
-    echo "Creating Kong config skeleton..."
-    mkdir -p "$INFRA_DIR/kong"
-    cat > "$KONG_FILE" << 'EOF'
-_format_version: "3.0"
-_transform: true
-
-# NOTE: full services/routes/plugins config is added in a later checkpoint (CP5).
-
-# --- BEGIN JWT PUBLIC KEY (managed by bootstrap-keys.sh) ---
-# --- END JWT PUBLIC KEY ---
-EOF
+    echo "ERROR: $KONG_FILE not found. kong.yml is tracked in git; pull it or restore it before bootstrapping keys." >&2
+    exit 1
 fi
 
-# Step 5: Replace public key content between marker comments (idempotent on re-run)
+# Step 5: Replace the rsa_public_key block scalar between marker comments (idempotent on re-run)
 echo "Injecting public key into $KONG_FILE..."
 
-# Replace everything between BEGIN/END markers with the public key content
+# Replace the rsa_public_key key + PEM block between BEGIN/END markers with the new public key,
+# indented to match the surrounding YAML (2 spaces deeper than the marker line).
 TEMP_KONG=$(mktemp)
 awk '
 BEGIN { in_section = 0 }
-/^# --- BEGIN JWT PUBLIC KEY/ {
+/^[ \t]*# --- BEGIN JWT PUBLIC KEY/ {
     print
+    match($0, /^[ \t]*/)
+    indent = substr($0, RSTART, RLENGTH)
+    print indent "rsa_public_key: |"
     while ((getline line < "'"$TEMP_PUBLIC"'") > 0) {
-        print line
+        print indent "  " line
     }
     close("'"$TEMP_PUBLIC"'")
     in_section = 1
     next
 }
-/^# --- END JWT PUBLIC KEY/ {
+/^[ \t]*# --- END JWT PUBLIC KEY/ {
     in_section = 0
     print
     next
