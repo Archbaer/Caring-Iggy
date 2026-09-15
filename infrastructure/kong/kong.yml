@@ -75,11 +75,13 @@ services:
     routes:
       - name: user-public
         paths: ["/api/auth/login", "/api/auth/signup", "/api/auth/session", "/api/auth/logout", "/internal/token", "/.well-known/jwks.json"]
+        strip_path: false
         plugins:
           - name: rate-limiting
             config: { minute: 10, limit_by: ip, policy: local }
       - name: user-protected
         paths: ["/api/auth/provision"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
@@ -87,6 +89,7 @@ services:
             config: { minute: 120, limit_by: consumer, policy: local }
       - name: user-employees
         paths: ["/api/employees"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
@@ -99,12 +102,14 @@ services:
       - name: animal-public-read
         methods: ["GET"]
         paths: ["/api/animals"]
+        strip_path: false
         plugins:
           - name: rate-limiting
             config: { minute: 120, limit_by: ip, policy: local }
       - name: animal-writes
         methods: ["POST", "PUT", "DELETE"]
         paths: ["/api/animals"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
@@ -116,6 +121,7 @@ services:
     routes:
       - name: adopter-protected
         paths: ["/api/adopters"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
@@ -127,6 +133,7 @@ services:
     routes:
       - name: reporting-protected
         paths: ["/api/reports"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
@@ -138,6 +145,7 @@ services:
     routes:
       - name: matching-protected
         paths: ["/api/matching"]
+        strip_path: false
         plugins:
           - name: jwt
             config: { key_claim_name: iss, claims_to_verify: [exp] }
