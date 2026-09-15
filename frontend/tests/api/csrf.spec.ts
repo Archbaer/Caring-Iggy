@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 
 const TEST_EMAIL = "testadmin@caringiggy.test";
 const TEST_PASSWORD = "password123";
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-async function loginAndGetState(request: any) {
+async function loginAndGetState(request: APIRequestContext) {
   // Get CSRF token and session cookie
   const sessionResp = await request.get("/api/auth/session");
   expect(sessionResp.ok()).toBeTruthy();
