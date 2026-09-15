@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,12 +42,14 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.getAnimalById(id));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping
     public ResponseEntity<AnimalDetailDto> createAnimal(@Valid @RequestBody CreateAnimalRequest request) {
         AnimalDetailDto createdAnimal = animalService.createAnimal(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAnimal);
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<AnimalDetailDto> updateAnimal(
             @PathVariable UUID id,
@@ -54,6 +57,7 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.updateAnimal(id, request));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id) {
         animalService.deleteAnimal(id);
