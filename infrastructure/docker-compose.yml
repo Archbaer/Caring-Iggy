@@ -15,6 +15,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks: [db]
 
   postgres-users:
     image: postgres:15-alpine
@@ -32,6 +33,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks: [db]
 
   postgres-adopters:
     image: postgres:15-alpine
@@ -49,14 +51,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks: [db]
 
   animal-service:
     build:
       context: ../backend
       dockerfile: animal-service/Dockerfile
     container_name: caring-iggy-animal-service
-    ports:
-      - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-animals
@@ -64,9 +65,11 @@ services:
       DB_NAME: animals_db
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       postgres-animals:
         condition: service_healthy
+    networks: [backend, db]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 30s
@@ -78,8 +81,6 @@ services:
       context: ../backend
       dockerfile: adopter-service/Dockerfile
     container_name: caring-iggy-adopter-service
-    ports:
-      - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-adopters
@@ -87,9 +88,11 @@ services:
       DB_NAME: adopters_db
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       postgres-adopters:
         condition: service_healthy
+    networks: [backend, db]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 30s
@@ -101,8 +104,6 @@ services:
       context: ../backend
       dockerfile: user-service/Dockerfile
     container_name: caring-iggy-user-service
-    ports:
-      - "8085:8085"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-users
@@ -111,9 +112,13 @@ services:
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      JWT_KEY_ID: ${JWT_KEY_ID:-ci-key-1}
     depends_on:
       postgres-users:
         condition: service_healthy
+    networks: [backend, db]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
       interval: 30s
@@ -129,24 +134,31 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+      JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       - animal-service
       - adopter-service
+    networks: [backend, db]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   reporting-service:
     build:
       context: ../backend
       dockerfile: reporting-service/Dockerfile
     container_name: caring-iggy-reporting-service
-    ports:
-      - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
+      JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       - animal-service
       - adopter-service
+    networks: [backend, db]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
       interval: 30s
@@ -172,11 +184,49 @@ services:
   #     timeout: 10s
   #     retries: 3
 
+  kong:
+    image: kong:3.6
+    container_name: caring-iggy-kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 127.0.0.1:8001
+      KONG_TRUSTED_IPS: 0.0.0.0/0        # dev: trust XFF; TIGHTEN to BFF subnet in prod
+      KONG_REAL_IP_HEADER: X-Forwarded-For
+      KONG_REAL_IP_RECURSIVE: "on"
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+    volumes:
+      - ./kong/kong.yml:/kong/kong.yml:ro
+    ports:
+      - "8000:8000"
+    networks: [public, backend]
+    depends_on:
+      user-service:
+        condition: service_healthy
+      animal-service:
+        condition: service_healthy
+      adopter-service:
+        condition: service_healthy
+      matching-service:
+        condition: service_healthy
+      reporting-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres-animals-data:
   postgres-users-data:
   postgres-adopters-data:
 
 networks:
-  default:
-    name: caring-iggy-network
+  public:
+    name: caring-iggy-public
+  backend:
+    name: caring-iggy-backend
+  db:
+    name: caring-iggy-db
