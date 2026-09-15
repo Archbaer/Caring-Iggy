@@ -8,6 +8,7 @@ import com.caringiggy.user.service.AuthService;
 import com.caringiggy.user.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +72,7 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision")
     public ResponseEntity<AuthResponse> provision(
             @Valid @RequestBody ProvisionAccountRequest request,
@@ -78,6 +80,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionEmployeeAccount(request, sessionToken));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision/staff")
     public ResponseEntity<AuthResponse> provisionStaff(
             @Valid @RequestBody ProvisionAccountRequest request,
@@ -85,6 +88,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionStaffAccount(request, sessionToken));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision/admin")
     public ResponseEntity<AuthResponse> provisionAdmin(
             @Valid @RequestBody ProvisionAccountRequest request,

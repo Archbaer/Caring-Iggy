@@ -3,6 +3,7 @@ package com.caringiggy.user.client;
 import com.caringiggy.user.dto.AdopterProfileDto;
 import com.caringiggy.user.dto.CreateAdopterProfileRequest;
 import com.caringiggy.user.exception.ApiException;
+import com.caringiggy.user.service.JwtService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class AdopterServiceClient {
 
     private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
             .build();
@@ -36,6 +38,7 @@ public class AdopterServiceClient {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(adopterServiceUrl + "/api/adopters"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .header("Authorization", "Bearer " + jwtService.mintServiceToken())
                     .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(request)))
                     .build();
 
@@ -57,6 +60,7 @@ public class AdopterServiceClient {
         try {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(adopterServiceUrl + "/api/adopters/" + adopterId))
+                    .header("Authorization", "Bearer " + jwtService.mintServiceToken())
                     .DELETE()
                     .build();
             httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());

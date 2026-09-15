@@ -30,6 +30,9 @@ management:
     web:
       exposure:
         include: health,info,circuitbreakers
+  endpoint:
+    health:
+      show-details: when-authorized
 
 logging:
   level:
