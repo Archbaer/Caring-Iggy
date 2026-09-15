@@ -195,7 +195,6 @@ services:
       KONG_TRUSTED_IPS: 0.0.0.0/0        # dev: trust XFF; TIGHTEN to BFF subnet in prod
       KONG_REAL_IP_HEADER: X-Forwarded-For
       KONG_REAL_IP_RECURSIVE: "on"
-      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
     volumes:
       - ./kong/kong.yml:/kong/kong.yml:ro
     ports:
