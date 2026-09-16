@@ -3,11 +3,14 @@ package com.caringiggy.matching.service;
 import com.caringiggy.matching.dto.MatchingResponse;
 import com.caringiggy.matching.feign.AdopterServiceClient;
 import com.caringiggy.matching.feign.AnimalServiceClient;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -30,7 +33,9 @@ class MatchingServiceTest {
 
     @BeforeEach
     void setUp() {
-        matchingService = new MatchingService(animalServiceClient, adopterServiceClient);
+        Resilience4JCircuitBreakerFactory circuitBreakerFactory = new Resilience4JCircuitBreakerFactory(
+                CircuitBreakerRegistry.ofDefaults(), TimeLimiterRegistry.ofDefaults(), null);
+        matchingService = new MatchingService(animalServiceClient, adopterServiceClient, circuitBreakerFactory);
     }
 
     @Test

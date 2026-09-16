@@ -1,7 +1,9 @@
 import type { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
 import { bffError, errorResponse, jsonResponse } from "@/lib/api/client";
-import { SERVICES } from "@/lib/constants/config";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { gatewayFetch } from "@/lib/gateway";
 import { requireAdminRequest } from "../../admin/_helpers";
 
 export async function GET(request: NextRequest): Promise<Response> {
@@ -16,9 +18,11 @@ export async function GET(request: NextRequest): Promise<Response> {
   }
 
   try {
-    const upstream = await fetch(
-      `${SERVICES.REPORTING}/api/reports/adoptions?month=${month}`,
-      { signal: AbortSignal.timeout(5000) },
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+    const upstream = await gatewayFetch(
+      `/api/reports/adoptions?month=${month}`,
+      { session: sessionToken, signal: AbortSignal.timeout(5000) },
     );
     const body = await upstream.json();
     return jsonResponse(body, { status: upstream.status });

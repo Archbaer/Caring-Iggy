@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class AdopterController {
 
     private final AdopterService adopterService;
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @GetMapping
     public ResponseEntity<List<AdopterDto>> getAllAdopters(@RequestParam(required = false) String status) {
         if (status != null) {
@@ -31,11 +33,13 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdopterById(id));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @GetMapping("/restricted")
     public ResponseEntity<List<AdopterRestrictedDto>> getAllAdoptersRestricted() {
         return ResponseEntity.ok(adopterService.getAllAdoptersRestricted());
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @GetMapping("/restricted/search")
     public ResponseEntity<AdopterRestrictedDto> getAdopterByNameAndTelephone(
             @RequestParam("name") String name,
@@ -50,11 +54,13 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdopterProfileByNameAndTelephone(name, telephone));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @GetMapping("/restricted/{id}")
     public ResponseEntity<AdopterRestrictedDto> getAdopterRestricted(@PathVariable UUID id) {
         return ResponseEntity.ok(adopterService.getAdopterRestricted(id));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping
     public ResponseEntity<AdopterDto> createAdopter(@Valid @RequestBody CreateAdopterRequest request) {
         AdopterDto createdAdopter = adopterService.createAdopter(request);
@@ -75,6 +81,7 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.updateInterests(id, request));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAdopter(@PathVariable UUID id) {
         adopterService.deleteAdopter(id);
@@ -86,6 +93,7 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdoptionHistoryByAdopter(id));
     }
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @GetMapping("/history")
     public ResponseEntity<List<AdoptionHistoryDto>> getAdoptionHistoryByMonth(
             @RequestParam(required = false) String month) {
@@ -99,6 +107,7 @@ public class AdopterController {
     }
 
 
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping("/history")
     public ResponseEntity<AdoptionHistoryDto> createAdoptionHistory(
             @Valid @RequestBody CreateAdoptionHistoryRequest request) {

@@ -6,6 +6,7 @@ import com.caringiggy.animal.dto.CreateAnimalRequest;
 import com.caringiggy.animal.dto.PreviousOwnerDto;
 import com.caringiggy.animal.dto.PreviousOwnerRequest;
 import com.caringiggy.animal.dto.UpdateAnimalRequest;
+import com.caringiggy.animal.config.SecurityConfig;
 import com.caringiggy.animal.exception.NotFoundException;
 import com.caringiggy.animal.model.AnimalGender;
 import com.caringiggy.animal.model.AnimalSize;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AnimalController.class)
+@Import(SecurityConfig.class)
 class AnimalControllerTest {
 
     @Autowired
@@ -99,6 +103,7 @@ class AnimalControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -112,6 +117,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withMissingName_returns400() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"breed\":\"Poodle\"}"))
                 .andExpect(status().isBadRequest());
@@ -129,6 +135,7 @@ class AnimalControllerTest {
         when(animalService.updateAnimal(eq(animalId), any(UpdateAnimalRequest.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"PENDING\"}"))
                 .andExpect(status().isOk())
@@ -140,6 +147,7 @@ class AnimalControllerTest {
         UUID animalId = UUID.randomUUID();
 
         mockMvc.perform(put("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"INVALID_STATUS\"}"))
                 .andExpect(status().isBadRequest());
@@ -150,6 +158,7 @@ class AnimalControllerTest {
         UUID animalId = UUID.randomUUID();
 
         mockMvc.perform(put("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"gender\":\"NEUTRAL\"}"))
                 .andExpect(status().isBadRequest());
@@ -171,7 +180,8 @@ class AnimalControllerTest {
         doThrow(new NotFoundException("Animal not found with id: " + animalId))
                 .when(animalService).deleteAnimal(animalId);
 
-        mockMvc.perform(delete("/api/animals/" + animalId))
+        mockMvc.perform(delete("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF")))
                 .andExpect(status().isNotFound());
     }
 
@@ -181,6 +191,7 @@ class AnimalControllerTest {
                 .thenThrow(new RuntimeException("Database connection lost"));
 
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Test\"}"))
                 .andExpect(status().isInternalServerError());
@@ -189,6 +200,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withInvalidAnimalType_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"animalType\":\"DRAGON\"}"))
                 .andExpect(status().isBadRequest())
@@ -198,6 +210,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withInvalidGender_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"gender\":\"NEUTRAL\"}"))
                 .andExpect(status().isBadRequest())
@@ -207,6 +220,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withInvalidSize_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"size\":\"ENORMOUS\"}"))
                 .andExpect(status().isBadRequest())
@@ -216,6 +230,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withInvalidStatus_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"status\":\"LOST\"}"))
                 .andExpect(status().isBadRequest())
@@ -226,6 +241,7 @@ class AnimalControllerTest {
     void createAnimal_withFutureDateOfBirth_returns400WithErrorBody() throws Exception {
         String futureDate = LocalDate.now().plusYears(1).toString();
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"dateOfBirth\":\"" + futureDate + "\"}"))
                 .andExpect(status().isBadRequest())
@@ -236,6 +252,7 @@ class AnimalControllerTest {
     void createAnimal_withFutureIntakeDate_returns400WithErrorBody() throws Exception {
         String futureDate = LocalDate.now().plusYears(1).toString();
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"intakeDate\":\"" + futureDate + "\"}"))
                 .andExpect(status().isBadRequest())
@@ -245,6 +262,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withPreviousOwnerMissingName_returns400WithNestedErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mochi\",\"previousOwner\":{\"telephone\":\"555-0100\"}}"))
                 .andExpect(status().isBadRequest())
@@ -254,6 +272,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withEmptyBody_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isBadRequest())
@@ -264,6 +283,7 @@ class AnimalControllerTest {
     void createAnimal_withWhitespaceOnlyName_returns400WithErrorBody() throws Exception {
         // @NotBlank rejects strings that are only whitespace
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"   \"}"))
                 .andExpect(status().isBadRequest())
@@ -273,6 +293,7 @@ class AnimalControllerTest {
     @Test
     void createAnimal_withMissingName_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/animals")
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"breed\":\"Poodle\"}"))
                 .andExpect(status().isBadRequest())
@@ -286,6 +307,7 @@ class AnimalControllerTest {
                 .thenThrow(new NotFoundException("Animal not found with id: " + animalId));
 
         mockMvc.perform(put("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"PENDING\"}"))
                 .andExpect(status().isNotFound())
@@ -297,6 +319,7 @@ class AnimalControllerTest {
     void updateAnimal_withInvalidSize_returns400WithErrorBody() throws Exception {
         UUID animalId = UUID.randomUUID();
         mockMvc.perform(put("/api/animals/" + animalId)
+                        .with(jwt().jwt(j -> j.claim("role", "STAFF")).authorities(() -> "ROLE_STAFF"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"size\":\"GIGANTIC\"}"))
                 .andExpect(status().isBadRequest())

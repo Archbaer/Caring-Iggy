@@ -5,8 +5,10 @@ import com.caringiggy.user.dto.LoginRequest;
 import com.caringiggy.user.dto.ProvisionAccountRequest;
 import com.caringiggy.user.dto.SignupRequest;
 import com.caringiggy.user.service.AuthService;
+import com.caringiggy.user.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,12 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtService jwtService;
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
         AuthService.AuthenticatedSession authenticatedSession = authService.signupAdopter(request);
+        authenticatedSession.response().setToken(jwtService.mint(authenticatedSession.response()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, authService.buildSessionCookie(
                         authenticatedSession.sessionToken(),
@@ -41,6 +45,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthService.AuthenticatedSession authenticatedSession = authService.login(request);
+        authenticatedSession.response().setToken(jwtService.mint(authenticatedSession.response()));
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authService.buildSessionCookie(
                         authenticatedSession.sessionToken(),
@@ -67,6 +72,7 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision")
     public ResponseEntity<AuthResponse> provision(
             @Valid @RequestBody ProvisionAccountRequest request,
@@ -74,6 +80,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionEmployeeAccount(request, sessionToken));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision/staff")
     public ResponseEntity<AuthResponse> provisionStaff(
             @Valid @RequestBody ProvisionAccountRequest request,
@@ -81,6 +88,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.provisionStaffAccount(request, sessionToken));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/provision/admin")
     public ResponseEntity<AuthResponse> provisionAdmin(
             @Valid @RequestBody ProvisionAccountRequest request,

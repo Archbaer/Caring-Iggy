@@ -1,5 +1,6 @@
 package com.caringiggy.user.controller;
 
+import com.caringiggy.user.config.SecurityConfig;
 import com.caringiggy.user.dto.CreateEmployeeRequest;
 import com.caringiggy.user.dto.EmployeeDto;
 import com.caringiggy.user.exception.ApiException;
@@ -11,8 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -31,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmployeeController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(roles = "ADMIN")
 class EmployeeControllerTest {
 
     @Autowired
@@ -44,6 +50,9 @@ class EmployeeControllerTest {
 
     @MockBean
     private EmployeeService employeeService;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     @Test
     void getAllEmployees_withoutSession_returnsUnauthorized() throws Exception {

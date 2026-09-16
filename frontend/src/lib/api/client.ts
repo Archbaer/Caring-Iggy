@@ -1,9 +1,4 @@
 import type { BffError } from "@/lib/types";
-import { SERVICES } from "@/lib/constants/config";
-
-export function serviceUrl(service: keyof typeof SERVICES, path: string): string {
-  return `${SERVICES[service]}${path}`;
-}
 
 export function bffError(status: number, code: string, message: string, fieldErrors?: Record<string, string | string[]>): BffError {
   return { status, code, message, fieldErrors };

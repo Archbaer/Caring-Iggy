@@ -2,9 +2,9 @@ import type { BffError } from "@/lib/types";
 import { cookies } from "next/headers";
 
 import { fetchAnimal } from "@/lib/api/animals";
-import { serviceUrl } from "@/lib/api/client";
 import { serializeBackendSessionCookie } from "@/lib/auth/server";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { gatewayFetch } from "@/lib/gateway";
 
 interface BackendAdopterDto {
   id: string;
@@ -127,11 +127,9 @@ export async function fetchAdminAdopters(): Promise<AdminAdopterSummary[]> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("ADOPTER", "/api/adopters"), {
+  const response = await gatewayFetch("/api/adopters", {
     cache: "no-store",
-    headers: sessionToken
-      ? { cookie: serializeBackendSessionCookie(sessionToken) }
-      : {},
+    session: sessionToken,
   });
 
   if (!response.ok) {
@@ -152,16 +150,8 @@ export async function fetchAdminAdopterDetail(
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
   const [profileResponse, historyResponse] = await Promise.all([
-    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
-      headers: sessionToken
-        ? { cookie: serializeBackendSessionCookie(sessionToken) }
-        : {},
-    }),
-    fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}/history`), {
-      headers: sessionToken
-        ? { cookie: serializeBackendSessionCookie(sessionToken) }
-        : {},
-    }),
+    gatewayFetch(`/api/adopters/${adopterId}`, { session: sessionToken }),
+    gatewayFetch(`/api/adopters/${adopterId}/history`, { session: sessionToken }),
   ]);
 
   if (!profileResponse.ok) {
@@ -198,7 +188,8 @@ export async function fetchAdminEmployees(): Promise<AdminEmployeeSummary[]> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("USER", "/api/employees"), {
+  const response = await gatewayFetch("/api/employees", {
+    session: sessionToken,
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
       : {},
@@ -221,8 +212,9 @@ export async function fetchAdminEmployeeDetail(
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+  const response = await gatewayFetch(`/api/employees/${employeeId}`, {
     cache: "no-store",
+    session: sessionToken,
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
       : {},
@@ -246,8 +238,9 @@ export async function provisionStaff(
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
   const path = body.role === "ADMIN" ? "/api/auth/provision/admin" : "/api/auth/provision/staff";
-  const response = await fetch(serviceUrl("USER", path), {
+  const response = await gatewayFetch(path, {
     method: "POST",
+    session: sessionToken,
     headers: {
       "Content-Type": "application/json",
       ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
@@ -279,12 +272,10 @@ export async function updateAdopter(
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
+  const response = await gatewayFetch(`/api/adopters/${adopterId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
-    },
+    session: sessionToken,
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response.ok) {
@@ -304,8 +295,9 @@ export async function updateStaff(
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+  const response = await gatewayFetch(`/api/employees/${employeeId}`, {
     method: "PUT",
+    session: sessionToken,
     headers: {
       "Content-Type": "application/json",
       ...(sessionToken ? { cookie: serializeBackendSessionCookie(sessionToken) } : {}),
@@ -328,8 +320,9 @@ export async function deleteStaff(employeeId: string): Promise<void> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  const response = await fetch(serviceUrl("USER", `/api/employees/${employeeId}`), {
+  const response = await gatewayFetch(`/api/employees/${employeeId}`, {
     method: "DELETE",
+    session: sessionToken,
     headers: sessionToken
       ? { cookie: serializeBackendSessionCookie(sessionToken) }
       : {},

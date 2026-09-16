@@ -24,25 +24,35 @@ resilience4j:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
+      adopterClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    instances:
+      adopterClient:
+        timeoutDuration: 5s
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,circuitbreakers
+  endpoint:
+    health:
+      show-details: when-authorized
 
 logging:
   level:
     com.caringiggy: DEBUG
 
+# (env-provided; documented here)
+# JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_KEY_ID=ci-key-1
+
 auth:
   session:
     ttl: ${AUTH_SESSION_TTL:PT168H}
     cookie-secure: ${AUTH_SESSION_COOKIE_SECURE:false}
-
-rate-limit:
-  login-per-minute: ${RATE_LIMIT_LOGIN_PER_MINUTE:5}
-  signup-per-minute: ${RATE_LIMIT_SIGNUP_PER_MINUTE:3}
 
 services:
   adopter:

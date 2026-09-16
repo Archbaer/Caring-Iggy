@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 import type {
   AnimalCreateRequest,
   AnimalSummary,
@@ -10,7 +12,8 @@ import type {
   AnimalSize,
 } from "@/lib/types";
 import { toStatusLabel } from "@/lib/constants/status-map";
-import { serviceUrl } from "./client";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { gatewayFetch } from "@/lib/gateway";
 
 interface BackendPreviousOwnerDto {
   id?: string;
@@ -57,13 +60,15 @@ export type AnimalDetailView = AnimalDetail & {
 };
 
 export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSummary[]> {
-  const url = new URL(serviceUrl("ANIMAL", "/api/animals"));
-  if (params?.status) url.searchParams.set("status", params.status);
-  if (params?.type) url.searchParams.set("type", params.type);
-  if (params?.sex) url.searchParams.set("sex", params.sex);
-  if (params?.size) url.searchParams.set("size", params.size);
+  const searchParams = new URLSearchParams();
+  if (params?.status) searchParams.set("status", params.status);
+  if (params?.type) searchParams.set("type", params.type);
+  if (params?.sex) searchParams.set("sex", params.sex);
+  if (params?.size) searchParams.set("size", params.size);
+  const query = searchParams.toString();
 
-  const res = await fetch(url.toString(), {
+  const res = await gatewayFetch(`/api/animals${query ? `?${query}` : ""}`, {
+    public: true,
     next: { tags: ["animals"] },
   });
   if (!res.ok) {
@@ -102,7 +107,8 @@ export async function fetchAnimals(params?: AnimalListParams): Promise<AnimalSum
 }
 
 export async function fetchAnimal(id: string): Promise<AnimalDetail> {
-  const res = await fetch(serviceUrl("ANIMAL", `/api/animals/${id}`), {
+  const res = await gatewayFetch(`/api/animals/${id}`, {
+    public: true,
     next: { tags: ["animals", `animal-${id}`] },
   });
   if (!res.ok) {
@@ -137,8 +143,10 @@ export async function fetchAnimalForView(id: string): Promise<AnimalDetailView> 
 }
 
 export async function createAnimal(body: AnimalCreateRequest): Promise<AnimalDetail> {
-  const response = await fetch(serviceUrl("ANIMAL", "/api/animals"), {
+  const session = await getSessionToken();
+  const response = await gatewayFetch("/api/animals", {
     method: "POST",
+    session,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -158,8 +166,10 @@ export async function updateAnimal(
   id: string,
   body: AnimalUpdateRequest,
 ): Promise<AnimalDetail> {
-  const response = await fetch(serviceUrl("ANIMAL", `/api/animals/${id}`), {
+  const session = await getSessionToken();
+  const response = await gatewayFetch(`/api/animals/${id}`, {
     method: "PUT",
+    session,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -176,8 +186,10 @@ export async function updateAnimal(
 }
 
 export async function deleteAnimal(id: string): Promise<void> {
-  const response = await fetch(serviceUrl("ANIMAL", `/api/animals/${id}`), {
+  const session = await getSessionToken();
+  const response = await gatewayFetch(`/api/animals/${id}`, {
     method: "DELETE",
+    session,
   });
 
   if (!response.ok) {
@@ -254,6 +266,11 @@ function resolveAge(dateOfBirth: string | null | undefined): number | undefined 
   }
 
   return age >= 0 ? age : undefined;
+}
+
+async function getSessionToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 }
 
 async function safeReadJson(response: Response): Promise<unknown> {
