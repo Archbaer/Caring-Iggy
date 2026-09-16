@@ -86,7 +86,7 @@ jobs:
 
       - name: Start backend stack
         run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait
-        timeout-minutes: 10
+        timeout-minutes: 20
 
       - name: Install frontend dependencies
         working-directory: frontend
