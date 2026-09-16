@@ -6,6 +6,7 @@ import com.caringiggy.matching.feign.AnimalServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,13 +19,19 @@ public class MatchingService {
 
     private final AnimalServiceClient animalServiceClient;
     private final AdopterServiceClient adopterServiceClient;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Value("${matching.enabled:false}")
     private boolean matchingEnabled;
 
     public MatchingResponse findMatches(String name, String telephone) {
-        Map<String, Object> adopter = adopterServiceClient.getAdopterProfileByNameAndTelephone(name, telephone);
-        
+        Map<String, Object> adopter = circuitBreakerFactory.create("adopterClient")
+                .run(() -> adopterServiceClient.getAdopterProfileByNameAndTelephone(name, telephone),
+                        throwable -> {
+                            log.warn("adopterClient circuit breaker fallback triggered: {}", throwable.getMessage());
+                            return Collections.emptyMap();
+                        });
+
         if (adopter == null || adopter.isEmpty()) {
             return MatchingResponse.builder()
                     .adopterName(name)
@@ -50,8 +57,13 @@ public class MatchingService {
                     .build();
         }
 
-        List<Map<String, Object>> allAnimals = animalServiceClient.getAnimalsByStatus("AVAILABLE");
-        
+        List<Map<String, Object>> allAnimals = circuitBreakerFactory.create("animalClient")
+                .run(() -> animalServiceClient.getAnimalsByStatus("AVAILABLE"),
+                        throwable -> {
+                            log.warn("animalClient circuit breaker fallback triggered: {}", throwable.getMessage());
+                            return Collections.emptyList();
+                        });
+
         List<Map<String, Object>> matchedAnimals = allAnimals.stream()
                 .filter(animal -> matchesPreferences(animal, preferences))
                 .collect(Collectors.toList());

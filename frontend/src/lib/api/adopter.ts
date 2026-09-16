@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 import type {
   AdopterInterest,
   AdopterPreferences,
@@ -5,7 +7,8 @@ import type {
   UpdateInterestsRequest,
   UpdatePreferencesRequest,
 } from "@/lib/types";
-import { serviceUrl } from "./client";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { gatewayFetch } from "@/lib/gateway";
 
 interface BackendAdopterDto {
   id: string;
@@ -35,7 +38,8 @@ export class AdopterServiceError extends Error {
 }
 
 export async function fetchAdopterProfile(adopterId: string): Promise<AdopterProfile | null> {
-  const res = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`));
+  const session = await getSessionToken();
+  const res = await gatewayFetch(`/api/adopters/${adopterId}`, { session });
 
   if (res.status === 404) {
     return null;
@@ -56,8 +60,10 @@ export async function updateAdopterPreferences(
   adopterId: string,
   body: UpdatePreferencesRequest,
 ): Promise<AdopterProfile> {
-  const res = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}`), {
+  const session = await getSessionToken();
+  const res = await gatewayFetch(`/api/adopters/${adopterId}`, {
     method: "PUT",
+    session,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       preferences: serializePreferences(body.preferences),
@@ -79,8 +85,10 @@ export async function updateAdopterInterests(
   adopterId: string,
   body: UpdateInterestsRequest,
 ): Promise<AdopterProfile> {
-  const res = await fetch(serviceUrl("ADOPTER", `/api/adopters/${adopterId}/interests`), {
+  const session = await getSessionToken();
+  const res = await gatewayFetch(`/api/adopters/${adopterId}/interests`, {
     method: "PUT",
+    session,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       interestedAnimals: body.interestedAnimalIds,
@@ -170,6 +178,11 @@ function normalizeInterests(input: string[] | null): AdopterInterest[] {
   return input
     .filter((animalId): animalId is string => typeof animalId === "string" && animalId.length > 0)
     .map((animalId) => ({ animalId }));
+}
+
+async function getSessionToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 }
 
 async function safeReadJson(response: Response): Promise<unknown> {

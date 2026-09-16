@@ -1,0 +1,172 @@
+_format_version: "3.0"
+_transform: true
+
+consumers:
+  - username: ci-bff
+    jwt_secrets:
+      - algorithm: RS256
+        key: caring-iggy-user-service        # must equal JWT 'iss'
+        # --- BEGIN JWT PUBLIC KEY (managed by bootstrap-keys.sh) ---
+        rsa_public_key: |
+          -----BEGIN PUBLIC KEY-----
+          <PASTE contents of public.pem here>
+          -----END PUBLIC KEY-----
+        # --- END JWT PUBLIC KEY ---
+
+upstreams:
+  - name: animal-upstream
+    targets:
+      - target: animal-service:8081
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:   { interval: 5, successes: 2 }
+        unhealthy: { interval: 5, http_failures: 3, tcp_failures: 3, timeouts: 3 }
+      passive:
+        unhealthy: { http_failures: 5, tcp_failures: 3, timeouts: 3 }
+
+  - name: adopter-upstream
+    targets:
+      - target: adopter-service:8082
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:   { interval: 5, successes: 2 }
+        unhealthy: { interval: 5, http_failures: 3, tcp_failures: 3, timeouts: 3 }
+      passive:
+        unhealthy: { http_failures: 5, tcp_failures: 3, timeouts: 3 }
+
+  - name: matching-upstream
+    targets:
+      - target: matching-service:8083
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:   { interval: 5, successes: 2 }
+        unhealthy: { interval: 5, http_failures: 3, tcp_failures: 3, timeouts: 3 }
+      passive:
+        unhealthy: { http_failures: 5, tcp_failures: 3, timeouts: 3 }
+
+  - name: reporting-upstream
+    targets:
+      - target: reporting-service:8084
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:   { interval: 5, successes: 2 }
+        unhealthy: { interval: 5, http_failures: 3, tcp_failures: 3, timeouts: 3 }
+      passive:
+        unhealthy: { http_failures: 5, tcp_failures: 3, timeouts: 3 }
+
+  - name: user-upstream
+    targets:
+      - target: user-service:8085
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:   { interval: 5, successes: 2 }
+        unhealthy: { interval: 5, http_failures: 3, tcp_failures: 3, timeouts: 3 }
+      passive:
+        unhealthy: { http_failures: 5, tcp_failures: 3, timeouts: 3 }
+
+services:
+  - name: user-service
+    url: http://user-upstream
+    routes:
+      # Credential endpoints: brute-force backstop. NOTE: unless the BFF runs behind an edge
+      # proxy with TRUST_PROXY_HEADERS=true, Kong sees every BFF request from ONE IP, so any
+      # limit_by: ip here is effectively app-wide. Tune per deployment.
+      - name: user-auth
+        paths: ["/api/auth/login", "/api/auth/signup"]
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config: { minute: 120, limit_by: ip, policy: local }
+      # Session validation / logout / token exchange / JWKS: called on ordinary page loads,
+      # must never be throttled like credential submission.
+      - name: user-public
+        paths: ["/api/auth/session", "/api/auth/logout", "/internal/token", "/.well-known/jwks.json"]
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config: { minute: 600, limit_by: ip, policy: local }
+      - name: user-protected
+        paths: ["/api/auth/provision"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 120, limit_by: consumer, policy: local }
+      - name: user-employees
+        paths: ["/api/employees"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 120, limit_by: consumer, policy: local }
+
+  - name: animal-service
+    url: http://animal-upstream
+    routes:
+      - name: animal-public-read
+        methods: ["GET"]
+        paths: ["/api/animals"]
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config: { minute: 120, limit_by: ip, policy: local }
+      - name: animal-writes
+        methods: ["POST", "PUT", "DELETE"]
+        paths: ["/api/animals"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 120, limit_by: consumer, policy: local }
+
+  - name: adopter-service
+    url: http://adopter-upstream
+    routes:
+      - name: adopter-protected
+        paths: ["/api/adopters"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 120, limit_by: consumer, policy: local }
+
+  - name: reporting-service
+    url: http://reporting-upstream
+    routes:
+      - name: reporting-protected
+        paths: ["/api/reports"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 60, limit_by: consumer, policy: local }
+
+  - name: matching-service
+    url: http://matching-upstream
+    routes:
+      - name: matching-protected
+        paths: ["/api/matching"]
+        strip_path: false
+        plugins:
+          - name: jwt
+            config: { key_claim_name: iss, claims_to_verify: [exp] }
+          - name: rate-limiting
+            config: { minute: 120, limit_by: consumer, policy: local }
+
+plugins:
+  - name: cors
+    config:
+      origins: ["http://localhost:3000"]  # dev origin; prod: use a vault ref {vault://env/app-origin}
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      headers: ["Authorization", "Content-Type", "X-CSRF-Token"]
+      credentials: true

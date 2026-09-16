@@ -4,12 +4,42 @@ server:
 spring:
   application:
     name: matching-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8085/.well-known/jwks.json}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,circuitbreakers
+  endpoint:
+    health:
+      show-details: when-authorized
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      animalClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      adopterClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    instances:
+      animalClient:
+        timeoutDuration: 5s
+      adopterClient:
+        timeoutDuration: 5s
 
 logging:
   level:

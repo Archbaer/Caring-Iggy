@@ -1,18 +1,23 @@
 package com.caringiggy.user.controller;
 
+import com.caringiggy.user.config.SecurityConfig;
 import com.caringiggy.user.dto.AuthResponse;
 import com.caringiggy.user.dto.LoginRequest;
 import com.caringiggy.user.dto.ProvisionAccountRequest;
 import com.caringiggy.user.dto.SessionUserDto;
 import com.caringiggy.user.dto.SignupRequest;
 import com.caringiggy.user.service.AuthService;
+import com.caringiggy.user.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -23,6 +28,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -30,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
 
     @Autowired
@@ -40,6 +47,12 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     @Test
     void login_setsSessionCookieAndReturnsCanonicalRole() throws Exception {
@@ -67,6 +80,31 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Set-Cookie", containsString("session=opaque-token")))
                 .andExpect(jsonPath("$.user.role").value("ADMIN"));
+    }
+
+    @Test
+    void loginReturnsJwt() throws Exception {
+        AuthResponse response = AuthResponse.builder()
+                .user(SessionUserDto.builder()
+                        .accountId(UUID.randomUUID())
+                        .role("ADMIN")
+                        .profileType("EMPLOYEE")
+                        .profileId(UUID.randomUUID())
+                        .build())
+                .expiresAtEpochSeconds(1_900_000_000L)
+                .build();
+
+        when(authService.login(any(LoginRequest.class)))
+                .thenReturn(new AuthService.AuthenticatedSession("opaque-token", response));
+        when(authService.buildSessionCookie(eq("opaque-token"), any(LocalDateTime.class)))
+                .thenReturn(ResponseCookie.from("session", "opaque-token").httpOnly(true).path("/").build());
+        when(jwtService.mint(any())).thenReturn("jwt-x");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"a@b.com\",\"password\":\"supersecret\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("jwt-x"));
     }
 
     @Test
@@ -122,6 +160,7 @@ class AuthControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/auth/provision")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ProvisionAccountRequest.builder()
@@ -150,6 +189,7 @@ class AuthControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/auth/provision/staff")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ProvisionAccountRequest.builder()
@@ -179,6 +219,7 @@ class AuthControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/auth/provision/admin")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ProvisionAccountRequest.builder()
@@ -258,6 +299,7 @@ class AuthControllerTest {
     @Test
     void provision_withMissingName_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/auth/provision")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"staff@example.com\",\"password\":\"supersecret\",\"role\":\"STAFF\"}"))
@@ -268,6 +310,7 @@ class AuthControllerTest {
     @Test
     void provision_withShortPassword_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/auth/provision")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Staff\",\"email\":\"staff@example.com\"," +
@@ -279,6 +322,7 @@ class AuthControllerTest {
     @Test
     void provision_withInvalidEmail_returns400WithErrorBody() throws Exception {
         mockMvc.perform(post("/api/auth/provision")
+                        .with(jwt().jwt(j -> j.claim("role", "ADMIN")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .cookie(new jakarta.servlet.http.Cookie("session", "admin-session"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Staff\",\"email\":\"not-an-email\"," +

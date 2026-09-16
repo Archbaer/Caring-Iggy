@@ -206,7 +206,7 @@ test.describe("Staff endpoints (as ADMIN)", () => {
     const listResp = await request.get("/api/admin/staff");
     const list = await listResp.json();
     const newStaff = list.find(
-      (s: any) => s.email?.includes("delete-me-"),
+      (s: { email?: string }) => s.email?.includes("delete-me-"),
     );
     expect(newStaff).toBeDefined();
 

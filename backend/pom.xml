@@ -29,7 +29,6 @@
         <java.version>17</java.version>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <resilience4j.version>2.2.0</resilience4j.version>
-        <bucket4j.version>8.7.0</bucket4j.version>
         <flyway.version>10.4.1</flyway.version>
         <lombok.version>1.18.38</lombok.version>
     </properties>

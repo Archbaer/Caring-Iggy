@@ -16,4 +16,5 @@ public class AuthResponse {
     private String profileType;
     private String profileId;
     private long expiresAtEpochSeconds;
+    private String token;
 }

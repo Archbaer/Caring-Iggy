@@ -1,11 +1,14 @@
 package com.caringiggy.matching.controller;
 
+import com.caringiggy.matching.config.SecurityConfig;
 import com.caringiggy.matching.dto.MatchingResponse;
 import com.caringiggy.matching.service.MatchingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -16,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MatchingController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(roles = "ADOPTER")
 class MatchingControllerTest {
 
     @Autowired

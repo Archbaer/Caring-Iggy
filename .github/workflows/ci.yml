@@ -81,12 +81,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
+      - name: Bootstrap JWT keypair (user-service + Kong)
+        run: bash infrastructure/kong/bootstrap-keys.sh
+
       - name: Start backend stack
         run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait
-        timeout-minutes: 10
-        env:
-          RATE_LIMIT_LOGIN_PER_MINUTE: 1000
-          RATE_LIMIT_SIGNUP_PER_MINUTE: 1000
+        timeout-minutes: 20
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -101,10 +101,20 @@ jobs:
         run: npx playwright test --project=setup --project=api
         env:
           CI: true
-          ANIMAL_SERVICE_URL: http://localhost:8081
-          USER_SERVICE_URL: http://localhost:8085
-          ADOPTER_SERVICE_URL: http://localhost:8082
-          REPORTING_SERVICE_URL: http://localhost:8084
+          KONG_URL: http://localhost:8000
+          INTERNAL_BASE_URL: http://localhost:3000
+          APP_ORIGIN: http://localhost:3000
+          AUTH_SESSION_STATE_SECRET: ci-test-session-secret-long-enough-for-ci
+          AUTH_CSRF_SECRET: ci-test-csrf-secret-long-enough-for-ci
+
+      # Runs last: the login rate-limit test burns the per-minute login window,
+      # which would 429 any suite that logs in afterwards.
+      - name: Run gateway tests
+        working-directory: frontend
+        run: npx playwright test --project=infra
+        env:
+          CI: true
+          KONG_URL: http://localhost:8000
           INTERNAL_BASE_URL: http://localhost:3000
           APP_ORIGIN: http://localhost:3000
           AUTH_SESSION_STATE_SECRET: ci-test-session-secret-long-enough-for-ci

@@ -10,6 +10,7 @@ import com.caringiggy.user.repository.EmployeeRepository;
 import com.caringiggy.user.repository.UserSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +40,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final SessionTokenGenerator sessionTokenGenerator;
     private final AuthProperties authProperties;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Transactional
     public AuthenticatedSession signupAdopter(SignupRequest request) {
@@ -46,12 +48,17 @@ public class AuthService {
 
         UUID adopterProfileId = null;
         try {
-            AdopterProfileDto adopterProfile = adopterServiceClient.createAdopterProfile(CreateAdopterProfileRequest.builder()
-                    .name(buildFullName(request.getFirstName(), request.getLastName()))
-                    .email(normalizeEmail(request.getEmail()))
-                    .telephone(request.getTelephone())
-                    .status("PENDING_REVIEW")
-                    .build());
+            AdopterProfileDto adopterProfile = circuitBreakerFactory.create("adopterClient").run(
+                    () -> adopterServiceClient.createAdopterProfile(CreateAdopterProfileRequest.builder()
+                            .name(buildFullName(request.getFirstName(), request.getLastName()))
+                            .email(normalizeEmail(request.getEmail()))
+                            .telephone(request.getTelephone())
+                            .status("PENDING_REVIEW")
+                            .build()),
+                    throwable -> {
+                        log.warn("adopterClient circuit breaker fallback on createAdopterProfile: {}", throwable.getMessage());
+                        throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Adopter profile service is unavailable, please try again later");
+                    });
             adopterProfileId = adopterProfile.getId();
 
             Account account = accountRepository.insert(Account.builder()
@@ -65,7 +72,16 @@ public class AuthService {
             return createAuthenticatedSession(account);
         } catch (RuntimeException exception) {
             if (adopterProfileId != null) {
-                adopterServiceClient.deleteAdopterProfile(adopterProfileId);
+                UUID profileIdToDelete = adopterProfileId;
+                circuitBreakerFactory.create("adopterClient").run(
+                        () -> {
+                            adopterServiceClient.deleteAdopterProfile(profileIdToDelete);
+                            return null;
+                        },
+                        throwable -> {
+                            log.warn("adopterClient circuit breaker fallback on deleteAdopterProfile (compensation): {}", throwable.getMessage());
+                            return null;
+                        });
             }
             throw exception;
         }
