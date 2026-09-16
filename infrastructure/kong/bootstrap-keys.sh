@@ -99,6 +99,8 @@ in_section {
 }
 { print }
 ' "$KONG_FILE" > "$TEMP_KONG"
+# mktemp creates 0600; Kong runs as its own user inside the container and must be able to read the bind mount
+chmod 644 "$TEMP_KONG"
 mv "$TEMP_KONG" "$KONG_FILE"
 
 echo ""
