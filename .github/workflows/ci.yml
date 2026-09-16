@@ -98,7 +98,20 @@ jobs:
 
       - name: Run API tests
         working-directory: frontend
-        run: npx playwright test --project=setup --project=api --project=infra
+        run: npx playwright test --project=setup --project=api
+        env:
+          CI: true
+          KONG_URL: http://localhost:8000
+          INTERNAL_BASE_URL: http://localhost:3000
+          APP_ORIGIN: http://localhost:3000
+          AUTH_SESSION_STATE_SECRET: ci-test-session-secret-long-enough-for-ci
+          AUTH_CSRF_SECRET: ci-test-csrf-secret-long-enough-for-ci
+
+      # Runs last: the login rate-limit test burns the per-minute login window,
+      # which would 429 any suite that logs in afterwards.
+      - name: Run gateway tests
+        working-directory: frontend
+        run: npx playwright test --project=infra
         env:
           CI: true
           KONG_URL: http://localhost:8000
