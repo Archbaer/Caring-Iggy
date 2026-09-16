@@ -81,12 +81,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
+      - name: Bootstrap JWT keypair (user-service + Kong)
+        run: bash infrastructure/kong/bootstrap-keys.sh
+
       - name: Start backend stack
         run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait
         timeout-minutes: 10
-        env:
-          RATE_LIMIT_LOGIN_PER_MINUTE: 1000
-          RATE_LIMIT_SIGNUP_PER_MINUTE: 1000
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -98,13 +98,10 @@ jobs:
 
       - name: Run API tests
         working-directory: frontend
-        run: npx playwright test --project=setup --project=api
+        run: npx playwright test --project=setup --project=api --project=infra
         env:
           CI: true
-          ANIMAL_SERVICE_URL: http://localhost:8081
-          USER_SERVICE_URL: http://localhost:8085
-          ADOPTER_SERVICE_URL: http://localhost:8082
-          REPORTING_SERVICE_URL: http://localhost:8084
+          KONG_URL: http://localhost:8000
           INTERNAL_BASE_URL: http://localhost:3000
           APP_ORIGIN: http://localhost:3000
           AUTH_SESSION_STATE_SECRET: ci-test-session-secret-long-enough-for-ci

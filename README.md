@@ -71,10 +71,11 @@ All services are Spring Boot 3 / Java 17. Each has its own PostgreSQL database.
 ### 1. Start infrastructure
 
 ```bash
-docker compose -f infrastructure/docker-compose.yml up -d
+bash infrastructure/kong/bootstrap-keys.sh        # once: RSA keypair → infrastructure/.env + kong.yml
+docker compose -f infrastructure/docker-compose.yml up -d --build
 ```
 
-This starts PostgreSQL instances for animals, users, and adopters databases.
+This starts the PostgreSQL instances, the five backend services (no host ports) and the Kong gateway on `http://localhost:8000`. The frontend BFF is the only client of Kong; it exchanges its session for a short-lived JWT at `/internal/token`. Never commit `infrastructure/kong/kong.yml` with the real public key injected.
 
 ### 2. Start backend services
 
@@ -99,9 +100,8 @@ Open `http://localhost:3000`.
 
 | Variable | Default | Description |
 |---|---|---|
-| `ANIMAL_SERVICE_URL` | `http://localhost:8081` | Animal service base URL |
-| `ADOPTER_SERVICE_URL` | `http://localhost:8082` | Adopter service base URL |
-| `USER_SERVICE_URL` | `http://localhost:8085` | User/auth service base URL |
+| `KONG_URL` | `http://localhost:8000` | Kong gateway base URL; all backend calls go through it |
+| `TRUST_PROXY_HEADERS` | `false` | Forward `X-Forwarded-For` to Kong; only behind an edge proxy that overwrites it |
 | `AUTH_SESSION_STATE_SECRET` | — | HMAC secret for signing session state cookie |
 | `AUTH_CSRF_SECRET` | — | HMAC secret for signing CSRF tokens |
 | `APP_ORIGIN` | — | Trusted origin for CSRF origin check (e.g. `https://caringiggy.com`) |
@@ -132,7 +132,8 @@ Test layout:
 frontend/tests/
 ├─ api/          API contract tests (auth, animals, admin, adopter, CSRF, session)
 ├─ auth/         Login, redirects, and role-boundary E2E tests
-└─ forms/        Staff form tests (animal create/edit)
+├─ forms/        Staff form tests (animal create/edit)
+└─ infra/        Kong gateway tests (hit :8000 directly: JWT, rate limit, network isolation)
 ```
 
 ## CI
@@ -145,5 +146,5 @@ frontend/tests/
 
 - `infrastructure/.env.example` — sample environment variables for local Docker Compose.
 - Each microservice connects to its own isolated PostgreSQL database.
-- The `matching-service` and `reporting-service` have no external port bindings; they are called internally by the BFF.
+- No backend service binds a host port; the BFF reaches them only through Kong (`infrastructure/kong/kong.yml`).
 - The frontend Docker service definition exists in `docker-compose.yml` but is commented out; it is run separately during development.
