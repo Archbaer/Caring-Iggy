@@ -61,6 +61,13 @@ if ! grep -q "^[[:space:]]*rsa_public_key: |" "$KONG_FILE"; then
 fi
 echo "PASS: rsa_public_key: | present in kong.yml"
 
+# Test 4b: kong.yml stays world-readable (the kong container user must read the bind mount)
+if [ ! -r "$KONG_FILE" ] || [ "$(stat -f '%Lp' "$KONG_FILE" 2>/dev/null || stat -c '%a' "$KONG_FILE")" != "644" ]; then
+    echo "FAIL: $KONG_FILE is not mode 644 after bootstrap"
+    exit 1
+fi
+echo "PASS: kong.yml is mode 644"
+
 # Test 5: Temp files are deleted
 TEMP_PRIVATE="$TEST_TMP/kong/tmp-private.pem"
 TEMP_PUBLIC="$TEST_TMP/kong/tmp-public.pem"
