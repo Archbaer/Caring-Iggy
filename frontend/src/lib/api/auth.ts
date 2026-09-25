@@ -8,6 +8,7 @@ import type {
 } from "@/lib/types";
 
 import { CSRF_HEADER_NAME } from "@/lib/auth/csrf";
+import { safeReadJson } from "@/lib/api/client";
 
 const JSON_HEADERS = {
   "Content-Type": "application/json",
@@ -127,20 +128,6 @@ function readBffError(
     ...fallbackError,
     status,
   };
-}
-
-async function safeReadJson(response: Response): Promise<unknown> {
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (!contentType.includes("application/json")) {
-    return null;
-  }
-
-  try {
-    return (await response.json()) as unknown;
-  } catch {
-    return null;
-  }
 }
 
 function isBffError(value: unknown): value is BffError {

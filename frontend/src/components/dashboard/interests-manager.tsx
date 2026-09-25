@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { InterestStatusList } from "@/components/dashboard/interest-status-list";
 import { saveAdopterInterests, AdopterApiError } from "@/lib/api/adopter-client";
 import type { AnimalSummaryView } from "@/lib/api/animals";
-import { fetchAuthSession, refreshCsrfToken } from "@/lib/api/auth";
+import { refreshCsrfToken } from "@/lib/api/auth";
 import { MAX_INTERESTS } from "@/lib/types";
 
 type InterestsManagerProps = {
@@ -36,7 +36,6 @@ export function InterestsManager({
   );
 
   const [selectedIds, setSelectedIds] = useState<string[]>(initialIds);
-  const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [pendingAnimalId, setPendingAnimalId] = useState<string | null>(null);
@@ -51,26 +50,6 @@ export function InterestsManager({
       return freshIds;
     });
   }, [dedupedCurrent]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    void fetchAuthSession()
-      .then((session) => {
-        if (!cancelled) {
-          setCsrfToken(session.csrfToken);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setErrorMessage("Interested animals are temporarily unavailable. Refresh and try again.");
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const animalsById = useMemo(
     () => new Map([...dedupedCatalog, ...dedupedCurrent].map((animal) => [animal.id, animal])),
@@ -168,8 +147,6 @@ export function InterestsManager({
   async function updateInterests(nextIds: string[], animalId: string) {
     const token = await refreshCsrfToken();
 
-    if (token) setCsrfToken(token);
-
     if (!token) {
       setErrorMessage("Security checks could not be prepared. Refresh and try again.");
       return;
@@ -192,14 +169,6 @@ export function InterestsManager({
     } catch (error) {
       setSelectedIds(Array.from(new Set(dedupedCurrent.map((a) => a.id))));
       setErrorMessage(toDisplayMessage(error));
-
-      if (error instanceof AdopterApiError && error.responseError.code === "FORBIDDEN") {
-        const nextToken = await refreshCsrfToken();
-
-        if (nextToken) {
-          setCsrfToken(nextToken);
-        }
-      }
     } finally {
       setPendingAnimalId(null);
     }

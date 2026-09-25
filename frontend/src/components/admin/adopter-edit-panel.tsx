@@ -33,7 +33,6 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
     status: adopter.status,
   });
   const csrfTokenRef = useRef<string | null>(null);
-  const [csrfToken, setCsrfTokenState] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, setIsPending] = useState(false);
@@ -45,7 +44,6 @@ export function AdopterEditPanel({ adopter, onCancel, onSuccess }: Props) {
       .then((session) => {
         if (!cancelled) {
           csrfTokenRef.current = session.csrfToken;
-          setCsrfTokenState(session.csrfToken);
         }
       })
       .catch(() => {

@@ -26,18 +26,12 @@ export interface AuthSession {
 
 const SESSION_STATE_VERSION = 1;
 
-export function decodeUserRole(value: string | null | undefined): UserRole | null {
+function decodeUserRole(value: string | null | undefined): UserRole | null {
   if (value === null || value === undefined) {
     return null;
   }
 
   return AUTH_ROLE_VALUES.includes(value as UserRole) ? (value as UserRole) : null;
-}
-
-export function isAuthenticatedSession(
-  session: AuthSession | null | undefined,
-): session is AuthSession {
-  return Boolean(session);
 }
 
 export async function encodeSessionState(

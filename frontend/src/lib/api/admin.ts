@@ -2,6 +2,7 @@ import type { BffError } from "@/lib/types";
 import { cookies } from "next/headers";
 
 import { fetchAnimal } from "@/lib/api/animals";
+import { safeReadJson } from "@/lib/api/client";
 import { serializeBackendSessionCookie } from "@/lib/auth/server";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { gatewayFetch } from "@/lib/gateway";
@@ -65,7 +66,7 @@ export interface AdminAdopterDetail extends AdminAdopterSummary {
   history: AdminAdoptionHistoryEntry[];
 }
 
-export interface AdminAdoptionHistoryEntry {
+interface AdminAdoptionHistoryEntry {
   id: string;
   animalId: string;
   adoptionDate?: string;
@@ -111,7 +112,7 @@ export interface UpdateStaffRequest {
   role?: "STAFF" | "ADMIN";
 }
 
-export class AdminApiError extends Error {
+class AdminApiError extends Error {
   readonly status: number;
   readonly body: unknown;
 
@@ -337,7 +338,7 @@ export async function deleteStaff(employeeId: string): Promise<void> {
   }
 }
 
-export function readAdminFieldErrors(
+function readAdminFieldErrors(
   error: AdminApiError,
 ): Record<string, string> | undefined {
   const body = error.body as BackendValidationError | null;
@@ -464,18 +465,4 @@ async function mapHistoryEntries(
       };
     }),
   );
-}
-
-async function safeReadJson(response: Response): Promise<unknown> {
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (!contentType.includes("application/json")) {
-    return null;
-  }
-
-  try {
-    return (await response.json()) as unknown;
-  } catch {
-    return null;
-  }
 }

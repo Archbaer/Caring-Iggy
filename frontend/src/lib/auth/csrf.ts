@@ -29,7 +29,7 @@ export interface IssuedCsrfToken {
   cookieValue: string;
 }
 
-export function isCsrfProtectedMethod(method: string): boolean {
+function isCsrfProtectedMethod(method: string): boolean {
   return !SAFE_METHODS.has(method.toUpperCase());
 }
 

@@ -1,5 +1,5 @@
 /** Canonical frontend role union — never expose backend EmployeeRole names. */
-export type Role = "ADOPTER" | "STAFF" | "ADMIN";
+type Role = "ADOPTER" | "STAFF" | "ADMIN";
 
 /** Session payload returned by /api/auth/session — minimal, role-normalized. */
 export interface SessionUser {
@@ -23,11 +23,6 @@ export interface AuthMutationResult {
 export interface LogoutResult {
   ok: true;
   csrfToken: string;
-}
-
-/** Shape of the signed CSRF token pair (cookie + header value). */
-export interface CsrfToken {
-  token: string;
 }
 
 /** BFF error envelope — single shape for all API error responses. */
@@ -55,10 +50,4 @@ export interface SignupRequest {
   email: string;
   telephone: string;
   password: string;
-}
-
-/** Generic API response wrapper for typed results. */
-export interface ApiResponse<T> {
-  data: T;
-  error?: BffError;
 }

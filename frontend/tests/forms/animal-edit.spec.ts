@@ -38,10 +38,6 @@ test.beforeAll(async ({ playwright }) => {
 });
 
 test.describe("Animal edit form", () => {
-  test.beforeEach(async ({ page }) => {
-    // Already authenticated via storageState (staff.json)
-  });
-
   test("form pre-fills with animal name", async ({ page }) => {
     await page.goto(`/dashboard/animals/${testAnimalId}/edit`);
 

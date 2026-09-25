@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, signup, refreshCsrfToken } from "@/lib/api/auth";
@@ -18,7 +18,6 @@ const EMPTY_FIELD_ERRORS: Record<keyof SignupRequest, string[]> = {
 
 export function SignupForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const csrfTokenRef = useRef<string | null>(null);
   const [fields, setFields] = useState<SignupRequest>({
     firstName: "",

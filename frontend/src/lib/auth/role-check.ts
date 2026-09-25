@@ -1,21 +1,21 @@
 import type { AuthSession, UserRole } from "@/lib/auth/session";
 
 export const LOGIN_ROUTE = "/login";
-export const SIGNUP_ROUTE = "/signup";
-export const DASHBOARD_ROUTE = "/dashboard";
-export const ADMIN_ROUTE_PREFIX = "/dashboard/admin";
-export const ADMIN_DEFAULT_ROUTE = "/dashboard/admin";
-export const STAFF_DEFAULT_ROUTE = "/dashboard";
+const SIGNUP_ROUTE = "/signup";
+const DASHBOARD_ROUTE = "/dashboard";
+const ADMIN_ROUTE_PREFIX = "/dashboard/admin";
+const ADMIN_DEFAULT_ROUTE = "/dashboard/admin";
+const STAFF_DEFAULT_ROUTE = "/dashboard";
 
 export type PathAccessDecision =
   | { action: "allow" }
   | { action: "redirect"; destination: string };
 
-export function isDashboardPath(pathname: string): boolean {
+function isDashboardPath(pathname: string): boolean {
   return pathname === DASHBOARD_ROUTE || pathname.startsWith(`${DASHBOARD_ROUTE}/`);
 }
 
-export function isAdminManagementPath(pathname: string): boolean {
+function isAdminManagementPath(pathname: string): boolean {
   return (
     pathname === ADMIN_ROUTE_PREFIX || pathname.startsWith(`${ADMIN_ROUTE_PREFIX}/`)
   );

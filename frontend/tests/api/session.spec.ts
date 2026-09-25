@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { getCsrfToken, loginAsAdmin, loginAsStaff, loginAsAdopter, ERROR_SHAPE } from "./helpers";
+import { getCsrfToken, loginAsAdmin, loginAsStaff } from "./helpers";
 import { TEST_CREDENTIALS } from "./fixtures";
 
 // ── Cookie Expiry — Employee (20 min) ─────────────────────────────

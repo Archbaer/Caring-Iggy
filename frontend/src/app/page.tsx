@@ -158,7 +158,7 @@ export default async function Home() {
       {/* ─── Trust Bar ──────────────────────────────────────────────────── */}
       <div className="px-6 py-6 bg-white border-b border-[var(--color-border)] shadow-sm">
         <div className="max-w-[var(--max-width-content)] mx-auto flex flex-wrap items-center justify-center gap-8 sm:gap-16">
-          {trustPoints.map((point, i) => (
+          {trustPoints.map((point) => (
             <div key={point.title} className="flex items-center gap-3">
               <span className="text-3xl">🐾</span>
               <div>
@@ -245,7 +245,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {testimonials.map((t) => (
               <div key={t.adopter} className="rounded-2xl border-l-4 border-[var(--color-accent)] bg-[var(--color-accent-pale)]/30 p-6">
                 <p className="text-[var(--color-ink)] italic leading-relaxed mb-4">
                   &ldquo;{t.quote}&rdquo;
@@ -275,7 +275,7 @@ export default async function Home() {
             </h2>
             <div className="w-12 h-1.5 rounded-full bg-[var(--color-accent)] mb-6" />
             <div className="space-y-6">
-              {values.map((value, i) => (
+              {values.map((value) => (
                 <div key={value.title}>
                   <p className="font-[family-name:var(--font-display)] text-xl font-medium text-[var(--color-ink)] mb-1">
                     {value.title}

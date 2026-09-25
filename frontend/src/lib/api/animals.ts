@@ -12,6 +12,7 @@ import type {
   AnimalSize,
 } from "@/lib/types";
 import { toStatusLabel } from "@/lib/constants/status-map";
+import { safeReadJson } from "@/lib/api/client";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { gatewayFetch } from "@/lib/gateway";
 
@@ -271,18 +272,4 @@ function resolveAge(dateOfBirth: string | null | undefined): number | undefined 
 async function getSessionToken(): Promise<string | null> {
   const cookieStore = await cookies();
   return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
-}
-
-async function safeReadJson(response: Response): Promise<unknown> {
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (!contentType.includes("application/json")) {
-    return null;
-  }
-
-  try {
-    return (await response.json()) as unknown;
-  } catch {
-    return null;
-  }
 }

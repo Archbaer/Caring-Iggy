@@ -15,7 +15,7 @@ export async function getCsrfToken(request: APIRequestContext): Promise<string> 
  * Login as a specific role and return fresh CSRF token.
  * Use this when you need to be authenticated for subsequent requests.
  */
-export async function loginAs(
+async function loginAs(
   request: APIRequestContext,
   email: string,
   password: string,
@@ -79,16 +79,6 @@ export const ANIMAL_DETAIL_SHAPE = {
   animalType: expect.any(String),
   breed: expect.any(String),
   status: expect.any(String),
-};
-
-/**
- * Staff summary shape matcher.
- */
-export const STAFF_SUMMARY_SHAPE = {
-  id: expect.any(String),
-  name: expect.any(String),
-  email: expect.any(String),
-  role: expect.any(String),
 };
 
 /**

@@ -22,7 +22,7 @@ type Props = {
 export function AdminStaffDetailClient({ employee }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState(employee);
+  const currentEmployee = employee;
   const [deleteStep, setDeleteStep] = useState<"initial" | "confirm">("initial");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);

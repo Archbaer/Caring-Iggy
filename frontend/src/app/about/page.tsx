@@ -147,7 +147,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {VALUES.map((value, i) => (
+            {VALUES.map((value) => (
               <Card variant="panel" as="section"
                 key={value.title}
                 className="group relative hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"
@@ -180,7 +180,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {TEAM_MEMBERS.map((member, i) => (
+            {TEAM_MEMBERS.map((member) => (
               <Card variant="panel" as="section"
                 key={member.name}
                 className="group flex flex-col items-center text-center hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-1.5 transition-all duration-300"

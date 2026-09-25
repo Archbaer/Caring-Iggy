@@ -86,7 +86,7 @@ test.describe("GET requests skip CSRF", () => {
   test("GET /api/admin/staff without CSRF headers succeeds", async ({
     request,
   }) => {
-    const token = await loginAndGetState(request);
+    await loginAndGetState(request);
     const resp = await request.get("/api/admin/staff");
     expect(resp.status()).toBe(200);
   });

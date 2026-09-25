@@ -18,7 +18,7 @@ type Props = {
 export function AdminAdopterDetailClient({ adopter }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
-  const [currentAdopter, setCurrentAdopter] = useState(adopter);
+  const currentAdopter = adopter;
   const [successAdopter, setSuccessAdopter] = useState<AdminAdopterDetail | null>(null);
 
   function handleSuccess(updated: AdminAdopterDetail) {

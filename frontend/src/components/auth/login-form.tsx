@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthApiError, fetchAuthSession, login, refreshCsrfToken } from "@/lib/api/auth";
@@ -14,7 +14,6 @@ type LoginFields = {
 
 export function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const csrfTokenRef = useRef<string | null>(null);
   const [fields, setFields] = useState<LoginFields>({
     email: "",

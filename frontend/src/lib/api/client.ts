@@ -11,3 +11,17 @@ export function jsonResponse<T>(data: T, init?: ResponseInit): Response {
 export function errorResponse(error: BffError): Response {
   return Response.json(error, { status: error.status });
 }
+
+export async function safeReadJson(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type") ?? "";
+
+  if (!contentType.includes("application/json")) {
+    return null;
+  }
+
+  try {
+    return (await response.json()) as unknown;
+  } catch {
+    return null;
+  }
+}

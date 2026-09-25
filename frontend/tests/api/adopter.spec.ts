@@ -1,12 +1,10 @@
 import { test, expect } from "@playwright/test";
 import {
   getCsrfToken,
-  loginAs,
   loginAsAdopter,
   loginAsStaff,
   ERROR_SHAPE,
 } from "./helpers";
-import { TEST_CREDENTIALS } from "./fixtures";
 
 // ── Unauthenticated requests ────────────────────────────────────
 

@@ -29,7 +29,6 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
     role: "STAFF",
   });
   const csrfTokenRef = useRef<string | null>(null);
-  const [csrfToken, setCsrfTokenState] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -40,7 +39,6 @@ export function StaffEditPanel({ employee, onCancel, onSuccess }: Props) {
       .then((session) => {
         if (!cancelled) {
           csrfTokenRef.current = session.csrfToken;
-          setCsrfTokenState(session.csrfToken);
         }
       })
       .catch(() => {

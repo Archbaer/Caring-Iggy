@@ -6,7 +6,6 @@ import {
   ERROR_SHAPE,
   NON_EXISTENT_ID,
 } from "./helpers";
-import { TEST_CREDENTIALS } from "./fixtures";
 
 // ── Unauthenticated requests ─────────────────────────────────────
 

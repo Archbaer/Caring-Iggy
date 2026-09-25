@@ -36,7 +36,7 @@ export function toInterestStatusSummary(code: AnimalStatusCode): string {
   return STATUS_META[code].interestSummary;
 }
 
-export const STATUS_CODES = Object.keys(STATUS_META) as AnimalStatusCode[];
+const STATUS_CODES = Object.keys(STATUS_META) as AnimalStatusCode[];
 
 export function isAnimalStatusCode(value: string): value is AnimalStatusCode {
   return STATUS_CODES.includes(value as AnimalStatusCode);
