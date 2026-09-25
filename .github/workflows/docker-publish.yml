@@ -22,8 +22,8 @@ on:
           - frontend
 
 env:
-  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME || github.repository_owner }}
-  DOCKER_IMAGE_PREFIX: ${{ vars.DOCKERHUB_USERNAME || github.repository_owner }}/caring-iggy
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME || vars.DOCKERHUB_USERNAME || github.repository_owner }}
+  DOCKER_IMAGE_PREFIX: ${{ secrets.DOCKERHUB_USERNAME || vars.DOCKERHUB_USERNAME || github.repository_owner }}/caring-iggy
 
 jobs:
   build-and-push:
