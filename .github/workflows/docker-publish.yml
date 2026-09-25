@@ -2,137 +2,136 @@ name: Build and Push to DockerHub
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy'
-        required: false
-        default: 'all'
+        description: Service to deploy
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - animal-service
+          - user-service
+          - matching-service
+          - reporting-service
+          - adopter-service
+          - frontend
 
 env:
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKER_IMAGE_PREFIX: ${{ secrets.DOCKERHUB_USERNAME }}/caring-iggy
+  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME || github.repository_owner }}
+  DOCKER_IMAGE_PREFIX: ${{ vars.DOCKERHUB_USERNAME || github.repository_owner }}/caring-iggy
 
 jobs:
   build-and-push:
+    name: Build and push ${{ matrix.service }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: animal-service
+            context: ./backend
+            dockerfile: ./backend/animal-service/Dockerfile
+          - service: user-service
+            context: ./backend
+            dockerfile: ./backend/user-service/Dockerfile
+          - service: matching-service
+            context: ./backend
+            dockerfile: ./backend/matching-service/Dockerfile
+          - service: reporting-service
+            context: ./backend
+            dockerfile: ./backend/reporting-service/Dockerfile
+          - service: adopter-service
+            context: ./backend
+            dockerfile: ./backend/adopter-service/Dockerfile
+          - service: frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+
     steps:
+      - name: Select service
+        id: selection
+        env:
+          SELECTED_SERVICE: ${{ inputs.service }}
+          SERVICE: ${{ matrix.service }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] || \
+             [ "$SELECTED_SERVICE" = "all" ] || \
+             [ "$SELECTED_SERVICE" = "$SERVICE" ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.selection.outputs.build == 'true'
+
+      - name: Validate DockerHub credentials
+        if: steps.selection.outputs.build == 'true'
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "DOCKERHUB_USERNAME and DOCKERHUB_TOKEN must be configured." >&2
+            exit 1
+          fi
 
       - name: Set up Docker Buildx
+        if: steps.selection.outputs.build == 'true'
         uses: docker/setup-buildx-action@v4
 
       - name: Login to DockerHub
+        if: steps.selection.outputs.build == 'true'
         uses: docker/login-action@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-          cache-dependency-path: 'backend/pom.xml'
-
-      - name: Extract metadata
+      - name: Prepare image tags
+        if: steps.selection.outputs.build == 'true'
         id: meta
+        env:
+          IMAGE: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          if [ "$VERSION" == "${GITHUB_REF}" ]; then
-            VERSION=latest
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="sha-${GITHUB_SHA::12}"
           fi
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build and Push animal-service
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/animal-service/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-animal-service:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-animal-service:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          {
+            echo "version=$VERSION"
+            echo "tags<<EOF"
+            echo "$IMAGE:$VERSION"
+            echo "$IMAGE:latest"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Build and Push user-service
-        uses: docker/build-push-action@v6
+      - name: Build and push image
+        if: steps.selection.outputs.build == 'true'
+        uses: docker/build-push-action@v7
         with:
-          context: ./backend
-          file: ./backend/user-service/Dockerfile
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-user-service:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-user-service:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and Push matching-service
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/matching-service/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-matching-service:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-matching-service:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and Push reporting-service
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/reporting-service/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-reporting-service:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-reporting-service:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and Push adopter-service
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/adopter-service/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and Push frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_PREFIX }}-frontend:${{ steps.meta.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_PREFIX }}-frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
       - name: Create deployment summary
+        if: steps.selection.outputs.build == 'true'
+        env:
+          IMAGE: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}
+          VERSION: ${{ steps.meta.outputs.version }}
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** ${{ steps.meta.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Images pushed to DockerHub:**" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-animal-service\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-user-service\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-matching-service\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-reporting-service\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-adopter-service\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ env.DOCKER_IMAGE_PREFIX }}-frontend\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## ${{ matrix.service }}"
+            echo "**Version:** $VERSION"
+            echo "**Image:** \`$IMAGE:$VERSION\`"
+          } >> "$GITHUB_STEP_SUMMARY"
