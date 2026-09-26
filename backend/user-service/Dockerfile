@@ -11,7 +11,11 @@ RUN mvn -f user-service/pom.xml -B -Dmaven.wagon.http.retryHandler.count=5 clean
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-COPY --from=build /app/user-service/target/*.jar app.jar
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system app \
+    && useradd --system --gid app --no-create-home app
+COPY --from=build --chown=app:app /app/user-service/target/*.jar app.jar
+USER app
 EXPOSE 8085
 ENTRYPOINT ["java", "-jar", "app.jar"]

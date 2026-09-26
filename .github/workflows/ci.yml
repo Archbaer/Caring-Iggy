@@ -85,7 +85,7 @@ jobs:
         run: bash infrastructure/kong/bootstrap-keys.sh
 
       - name: Start backend stack
-        run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait
+        run: docker compose -f infrastructure/docker-compose.yml up -d --build --wait kong
         timeout-minutes: 20
 
       - name: Install frontend dependencies

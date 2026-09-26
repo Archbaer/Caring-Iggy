@@ -66,35 +66,27 @@ All services are Spring Boot 3 / Java 17. Each has its own PostgreSQL database.
 
 ## Quick Start
 
-**Prerequisites:** Java 17+, Maven 3.8+, Node.js 20+, Docker + Docker Compose
+**Prerequisites:** Java 17+, Maven 3.8+, Node.js 22+, Docker + Docker Compose
 
-### 1. Start infrastructure
+### 1. Start the full Docker stack
 
 ```bash
-bash infrastructure/kong/bootstrap-keys.sh        # once: RSA keypair → infrastructure/.env + kong.yml
-docker compose -f infrastructure/docker-compose.yml up -d --build
+bash infrastructure/kong/bootstrap-keys.sh
+docker compose -f infrastructure/docker-compose.yml up -d --build --wait
 ```
 
-This starts the PostgreSQL instances, the five backend services (no host ports) and the Kong gateway on `http://localhost:8000`. The frontend BFF is the only client of Kong; it exchanges its session for a short-lived JWT at `/internal/token`. Never commit `infrastructure/kong/kong.yml` with the real public key injected.
+This starts the PostgreSQL instances, five backend services, Kong on `http://localhost:8000`, and the production frontend on `http://localhost:3000`. The frontend BFF is the only client of Kong; it exchanges its session for a short-lived JWT at `/internal/token`. Never commit `infrastructure/kong/kong.yml` with the real public key injected.
 
-### 2. Start backend services
-
-```bash
-mvn -f backend/pom.xml clean package -DskipTests
-java -jar backend/animal-service/target/*.jar &
-java -jar backend/adopter-service/target/*.jar &
-java -jar backend/user-service/target/*.jar &
-```
-
-### 3. Start frontend
+### 2. Run the frontend dev server instead (optional)
 
 ```bash
+docker compose -f infrastructure/docker-compose.yml up -d --build --wait kong
 cp frontend/.env.local.example frontend/.env.local   # set service URLs
-npm --prefix frontend install
+npm --prefix frontend ci
 npm --prefix frontend run dev
 ```
 
-Open `http://localhost:3000`.
+Targeting `kong` starts every backend dependency without starting the Compose frontend, leaving port 3000 available for hot reload.
 
 ## Frontend Environment Variables
 
@@ -147,4 +139,4 @@ frontend/tests/
 - `infrastructure/.env.example` — sample environment variables for local Docker Compose.
 - Each microservice connects to its own isolated PostgreSQL database.
 - No backend service binds a host port; the BFF reaches them only through Kong (`infrastructure/kong/kong.yml`).
-- The frontend Docker service definition exists in `docker-compose.yml` but is commented out; it is run separately during development.
+- The default Compose stack runs the standalone production frontend. Target `kong` when running the frontend dev server separately.

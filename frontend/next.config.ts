@@ -33,6 +33,7 @@ const userUrl = process.env.USER_SERVICE_URL;
 const adopterUrl = process.env.ADOPTER_SERVICE_URL;
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "localhost", port: "8081", pathname: "/**" },
