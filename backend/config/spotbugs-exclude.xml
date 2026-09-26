@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- JdbcTemplate owns and closes statements returned by PreparedStatementCreator. -->
+    <Match>
+        <Class name="~com\.caringiggy\..*\.repository\..*Repository"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
+    </Match>
+
+    <!-- Spring-managed collaborators are intentionally retained by their controllers. -->
+    <Match>
+        <Class name="~com\.caringiggy\.user\.controller\.(EmployeeController|InternalTokenController)"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- These DTOs are mutable JavaBean contracts used by Jackson. -->
+    <Match>
+        <Class name="~com\.caringiggy\.reporting\.dto\.(AdoptionReport|IntakeReport|SummaryReport)"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- API exception/session value objects are request-scoped and never shared across threads. -->
+    <Match>
+        <Class name="~com\.caringiggy\.user\.(exception\.ApiException|service\.AuthService\$AuthenticatedSession)"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

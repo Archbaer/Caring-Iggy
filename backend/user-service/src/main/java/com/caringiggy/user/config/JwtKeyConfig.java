@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -27,7 +28,7 @@ public class JwtKeyConfig {
     }
 
     private static byte[] decodePem(String base64Pem, String marker) {
-        String pem = new String(Base64.getDecoder().decode(base64Pem));
+        String pem = new String(Base64.getDecoder().decode(base64Pem), StandardCharsets.US_ASCII);
         String body = pem
                 .replace("-----BEGIN " + marker + " KEY-----", "")
                 .replace("-----END " + marker + " KEY-----", "")
