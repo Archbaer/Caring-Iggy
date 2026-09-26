@@ -11,7 +11,11 @@ RUN mvn -f adopter-service/pom.xml -B -Dmaven.wagon.http.retryHandler.count=5 cl
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-COPY --from=build /app/adopter-service/target/*.jar app.jar
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system app \
+    && useradd --system --gid app --no-create-home app
+COPY --from=build --chown=app:app /app/adopter-service/target/*.jar app.jar
+USER app
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]

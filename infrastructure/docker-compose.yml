@@ -59,7 +59,6 @@ services:
       dockerfile: animal-service/Dockerfile
     container_name: caring-iggy-animal-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-animals
       DB_PORT: 5432
       DB_NAME: animals_db
@@ -82,7 +81,6 @@ services:
       dockerfile: adopter-service/Dockerfile
     container_name: caring-iggy-adopter-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-adopters
       DB_PORT: 5432
       DB_NAME: adopters_db
@@ -105,7 +103,6 @@ services:
       dockerfile: user-service/Dockerfile
     container_name: caring-iggy-user-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres-users
       DB_PORT: 5432
       DB_NAME: users_db
@@ -131,7 +128,6 @@ services:
       dockerfile: matching-service/Dockerfile
     container_name: caring-iggy-matching-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
       JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
@@ -151,7 +147,6 @@ services:
       dockerfile: reporting-service/Dockerfile
     container_name: caring-iggy-reporting-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
       JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
@@ -165,24 +160,28 @@ services:
       timeout: 10s
       retries: 3
 
-  # frontend:
-  #   build:
-  #     context: ../frontend
-  #     dockerfile: Dockerfile
-  #   container_name: caring-iggy-frontend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     ANIMAL_SERVICE_URL: ${ANIMAL_SERVICE_URL:-http://animal-service:8081}
-  #     USER_SERVICE_URL: ${USER_SERVICE_URL:-http://user-service:8085}
-  #     ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
-  #   volumes:
-  #     - ../frontend/src:/app/src:ro
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: caring-iggy-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      KONG_URL: ${KONG_URL:-http://kong:8000}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
+      AUTH_SESSION_STATE_SECRET: ${AUTH_SESSION_STATE_SECRET}
+      AUTH_CSRF_SECRET: ${AUTH_CSRF_SECRET}
+    depends_on:
+      kong:
+        condition: service_healthy
+    networks: [public]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   kong:
     image: kong:3.6

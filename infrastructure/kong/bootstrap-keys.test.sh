@@ -4,7 +4,7 @@
 # Asserts postconditions: keys in .env, public key pasted to kong.yml, temp files deleted
 # Runs against a COPY of the repo's kong dir in a temp dir — never touches the tracked kong.yml.
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -14,9 +14,19 @@ trap 'rm -rf "$TEST_TMP"' EXIT
 mkdir -p "$TEST_TMP/kong"
 cp "$SCRIPT_DIR/bootstrap-keys.sh" "$TEST_TMP/kong/bootstrap-keys.sh"
 cp "$SCRIPT_DIR/kong.yml" "$TEST_TMP/kong/kong.yml"
+TRACKED_KONG_HASH_BEFORE=$(openssl dgst -sha256 "$SCRIPT_DIR/kong.yml" | awk '{print $NF}')
 
 ENV_FILE="$TEST_TMP/.env"
 KONG_FILE="$TEST_TMP/kong/kong.yml"
+
+# Exercise legacy dotenv formatting: whitespace around '=', duplicates, and no final newline.
+printf '%s\n' \
+    'DB_USER = "postgres"' \
+    'JWT_PRIVATE_KEY = "stale-private"' \
+    'JWT_PRIVATE_KEY=stale-duplicate' \
+    'JWT_PUBLIC_KEY = "stale-public"' \
+    'AUTH_SESSION_STATE_SECRET = "stale-session"' > "$ENV_FILE"
+printf '%s' 'AUTH_CSRF_SECRET = "stale-csrf"' >> "$ENV_FILE"
 
 # Run bootstrap script against the copy
 bash "$TEST_TMP/kong/bootstrap-keys.sh"
@@ -41,6 +51,42 @@ if ! grep -q "^JWT_KEY_ID=" "$ENV_FILE"; then
     exit 1
 fi
 echo "PASS: JWT_KEY_ID found in .env"
+
+# Test 3b: Frontend auth secrets are generated as independent 32-byte hex values
+SESSION_SECRET=$(sed -n 's/^AUTH_SESSION_STATE_SECRET=//p' "$ENV_FILE")
+CSRF_SECRET=$(sed -n 's/^AUTH_CSRF_SECRET=//p' "$ENV_FILE")
+
+if ! printf '%s\n' "$SESSION_SECRET" | grep -Eq '^[0-9a-f]{64}$'; then
+    echo "FAIL: AUTH_SESSION_STATE_SECRET is missing or invalid"
+    exit 1
+fi
+echo "PASS: AUTH_SESSION_STATE_SECRET is a 32-byte hex value"
+
+if ! printf '%s\n' "$CSRF_SECRET" | grep -Eq '^[0-9a-f]{64}$'; then
+    echo "FAIL: AUTH_CSRF_SECRET is missing or invalid"
+    exit 1
+fi
+echo "PASS: AUTH_CSRF_SECRET is a 32-byte hex value"
+
+if [ "$SESSION_SECRET" = "$CSRF_SECRET" ]; then
+    echo "FAIL: frontend auth secrets must be different"
+    exit 1
+fi
+echo "PASS: frontend auth secrets are different"
+
+# Test 3c: managed keys are normalized and de-duplicated
+for KEY in JWT_PRIVATE_KEY JWT_PUBLIC_KEY JWT_KEY_ID AUTH_SESSION_STATE_SECRET AUTH_CSRF_SECRET; do
+    if [ "$(grep -Ec "^${KEY}=" "$ENV_FILE")" -ne 1 ]; then
+        echo "FAIL: $KEY must have exactly one normalized entry"
+        exit 1
+    fi
+
+    if grep -Eq "^[[:space:]]*${KEY}[[:space:]]+=" "$ENV_FILE"; then
+        echo "FAIL: $KEY still has a whitespace-padded entry"
+        exit 1
+    fi
+done
+echo "PASS: managed .env entries normalized and de-duplicated"
 
 # Test 4: Public key content is in kong.yml, placed under rsa_public_key: |
 if ! grep -q "BEGIN PUBLIC KEY" "$KONG_FILE"; then
@@ -78,7 +124,8 @@ fi
 echo "PASS: Temp files deleted"
 
 # Test 6: the real, tracked kong.yml was never touched by this test run
-if ! grep -q "PASTE contents of public.pem here" "$SCRIPT_DIR/kong.yml"; then
+TRACKED_KONG_HASH_AFTER=$(openssl dgst -sha256 "$SCRIPT_DIR/kong.yml" | awk '{print $NF}')
+if [ "$TRACKED_KONG_HASH_BEFORE" != "$TRACKED_KONG_HASH_AFTER" ]; then
     echo "FAIL: tracked kong.yml was modified by the test run"
     exit 1
 fi

@@ -1,0 +1,10 @@
+node_modules
+.next
+.next-stale-*
+out
+coverage
+test-results
+.auth
+.env
+.env.*
+.git
