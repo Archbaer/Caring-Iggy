@@ -1,7 +1,7 @@
 # Simple AWS Deployment Design
 
 Date: 2026-09-28
-Status: Approved conversational design; awaiting written-spec review
+Status: Approved
 
 ## 1. Purpose
 
@@ -24,7 +24,8 @@ This design includes:
 
 - AWS infrastructure expressed in CloudFormation.
 - One EC2 application host.
-- One RDS PostgreSQL instance with three logical databases.
+- One RDS PostgreSQL 15 instance with three logical databases.
+- One private, encrypted S3 bucket used only to transport versioned deployment artifacts to EC2.
 - Caddy, Next.js, Kong, and five Spring Boot services under Docker Compose.
 - Secrets Manager integration.
 - SSM-based administration and deployment.
@@ -55,7 +56,7 @@ The deployment uses `eu-west-2` and one CloudFormation stack.
 
 ### Database
 
-- One Single-AZ RDS PostgreSQL `db.t4g.small`: 2 vCPU and 2 GiB RAM.
+- One Single-AZ RDS PostgreSQL 15 `db.t4g.small`: 2 vCPU and 2 GiB RAM.
 - 20 GiB encrypted gp3 storage.
 - No public address.
 - Seven-day automated backup retention and point-in-time recovery.
@@ -128,7 +129,9 @@ Security groups enforce:
 
 EC2 uses its Elastic IP and internet gateway for public traffic, Docker image pulls, AWS API access, and SSM. RDS does not need outbound internet access.
 
-The EC2 instance requires IMDSv2. Its IAM role includes SSM managed-instance permissions and least-privilege reads for the two deployment secrets. It does not receive broad Secrets Manager or CloudFormation permissions.
+The EC2 instance requires IMDSv2. Its IAM role includes SSM managed-instance permissions, least-privilege reads for the two deployment secrets, and `s3:GetObject` for only the stack-owned deployment-artifact bucket prefix. It does not receive broad Secrets Manager, S3, or CloudFormation permissions.
+
+The stack-owned deployment-artifact bucket blocks all public access, uses server-side encryption, and expires objects after one day. `deploy-aws.sh` uploads one archive containing only committed AWS runtime files under a random object key. The SSM command tells EC2 which object key to download; it never embeds file contents or secrets. The deploy script deletes the object after success or failure, while the lifecycle rule removes abandoned objects.
 
 ## 6. TLS and public origin
 
@@ -136,7 +139,7 @@ Caddy is the only container publishing host ports. It redirects HTTP to HTTPS an
 
 The temporary deployment uses the Elastic IP as its HTTPS origin. Caddy explicitly requests a short-lived IP-address certificate from Let's Encrypt at `https://acme-v02.api.letsencrypt.org/directory` using the `shortlived` profile. No fallback issuer is configured because another issuer could silently lack the required IP-certificate profile. Caddy's `/data` volume persists certificate state across container restarts.
 
-If the browser-trusted IP certificate cannot be issued or renewed, deployment health verification fails. The system never falls back to authenticated plain HTTP or a browser-untrusted self-signed certificate. The disposable stack stays online for at least one complete certificate renewal cycle, and verification checks the renewed certificate's issuer and expiry before production acceptance.
+If the browser-trusted IP certificate cannot be issued or renewed, deployment health verification fails. The system never falls back to authenticated plain HTTP or a browser-untrusted self-signed certificate. The disposable stack stays online for eight days to cover at least one complete short-lived certificate renewal cycle, and verification checks the renewed certificate's changed serial number, issuer, and future expiry before production acceptance.
 
 Runtime configuration sets:
 
@@ -157,6 +160,7 @@ The application secret is one JSON bundle containing:
 - Frontend session-state HMAC secret.
 - Frontend CSRF HMAC secret.
 - Three database usernames and independent generated passwords.
+- Initial administrator email and generated high-entropy password.
 
 `deploy-aws.sh` generates the application bundle only when no current secret value exists. It uses a mode-0700 temporary directory, mode-0600 files, `umask 077`, and cleanup traps. The AWS CLI receives a file path, not secret contents in command arguments. Ordinary deployments never regenerate or rotate secrets.
 
@@ -172,6 +176,12 @@ The script creates `/run/caring-iggy` with mode 0700 under `umask 077`, writes s
 The JWT private key reaches only user service. The public key reaches user service and generated Kong configuration. Frontend HMAC values remain stable across restarts.
 
 Secret rotation is an explicit later operation. JWT rotation must publish old and new verification keys concurrently until all tokens signed by the old key expire.
+
+### Initial administrator
+
+Initial deployment requires `--admin-email`. When the application secret has no current value, `deploy-aws.sh` stores that email plus a generated high-entropy password in the application secret. No administrator identity, password, UUID, or password hash is committed to Git.
+
+After Flyway completes, a root-only, idempotent bootstrap script creates the first real `ADMIN` account through a parameterized SQL transaction. Database initialization enables PostgreSQL `pgcrypto` in `users_db`; the bootstrap hashes the generated password with bcrypt cost 12 inside PostgreSQL. If that email already owns an `ADMIN` account, the script succeeds without changing it. If any different `ADMIN` already exists, the script refuses to create another. Deploy output identifies the secret, and the runbook gives an explicit AWS CLI command for the operator to retrieve the password directly from Secrets Manager; scripts never print it.
 
 ## 8. Database initialization and migrations
 
@@ -190,7 +200,7 @@ Application JDBC connections include `sslmode=require`. Flyway then creates appl
 
 ### Production data policy
 
-Production starts empty except for schema-required lookup/reference rows. Demo animals, adopters, employees, accounts, and known passwords are forbidden.
+Production starts empty except for schema-required lookup/reference rows and the generated first administrator described above. Demo animals, adopters, employees, accounts, and known passwords are forbidden.
 
 Current seed migrations are separated before deployment:
 
@@ -257,18 +267,21 @@ Initial memory budgets are implementation parameters verified by load testing, n
 
 1. Validate AWS CLI, authenticated account, `eu-west-2`, Docker image owner, and immutable image tag.
 2. Run local shell, Compose, and CloudFormation validation.
-3. Deploy or update the CloudFormation stack.
-4. Create the application secret value only when absent.
-5. Wait for stack resources and SSM registration.
-6. Read and preserve the currently successful image tag before changing any host file or candidate value.
-7. Use SSM Run Command to install/update committed host runtime files and a separate candidate tag.
-8. Run idempotent database initialization.
-9. Pull candidate images and run `docker compose up -d` against the candidate configuration.
-10. Wait for container health and verify external HTTPS.
-11. Atomically promote the candidate tag to the current successful tag.
-12. Print non-secret deployment outputs and the rollback command.
+3. Package only committed AWS runtime files into a versioned archive.
+4. Deploy or update the CloudFormation stack.
+5. Create the application secret value only when absent.
+6. Wait for stack resources and SSM registration.
+7. Upload the archive to the private stack-owned artifact bucket under a random key.
+8. Read and preserve the currently successful image tag before changing any host file or candidate value.
+9. Use SSM Run Command to download the exact archive, install/update host runtime files, and set a separate candidate tag.
+10. Run idempotent database initialization.
+11. Pull candidate images and run `docker compose up -d` against the candidate configuration.
+12. Wait for container health, then create or verify the initial administrator after Flyway completes.
+13. Verify public HTTPS from the operator machine.
+14. Atomically promote the candidate tag to the current successful tag.
+15. Delete the uploaded archive and print non-secret deployment outputs plus the rollback command.
 
-No Lambda bootstrap is used. EC2 user data stays short: install Docker/Compose prerequisites, enable Docker, create required directories, and install/enable a systemd unit. Application deployment logic lives in committed scripts, not a large CloudFormation user-data block.
+No Lambda bootstrap is used. EC2 user data stays short: install Docker/Compose and AWS CLI prerequisites, enable Docker, and create required directories. Versioned scripts and the systemd unit arrive through the private deployment archive and are installed/enabled by the SSM rollout. Application deployment logic lives in committed scripts, not a large CloudFormation user-data block.
 
 The systemd unit regenerates runtime configuration and starts Compose after network and Docker availability. Secret retrieval, DNS, DockerHub pulls, and RDS readiness use six bounded exponential-backoff attempts. If preparation still fails, systemd uses `Restart=on-failure` with a five-minute delay so a transient external outage does not permanently prevent boot recovery or create a tight retry loop. A successful preparation resets the failure state. EC2 reboot therefore restores the stack without manual action once dependencies recover.
 
@@ -344,6 +357,7 @@ Expected new files:
 - `infrastructure/aws/kong.prod.yml.template`
 - `infrastructure/aws/prepare-runtime.sh`
 - `infrastructure/aws/init-databases.sh`
+- `infrastructure/aws/bootstrap-admin.sh`
 - `infrastructure/aws/caring-iggy.service`
 - Infrastructure script tests and load-test files.
 
