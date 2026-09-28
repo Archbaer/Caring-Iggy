@@ -187,7 +187,7 @@ services:
       retries: 3
 
   kong:
-    image: kong:3.6
+    image: kong:3.9.3
     container_name: caring-iggy-kong
     environment:
       KONG_DATABASE: "off"
