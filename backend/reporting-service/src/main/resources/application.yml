@@ -32,11 +32,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,circuitbreakers
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,circuitbreakers}
   endpoint:
     health:
       show-details: when-authorized
 
 logging:
   level:
-    com.caringiggy: DEBUG
+    com.caringiggy: ${LOGGING_LEVEL_COM_CARINGIGGY:DEBUG}

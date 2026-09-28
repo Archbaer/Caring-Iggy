@@ -5,13 +5,13 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:users_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:users_db}?sslmode=${DB_SSLMODE:disable}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -37,14 +37,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,circuitbreakers
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,circuitbreakers}
   endpoint:
     health:
       show-details: when-authorized
 
 logging:
   level:
-    com.caringiggy: DEBUG
+    com.caringiggy: ${LOGGING_LEVEL_COM_CARINGIGGY:DEBUG}
+    org.springframework.jdbc: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC:DEBUG}
 
 # (env-provided; documented here)
 # JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_KEY_ID=ci-key-1
