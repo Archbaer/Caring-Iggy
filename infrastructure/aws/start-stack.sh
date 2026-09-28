@@ -9,6 +9,7 @@ fi
 install_dir=${INSTALL_DIR:-/opt/caring-iggy}
 runtime_dir=${RUNTIME_DIR:-/run/caring-iggy}
 deployment_env_file=${DEPLOYMENT_ENV_FILE:-/etc/caring-iggy/deployment.env}
+current_image_tag_file=${CURRENT_IMAGE_TAG_FILE:-/etc/caring-iggy/current-image-tag}
 compose_file="$install_dir/docker-compose.prod.yml"
 
 for file in \
@@ -26,6 +27,14 @@ set -a
 # shellcheck disable=SC1090
 source "$deployment_env_file"
 set +a
+if [[ -f $current_image_tag_file ]]; then
+    read -r IMAGE_TAG <"$current_image_tag_file"
+fi
+[[ ${IMAGE_TAG:-} =~ ^sha-[0-9a-f]{12}$ ]] || {
+    echo "current image tag is unavailable or invalid" >&2
+    exit 1
+}
+export IMAGE_TAG
 export RUNTIME_DIR="$runtime_dir"
 
 run_attempt() {

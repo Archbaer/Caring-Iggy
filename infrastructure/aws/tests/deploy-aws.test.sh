@@ -29,8 +29,7 @@ mkdir -p "$bin_dir" "$subject_dir/tests"
 cp "$source_script" "$subject_dir/deploy-aws.sh"
 cp "$repo_root/infrastructure/aws/template.yml" "$subject_dir/template.yml"
 cp "$repo_root/infrastructure/aws/docker-compose.prod.yml" "$subject_dir/docker-compose.prod.yml"
-printf '# test\n' >"$subject_dir/Caddyfile.template"
-printf '_format_version: "3.0"\n' >"$subject_dir/kong.prod.yml.template"
+cp "$repo_root/infrastructure/aws/"{Caddyfile.template,kong.prod.yml.template,prepare-runtime.sh,init-databases.sh,bootstrap-admin.sh,start-stack.sh,deploy-on-host.sh,caring-iggy.service} "$subject_dir/"
 printf '#!/usr/bin/env bash\nexit 0\n' >"$subject_dir/tests/production-compose.test.sh"
 printf '#!/usr/bin/env bash\nexit 0\n' >"$subject_dir/tests/secret-scan.test.sh"
 chmod +x "$subject_dir"/*.sh "$subject_dir/tests"/*.sh
@@ -40,6 +39,7 @@ secret_capture="$fixture_dir/secret-capture.json"
 change_set_fixture="$fixture_dir/change-set.json"
 existing_secret_fixture="$fixture_dir/existing-secret.json"
 openssl_counter="$fixture_dir/openssl-counter"
+ssm_counter="$fixture_dir/ssm-counter"
 
 cat >"$bin_dir/aws" <<'EOF'
 #!/usr/bin/env bash
@@ -101,6 +101,42 @@ JSON
         cp "${secret_arg#file://}" "$SECRET_CAPTURE"
         echo '{"VersionId":"v1"}'
         ;;
+    s3:cp)
+        [[ ${S3_CP_FAIL:-0} != 1 ]]
+        ;;
+    s3:rm)
+        ;;
+    ssm:describe-instance-information)
+        if [[ $* == *'--output text'* ]]; then
+            echo Online
+        else
+            echo '{"InstanceInformationList":[{"InstanceId":"i-0123456789abcdef0","PingStatus":"Online"}]}'
+        fi
+        ;;
+    ssm:send-command)
+        count=0
+        [[ -f "$SSM_COUNTER" ]] && read -r count <"$SSM_COUNTER"
+        count=$((count + 1))
+        printf '%s\n' "$count" >"$SSM_COUNTER"
+        if [[ $* == *current-image-tag* ]]; then
+            printf 'command-%s\n' "$count" >"$SSM_CURRENT_COMMAND"
+        fi
+        printf '{"Command":{"CommandId":"command-%s"}}\n' "$count"
+        ;;
+    ssm:get-command-invocation)
+        command_id=""
+        while (($#)); do
+            if [[ $1 == --command-id ]]; then command_id=$2; break; fi
+            shift
+        done
+        if [[ ${SSM_FAIL_COMMAND:-} == "$command_id" ]]; then
+            printf '{"Status":"Failed","StandardOutputContent":"","StandardErrorContent":"fixture failure"}\n'
+        elif [[ -f "$SSM_CURRENT_COMMAND" && $command_id == "$(<"$SSM_CURRENT_COMMAND")" ]]; then
+            printf '{"Status":"Success","StandardOutputContent":"sha-aaaaaaaaaaaa\\n","StandardErrorContent":""}\n'
+        else
+            printf '{"Status":"Success","StandardOutputContent":"ok\\n","StandardErrorContent":""}\n'
+        fi
+        ;;
     *)
         echo "unexpected aws call: $*" >&2
         exit 2
@@ -146,6 +182,12 @@ case "${1:-}" in
         printf '%s\n' "$count" >"$OPENSSL_COUNTER"
         printf '%064x\n' "$count"
         ;;
+    s_client)
+        printf '%s\n' '-----BEGIN CERTIFICATE-----' fixture '-----END CERTIFICATE-----'
+        ;;
+    x509)
+        cat >/dev/null
+        ;;
     *) exit 2 ;;
 esac
 EOF
@@ -156,6 +198,11 @@ for command in shellcheck cfn-lint trivy; do
 exit 0
 EOF
 done
+cat >"$bin_dir/curl" <<'EOF'
+#!/usr/bin/env bash
+printf 'curl %s\n' "$*" >>"$AWS_LOG"
+[[ ${CURL_FAIL:-0} != 1 ]]
+EOF
 chmod +x "$bin_dir"/*
 
 cat >"$change_set_fixture" <<'EOF'
@@ -169,6 +216,14 @@ export SECRET_CAPTURE="$secret_capture"
 export CHANGE_SET_FIXTURE="$change_set_fixture"
 export EXISTING_SECRET_FIXTURE="$existing_secret_fixture"
 export OPENSSL_COUNTER="$openssl_counter"
+export SSM_COUNTER="$ssm_counter"
+export SSM_CURRENT_COMMAND="$fixture_dir/ssm-current-command"
+
+git -C "$subject_root" init -q
+git -C "$subject_root" config user.name fixture
+git -C "$subject_root" config user.email fixture@example.org
+git -C "$subject_root" add infrastructure/aws
+git -C "$subject_root" commit -qm fixture
 
 common_args=(
     --stack-name caring-iggy-test
@@ -228,6 +283,19 @@ export SECRET_STATE=existing
 run_valid >"$fixture_dir/existing-output.log"
 [[ $(grep -c 'secretsmanager put-secret-value' "$aws_log" || true) == 0 ]]
 grep -Fq -- '--capabilities CAPABILITY_IAM' "$aws_log"
+grep -Eq 's3 cp .*s3://artifact-bucket/deployments/' "$aws_log"
+[[ $(grep -c 's3 rm s3://artifact-bucket/deployments/' "$aws_log") == 1 ]]
+[[ $(grep -c 'ssm send-command' "$aws_log") == 3 ]]
+promote_line=$(grep -n "deploy-on-host.sh promote.*sha-0123456789ab" "$aws_log" | cut -d: -f1)
+curl_line=$(grep -n '^curl ' "$aws_log" | cut -d: -f1)
+[[ -n $promote_line && -n $curl_line && $promote_line -gt $curl_line ]]
+if grep -Eq 'fixture-private-key|passwordHex|sessionSecretHex' "$aws_log"; then
+    echo "secret material was sent through SSM" >&2
+    exit 1
+fi
+grep -Fq 'sha256sum' "$aws_log"
+grep -Eq 'deploy-on-host\.sh.* install' "$aws_log"
+grep -Eq 'deploy-on-host\.sh.* release' "$aws_log"
 
 : >"$aws_log"
 rm -f "$openssl_counter"
@@ -253,6 +321,42 @@ jq -e '
       .databases.animals.passwordHex, .databases.users.passwordHex,
       .databases.adopters.passwordHex, .initialAdmin.passwordHex] | unique | length == 6)
 ' "$secret_capture" >/dev/null
+
+: >"$aws_log"
+rm -f "$ssm_counter"
+export SECRET_STATE=existing
+export CURL_FAIL=1
+if run_valid >"$fixture_dir/https-failure-output.log" 2>&1; then
+    echo "failed HTTPS verification was accepted" >&2
+    exit 1
+fi
+unset CURL_FAIL
+grep -Fq 'deploy-on-host.sh rollback' "$aws_log"
+if grep -Fq 'deploy-on-host.sh promote' "$aws_log"; then
+    echo "failed HTTPS candidate was promoted" >&2
+    exit 1
+fi
+[[ $(grep -c 's3 rm s3://artifact-bucket/deployments/' "$aws_log") == 1 ]]
+
+: >"$aws_log"
+export S3_CP_FAIL=1
+if run_valid >"$fixture_dir/s3-failure-output.log" 2>&1; then
+    echo "failed artifact upload was accepted" >&2
+    exit 1
+fi
+unset S3_CP_FAIL
+[[ $(grep -c 's3 rm s3://artifact-bucket/deployments/' "$aws_log") == 1 ]]
+
+: >"$aws_log"
+rm -f "$ssm_counter" "$SSM_CURRENT_COMMAND"
+export SSM_FAIL_COMMAND=command-2
+if run_valid >"$fixture_dir/ssm-failure-output.log" 2>&1; then
+    echo "failed SSM rollout was accepted" >&2
+    exit 1
+fi
+unset SSM_FAIL_COMMAND
+grep -Fq 'deploy-on-host.sh rollback' "$aws_log"
+[[ $(grep -c 's3 rm s3://artifact-bucket/deployments/' "$aws_log") == 1 ]]
 
 cat >"$change_set_fixture" <<'EOF'
 {"Status":"CREATE_COMPLETE","Changes":[{"ResourceChange":{"LogicalResourceId":"Database","ResourceType":"AWS::RDS::DBInstance","Replacement":"True"}}]}

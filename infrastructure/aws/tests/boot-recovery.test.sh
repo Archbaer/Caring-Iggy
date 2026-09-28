@@ -50,7 +50,7 @@ printf '%s\n' "$*" >>"$SYSTEMCTL_LOG"
 EOF
 cat >"$bin_dir/docker" <<'EOF'
 #!/usr/bin/env bash
-printf '%s\n' "$*" >>"$DOCKER_LOG"
+printf '%s IMAGE_TAG=%s\n' "$*" "${IMAGE_TAG:-}" >>"$DOCKER_LOG"
 EOF
 chmod +x "$bin_dir/sleep" "$bin_dir/systemctl" "$bin_dir/docker"
 
@@ -82,6 +82,7 @@ run_start_stack() {
     INSTALL_DIR="$install_dir" \
     RUNTIME_DIR="$runtime_dir" \
     DEPLOYMENT_ENV_FILE="$fixture_dir/deployment.env" \
+    CURRENT_IMAGE_TAG_FILE="$fixture_dir/current-image-tag" \
         bash "$start_script" >"$fixture_dir/output.log" 2>&1
 }
 
@@ -101,10 +102,12 @@ fi
 : >"$DOCKER_LOG"
 : >"$SEQUENCE_LOG"
 export FAIL_PREPARE_ATTEMPTS=2
+printf '%s\n' sha-fedcba987654 >"$fixture_dir/current-image-tag"
 run_start_stack
 [[ $(<"$ATTEMPT_FILE") == 3 ]]
 [[ $(cat "$SLEEP_LOG") == $'1\n2' ]]
 grep -Fq 'compose' "$DOCKER_LOG"
+grep -Fq 'IMAGE_TAG=sha-fedcba987654' "$DOCKER_LOG"
 grep -Fqx 'reset-failed caring-iggy.service' "$SYSTEMCTL_LOG"
 
 echo "boot recovery contract: PASS"
