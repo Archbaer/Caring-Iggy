@@ -8,28 +8,32 @@ CREATE TABLE animal_type (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO animal_type (name) VALUES ('DOG'), ('CAT'), ('BIRD');
+INSERT INTO animal_type (name) VALUES ('DOG'), ('CAT'), ('BIRD')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE animal_status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO animal_status (name) VALUES ('AVAILABLE'), ('PENDING'), ('ADOPTED'), ('IN_TREATMENT'), ('DECEASED');
+INSERT INTO animal_status (name) VALUES ('AVAILABLE'), ('PENDING'), ('ADOPTED'), ('IN_TREATMENT'), ('DECEASED')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE animal_size (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO animal_size (name) VALUES ('SMALL'), ('MEDIUM'), ('LARGE');
+INSERT INTO animal_size (name) VALUES ('SMALL'), ('MEDIUM'), ('LARGE')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE animal_gender (
     id SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
-INSERT INTO animal_gender (name) VALUES ('MALE'), ('FEMALE'), ('UNKNOWN');
+INSERT INTO animal_gender (name) VALUES ('MALE'), ('FEMALE'), ('UNKNOWN')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE previous_owners (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

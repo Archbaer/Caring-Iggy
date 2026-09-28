@@ -8,7 +8,8 @@ CREATE TABLE adopter_status (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO adopter_status (name) VALUES ('ACTIVE'), ('PENDING_REVIEW'), ('APPROVED'), ('REJECTED'), ('INACTIVE');
+INSERT INTO adopter_status (name) VALUES ('ACTIVE'), ('PENDING_REVIEW'), ('APPROVED'), ('REJECTED'), ('INACTIVE')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE adopters (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
