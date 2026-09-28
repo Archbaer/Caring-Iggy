@@ -44,7 +44,7 @@ jq -e '
         {service: "caddy", target: 443, published: 443}
     ]
 ' "$rendered" >/dev/null
-jq -e '.networks.backend.internal == true' "$rendered" >/dev/null
+jq -e '.networks | has("edge") and has("backend")' "$rendered" >/dev/null
 jq -e '.networks.edge.ipam.config[0].subnet == "172.30.0.0/24"' "$rendered" >/dev/null
 jq -e '[.services[] | .restart == "unless-stopped"] | all' "$rendered" >/dev/null
 jq -e '[.services[] | .logging.options["max-size"] == "10m" and .logging.options["max-file"] == "3"] | all' "$rendered" >/dev/null

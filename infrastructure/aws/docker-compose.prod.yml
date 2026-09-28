@@ -23,6 +23,8 @@ x-java-healthcheck: &java-healthcheck
   retries: 5
   start_period: 90s
 
+name: caring-iggy
+
 services:
   caddy:
     <<: *runtime
@@ -236,4 +238,3 @@ networks:
       config:
         - subnet: 172.30.0.0/24
   backend:
-    internal: true

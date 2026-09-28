@@ -1,20 +1,20 @@
 {
-    admin 127.0.0.1:2019
-    http_port 80
-    https_port 443
+	admin 127.0.0.1:2019
+	http_port 80
+	https_port 443
 }
 
 {$APP_ORIGIN} {
-    tls {
-        issuer acme {
-            ca https://acme-v02.api.letsencrypt.org/directory
-            profile shortlived
-        }
-    }
+	tls {
+		issuer acme {
+			dir https://acme-v02.api.letsencrypt.org/directory
+			profile shortlived
+		}
+	}
 
-    reverse_proxy frontend:3000 {
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Host {host}
-        header_up X-Forwarded-Proto https
-    }
+	reverse_proxy frontend:3000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto https
+	}
 }
