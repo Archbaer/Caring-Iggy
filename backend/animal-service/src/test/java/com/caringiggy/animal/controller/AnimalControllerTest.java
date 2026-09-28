@@ -13,11 +13,11 @@ import com.caringiggy.animal.model.AnimalSize;
 import com.caringiggy.animal.model.AnimalStatus;
 import com.caringiggy.animal.model.AnimalType;
 import com.caringiggy.animal.service.AnimalService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,9 +46,9 @@ class AnimalControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private AnimalService animalService;
 
     @Test

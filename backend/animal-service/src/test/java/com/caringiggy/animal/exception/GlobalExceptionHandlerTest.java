@@ -5,8 +5,8 @@ import com.caringiggy.animal.controller.AnimalController;
 import com.caringiggy.animal.service.AnimalService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GlobalExceptionHandlerTest {
 
     @Autowired MockMvc mvc;
-    @MockBean AnimalService animalService;
+    @MockitoBean AnimalService animalService;
 
     @Test
     void accessDeniedExceptionMapsTo403() throws Exception {

@@ -7,11 +7,11 @@ import com.caringiggy.adopter.dto.CreateAdopterRequest;
 import com.caringiggy.adopter.dto.UpdateAdopterRequest;
 import com.caringiggy.adopter.exception.NotFoundException;
 import com.caringiggy.adopter.service.AdopterService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -41,9 +41,9 @@ class AdopterControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private AdopterService adopterService;
 
     @Test

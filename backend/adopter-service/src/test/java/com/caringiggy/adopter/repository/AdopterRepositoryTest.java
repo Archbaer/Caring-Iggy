@@ -1,7 +1,7 @@
 package com.caringiggy.adopter.repository;
 
 import com.caringiggy.adopter.model.Adopter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +37,7 @@ class AdopterRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        adopterRepository = new AdopterRepository(jdbcTemplate, new ObjectMapper());
+        adopterRepository = new AdopterRepository(jdbcTemplate, new JsonMapper());
     }
 
     @Test

@@ -6,12 +6,12 @@ import com.caringiggy.user.dto.EmployeeDto;
 import com.caringiggy.user.exception.ApiException;
 import com.caringiggy.user.service.AuthService;
 import com.caringiggy.user.service.EmployeeService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,15 +43,15 @@ class EmployeeControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private AuthService authService;
 
-    @MockBean
+    @MockitoBean
     private EmployeeService employeeService;
 
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test
