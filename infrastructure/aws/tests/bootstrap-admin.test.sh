@@ -18,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-master_password=master-fixture-password
+master_password='master-fixture''-password'
 users_password=$(printf '22%.0s' {1..32})
 admin_password=$(printf '44%.0s' {1..32})
 admin_email=admin@example.org

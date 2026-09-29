@@ -193,8 +193,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck jq docker-compose-plugin
+          jq --version
+          compose_version=$(docker compose version --short)
+          compose_version=${compose_version#v}
+          IFS=. read -r compose_major compose_minor _ <<<"$compose_version"
+          if ((compose_major < 2 || (compose_major == 2 && compose_minor < 30))); then
+            echo "Docker Compose 2.30 or later required; found $compose_version" >&2
+            exit 1
+          fi
 
       - name: Install cfn-lint
         run: pip install cfn-lint
@@ -228,12 +238,6 @@ jobs:
 
       - name: Run AWS deployment contract tests
         run: |
-          # Execute every contract test, including:
-          #   infrastructure/aws/tests/secret-scan.test.sh
-          #   infrastructure/aws/tests/migration-data.test.sh
-          #   infrastructure/aws/tests/production-compose.test.sh
-          #   infrastructure/aws/tests/template.test.sh
-          #   infrastructure/aws/tests/ci-contract.test.sh
           for test in infrastructure/aws/tests/*.test.sh; do
             bash "$test"
           done

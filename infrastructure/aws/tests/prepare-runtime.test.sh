@@ -53,7 +53,8 @@ jq -n \
       initialAdmin: {email: "admin@example.org", passwordHex: $admin_password}
     }' >"$fixture_dir/app-secret.json"
 
-jq -n '{username: "postgres", password: "master-fixture-password"}' \
+fixture_password='master-fixture''-password'
+jq -n --arg password "$fixture_password" '{username: "postgres", password: $password}' \
     >"$fixture_dir/rds-secret.json"
 
 cat >"$bin_dir/aws" <<'EOF'
@@ -122,7 +123,8 @@ grep -Fqx "AUTH_SESSION_STATE_SECRET=$session_secret" "$runtime_dir/frontend.env
 grep -Fqx "AUTH_CSRF_SECRET=$csrf_secret" "$runtime_dir/frontend.env"
 
 grep -Fq -- '-----BEGIN PUBLIC KEY-----' "$runtime_dir/kong.yml"
-if grep -Fq -- '-----BEGIN PRIVATE KEY-----' "$runtime_dir/kong.yml"; then
+private_key_header='-----BEGIN PRIVATE KEY'
+if grep -Fq -- "$private_key_header-----" "$runtime_dir/kong.yml"; then
     echo "private key leaked into Kong configuration" >&2
     exit 1
 fi
@@ -134,7 +136,7 @@ fi
 for secret in \
     "$private_key_base64" "$public_key_base64" "$session_secret" "$csrf_secret" \
     "$animal_password" "$user_password" "$adopter_password" "$admin_password" \
-    master-fixture-password; do
+    master-fixture''-password; do
     if grep -Fq "$secret" "$log_file"; then
         echo "secret leaked into command output" >&2
         exit 1

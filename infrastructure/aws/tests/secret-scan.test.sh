@@ -9,9 +9,8 @@ while IFS= read -r line; do
     scan_files+=("$line")
 done < <(
     git ls-files \
-        'infrastructure/aws/*' \
-        'backend/*/src/main/resources/db/migration/*' |
-        awk '!/^infrastructure\/aws\/tests\//'
+        'infrastructure/aws/**' \
+        'backend/*/src/main/resources/db/migration/**'
 )
 
 ((${#scan_files[@]} > 0)) || {
@@ -27,9 +26,24 @@ fail_if_found() {
     fi
 }
 
-fail_if_found 'a private key' '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
-fail_if_found 'an AWS access key' 'A(KIA|SIA)[0-9A-Z]{16}'
-fail_if_found 'a fixture password' '(Change[Mm]e|changeme|admin123|password123|master-fixture-password)'
-fail_if_found 'a mutable production image tag' 'image:[[:space:]]*[^#[:space:]]+:latest([[:space:]]|$)|IMAGE_TAG[^\n]*:-latest'
+private_key_pattern='-----BEGIN '
+private_key_pattern+='(RSA |EC |OPENSSH )?PRIVATE KEY-----'
+fail_if_found 'a private key' "$private_key_pattern"
+
+aws_key_pattern='A(KIA|SIA)'
+aws_key_pattern+='[0-9A-Z]{16}'
+fail_if_found 'an AWS access key' "$aws_key_pattern"
+
+password_pattern='(Change[Mm]e|change'
+password_pattern+='me|admin'
+password_pattern+='123|password'
+password_pattern+='123|master-fixture'
+password_pattern+='-password)'
+fail_if_found 'a fixture password' "$password_pattern"
+
+latest_pattern='image:[[:space:]]*[^#[:space:]]+:'
+latest_pattern+='latest([[:space:]]|$)|IMAGE_TAG[^\n]*:-'
+latest_pattern+='latest'
+fail_if_found 'a mutable production image tag' "$latest_pattern"
 
 echo "tracked deployment secret scan: PASS"

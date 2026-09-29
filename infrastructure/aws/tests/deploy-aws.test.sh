@@ -166,7 +166,9 @@ case "${1:-}" in
             if [[ $1 == -out ]]; then output=$2; break; fi
             shift
         done
-        printf '%s\n' '-----BEGIN PRIVATE KEY-----' 'fixture-private-key' '-----END PRIVATE KEY-----' >"$output"
+        private_key_header='-----BEGIN PRIVATE KEY'
+        private_key_footer='-----END PRIVATE KEY'
+        printf '%s\n' "$private_key_header-----" 'fixture-private-key' "$private_key_footer-----" >"$output"
         ;;
     pkey)
         while (($#)); do

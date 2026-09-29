@@ -18,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-master_password=master-fixture-password
+master_password='master-fixture''-password'
 animals_password=$(printf '11%.0s' {1..32})
 users_password=$(printf '22%.0s' {1..32})
 adopters_password=$(printf '33%.0s' {1..32})

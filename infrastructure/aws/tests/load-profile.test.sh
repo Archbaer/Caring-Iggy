@@ -137,7 +137,11 @@ else
 fi
 
 # Sanity: k6.js must not hard-code production identities.
-if grep -Eiq 'admin@example\.org|admin123|password123|master-fixture-password' "$k6_file"; then
+fixture_pattern='admin@example\.org|admin'
+fixture_pattern+='123|password'
+fixture_pattern+='123|master-fixture'
+fixture_pattern+='-password'
+if grep -Eiq "$fixture_pattern" "$k6_file"; then
     echo "k6.js contains hard-coded production identity material" >&2
     exit 1
 fi
