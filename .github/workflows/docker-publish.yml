@@ -124,6 +124,15 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
+      - name: Scan image for vulnerabilities
+        if: steps.selection.outputs.build == 'true'
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.meta.outputs.version }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
       - name: Create deployment summary
         if: steps.selection.outputs.build == 'true'
         env:

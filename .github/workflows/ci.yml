@@ -183,3 +183,73 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         run: docker compose -f infrastructure/docker-compose.yml logs
+
+  infrastructure-validation:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Install cfn-lint
+        run: pip install cfn-lint
+
+      - name: Lint shell scripts
+        run: |
+          shopt -s nullglob
+          scripts=(
+            infrastructure/aws/*.sh
+            infrastructure/aws/tests/*.sh
+            infrastructure/aws/load/*.sh
+          )
+          if ((${#scripts[@]} > 0)); then
+            shellcheck "${scripts[@]}"
+          fi
+
+      - name: Syntax-check shell scripts
+        run: |
+          shopt -s nullglob
+          scripts=(
+            infrastructure/aws/*.sh
+            infrastructure/aws/tests/*.sh
+            infrastructure/aws/load/*.sh
+          )
+          for script in "${scripts[@]}"; do
+            bash -n "$script"
+          done
+
+      - name: Lint CloudFormation template
+        run: cfn-lint -r eu-west-2 -t infrastructure/aws/template.yml
+
+      - name: Run AWS deployment contract tests
+        run: |
+          # Execute every contract test, including:
+          #   infrastructure/aws/tests/secret-scan.test.sh
+          #   infrastructure/aws/tests/migration-data.test.sh
+          #   infrastructure/aws/tests/production-compose.test.sh
+          #   infrastructure/aws/tests/template.test.sh
+          #   infrastructure/aws/tests/ci-contract.test.sh
+          for test in infrastructure/aws/tests/*.test.sh; do
+            bash "$test"
+          done
+
+      - name: Scan Caddy base image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: caddy:2.11.4@sha256:040e9f7480b80b6d4a7e5013a21159b950a63dcbdb956e38abe2387fb28d9ec0
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Scan Kong base image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
