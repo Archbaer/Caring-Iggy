@@ -153,8 +153,9 @@ done
 
 # HTTP must redirect to HTTPS.
 redirect_headers=$(curl --silent --show-error --max-time 10 -I "http://$elastic_ip/")
-if ! grep -Eiq '^HTTP/[^ ]+ 30[1278] ' <<<"$redirect_headers" ||
-    ! grep -Eiq "^Location:[[:space:]]*https://$elastic_ip/([[:space:]]|$)" <<<"$redirect_headers"; then
+redirect_location=$(awk 'tolower($1) == "location:" {sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print}' <<<"$redirect_headers")
+if ! grep -Eiq '^HTTP/[^ ]+ 30[1278]([[:space:]]|$)' <<<"$redirect_headers" ||
+    [[ $redirect_location != "https://$elastic_ip/" ]]; then
     die "HTTP did not redirect to HTTPS"
 fi
 echo "HTTP redirects to HTTPS"
@@ -236,7 +237,7 @@ health_body=$(cat <<'BASH'
 set -euo pipefail
 cd /opt/caring-iggy
 read -r IMAGE_TAG </etc/caring-iggy/current-image-tag
-[[ $IMAGE_TAG =~ ^sha-[0-9a-f]{12}$ ]]
+[[ $IMAGE_TAG =~ ^sha-[0-9a-f]{12}$ ]] || exit 1
 export IMAGE_TAG
 for service in caddy frontend kong animal-service adopter-service user-service matching-service reporting-service; do
     container=$(docker compose --env-file /etc/caring-iggy/deployment.env -f docker-compose.prod.yml ps --all -q "$service")
@@ -259,18 +260,12 @@ echo "Database role isolation verified"
 # Reboot recovery: restart the host and confirm the stack comes back healthy.
 echo "Checking reboot recovery..."
 boot_id_before=$(ssm_run "cat /proc/sys/kernel/random/boot_id") || die "could not read pre-reboot boot ID"
-[[ $boot_id_before =~ ^[0-9a-f-]{36}$ ]] || die "invalid pre-reboot boot ID"
+boot_id_pattern='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+[[ $boot_id_before =~ $boot_id_pattern ]] || die "invalid pre-reboot boot ID"
 # Reboot can terminate its own SSM invocation; dispatch acceptance is sufficient.
 ssm_run "shutdown -r +0" dispatch >/dev/null || die "reboot dispatch failed"
-offline=false
-for ((attempt = 1; attempt <= 60; attempt++)); do
-    online=$(aws ssm describe-instance-information --region "$region" \
-        --filters "Key=InstanceIds,Values=$instance_id" \
-        --query 'InstanceInformationList[0].PingStatus' --output text 2>/dev/null || true)
-    if [[ $online != Online ]]; then offline=true; break; fi
-    sleep 10
-done
-[[ $offline == true ]] || die "no reboot/offline transition observed"
+# PingStatus may remain cached Online throughout a short reboot. Each sample
+# sends a new command; only a fresh different boot ID plus health proves recovery.
 recovered=false
 for ((attempt = 1; attempt <= 120; attempt++)); do
     online=$(aws ssm describe-instance-information --region "$region" \
@@ -278,7 +273,7 @@ for ((attempt = 1; attempt <= 120; attempt++)); do
         --query 'InstanceInformationList[0].PingStatus' --output text 2>/dev/null || true)
     if [[ $online == Online ]]; then
         boot_id_after=$(ssm_run "cat /proc/sys/kernel/random/boot_id" 2>/dev/null || true)
-        if [[ $boot_id_after =~ ^[0-9a-f-]{36}$ && $boot_id_after != "$boot_id_before" ]] &&
+        if [[ $boot_id_after =~ $boot_id_pattern && $boot_id_after != "$boot_id_before" ]] &&
             ssm_run "$health_command" >/dev/null 2>&1; then
             recovered=true
             break
@@ -291,10 +286,40 @@ echo "Reboot recovery verified"
 
 # Bad-tag rollback: a non-existent image release must be undoable.
 echo "Checking bad-tag rollback..."
+image_tag_before=$(ssm_run "cat /etc/caring-iggy/current-image-tag") || die "could not read current immutable image tag"
+[[ $image_tag_before =~ ^sha-[0-9a-f]{12}$ ]] || die "invalid current immutable image tag"
 if ssm_run "bash /opt/caring-iggy/deploy-on-host.sh release sha-000000000000" >/dev/null 2>&1; then
     die "bad-tag release unexpectedly succeeded"
 fi
+candidate_body=$(cat <<'BASH'
+set -euo pipefail
+read -r previous </etc/caring-iggy/previous-image-tag
+read -r candidate </etc/caring-iggy/candidate-image-tag
+[[ $previous == "$1" && $candidate == sha-000000000000 ]] || exit 1
+BASH
+)
+printf -v candidate_command 'bash -c %q verification %q' "$candidate_body" "$image_tag_before"
+ssm_run "$candidate_command" >/dev/null || die "bad release did not reach the expected candidate phase; rollback acceptance failed"
 ssm_run "bash /opt/caring-iggy/deploy-on-host.sh rollback" >/dev/null || die "rollback command failed"
+rollback_body=$(cat <<'BASH'
+set -euo pipefail
+cd /opt/caring-iggy
+read -r IMAGE_TAG </etc/caring-iggy/current-image-tag
+[[ $IMAGE_TAG == "$1" ]] || { echo "incorrect restored tag" >&2; exit 1; }
+export IMAGE_TAG
+set -a
+. /etc/caring-iggy/deployment.env
+set +a
+for service in frontend animal-service adopter-service user-service matching-service reporting-service; do
+    container=$(docker compose --env-file /etc/caring-iggy/deployment.env -f docker-compose.prod.yml ps --all -q "$service")
+    [[ -n $container && $container != *$'\n'* ]] || exit 1
+    image=$(docker inspect --format '{{.Config.Image}}' "$container")
+    [[ $image == "${DOCKER_IMAGE_PREFIX:?}-$service:$1" ]] || { echo "incorrect restored image: $service" >&2; exit 1; }
+done
+BASH
+)
+printf -v rollback_command 'bash -c %q verification %q' "$rollback_body" "$image_tag_before"
+ssm_run "$rollback_command" >/dev/null || die "rollback did not restore the captured tag and all six application images"
 ssm_run "$health_command" >/dev/null || die "health check after rollback failed"
 echo "Bad-tag rollback verified"
 
@@ -304,6 +329,7 @@ source_db_id=$(jq -r '.[0].DBInstanceIdentifier' <<<"$rds_info")
 [[ -n $source_db_id && $source_db_id != null ]] || die "could not determine source RDS identifier"
 timestamp=$(date -u +%Y%m%d%H%M%S)
 target_db_id="${stack_name:0:40}-pitr-${timestamp}-$$"
+target_db_id=$(tr '[:upper:]' '[:lower:]' <<<"$target_db_id" | tr -s '-')
 # Trim if needed to stay within AWS 63-character limit.
 target_db_id="${target_db_id:0:63}"
 

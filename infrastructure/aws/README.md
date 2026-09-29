@@ -297,8 +297,8 @@ The script checks:
 - HTTP redirects to HTTPS and the TLS certificate is trusted and valid for more than one day
 - all eight expected containers exist, are running and healthy, and report no OOM kill
 - database role isolation passes
-- reboot dispatch is accepted, SSM goes offline, and a changed kernel boot ID plus healthy containers proves recovery
-- a bad image tag can be rolled back
+- reboot dispatch is accepted and a fresh changed kernel boot ID plus healthy containers proves recovery; cached SSM Online does not require an observed offline interval
+- a bad candidate reaches the release phase and rollback restores the captured immutable tag and all six application image references, followed by healthy containers
 - point-in-time restore to a new temporary RDS instance succeeds
 
 The verifier leaves the protected temporary RDS instance and the stack in place; it prints the restore identifier before creation and a cleanup checklist at the end. Every complete invocation creates another retained restore, so review and remove each separately. A failed command also leaves any created AWS resources for manual review. It never disables source protection or deletes resources.

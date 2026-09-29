@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
-subject="$repo_root/infrastructure/aws/disposable-verification.sh"
+subject="${VERIFIER_UNDER_TEST:-$repo_root/infrastructure/aws/disposable-verification.sh}"
 fixture_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir"' EXIT
 mkdir -p "$fixture_dir/bin" "$fixture_dir/host" "$fixture_dir/config"
@@ -52,7 +52,7 @@ case "$service:$operation" in
     if [[ -f "$TEST_ROOT/reboot" ]]; then
       count=$(<"$TEST_ROOT/pings")
       count=$((count+1)); printf '%s' "$count" >"$TEST_ROOT/pings"
-      if [[ ${SCENARIO_REBOOT:-normal} == no-transition || $count == 1 || $count -ge 3 ]]; then echo Online
+      if [[ ${SCENARIO_REBOOT:-normal} == always-online || ${SCENARIO_REBOOT:-normal} == no-transition || $count == 1 || $count -ge 3 ]]; then echo Online
       else echo ConnectionLost; fi
     else echo Online; fi ;;
   ssm:send-command)
@@ -60,6 +60,13 @@ case "$service:$operation" in
     id=$(($(<"$TEST_ROOT/count")+1)); printf '%s' "$id" >"$TEST_ROOT/count"
     printf '%s' "$command" >"$TEST_ROOT/command-$id"
     [[ $command != *'shutdown -r'* ]] || touch "$TEST_ROOT/reboot"
+    if [[ $command == *'/proc/sys/kernel/random/boot_id'* ]]; then
+      boot_id=11111111-1111-1111-1111-111111111111
+      if [[ -f "$TEST_ROOT/reboot" && $(<"$TEST_ROOT/pings") -ge 3 && ${SCENARIO_REBOOT:-normal} != same-marker && ${SCENARIO_REBOOT:-normal} != no-transition ]]; then
+        boot_id=22222222-2222-2222-2222-222222222222
+      fi
+      printf '%s' "$boot_id" >"$TEST_ROOT/command-$id.boot-id"
+    fi
     jq -n --arg id "command-$id" '{Command:{CommandId:$id}}' ;;
   ssm:get-command-invocation)
     id=$(value --command-id); command=$(<"$TEST_ROOT/$id")
@@ -67,16 +74,23 @@ case "$service:$operation" in
     case "$command" in
       *'shutdown -r'*) touch "$TEST_ROOT/reboot"; status=Failed; error='SSM disconnected during reboot' ;;
       *'/proc/sys/kernel/random/boot_id'*)
-        output=11111111-1111-1111-1111-111111111111
-        if [[ -f "$TEST_ROOT/reboot" && $(<"$TEST_ROOT/pings") -ge 3 && ${SCENARIO_REBOOT:-normal} != same-marker ]]; then
-          output=22222222-2222-2222-2222-222222222222
-        fi ;;
-      *'docker inspect'*|*'init-databases.sh'*)
+        output=$(<"$TEST_ROOT/$id.boot-id") ;;
+      *'docker inspect'*|*'init-databases.sh'*|*'/etc/caring-iggy/'*)
         command=${command//\/opt\/caring-iggy/$TEST_ROOT\/host}
         command=${command//\/etc\/caring-iggy/$TEST_ROOT\/config}
         if ! output=$(bash -c "$command" 2>"$TEST_ROOT/remote-error"); then status=Failed; error=$(<"$TEST_ROOT/remote-error"); fi ;;
-      *'release sha-000000000000'*) status=Failed; error='bad image' ;;
-      *'deploy-on-host.sh rollback'*) [[ ${SCENARIO_ROLLBACK:-ok} == ok ]] || status=Failed ;;
+      *'release sha-000000000000'*)
+        status=Failed; error='bad image'
+        if [[ ${SCENARIO_CANDIDATE:-executed} != not-executed ]]; then
+          cp "$TEST_ROOT/config/current-image-tag" "$TEST_ROOT/config/previous-image-tag"
+          echo sha-000000000000 >"$TEST_ROOT/config/candidate-image-tag"
+          touch "$TEST_ROOT/candidate-executed"
+        fi ;;
+      *'deploy-on-host.sh rollback'*)
+        [[ ${SCENARIO_ROLLBACK:-ok} == ok ]] || status=Failed
+        cp "$TEST_ROOT/config/previous-image-tag" "$TEST_ROOT/config/current-image-tag"
+        [[ ${SCENARIO_RESTORED_TAG:-correct} != wrong ]] || echo sha-abcdefabcdef >"$TEST_ROOT/config/current-image-tag"
+        touch "$TEST_ROOT/rolled-back" ;;
       *'restore.example.internal'*) [[ ${SCENARIO_PITR_VERIFY:-ok} == ok ]] || status=Failed ;;
       *) echo "unexpected remote command: $command" >&2; exit 2 ;;
     esac
@@ -85,6 +99,7 @@ case "$service:$operation" in
     [[ " $* " == *' --use-latest-restorable-time '* ]] || { echo 'restore time exceeds latest restorable time' >&2; exit 1; }
     [[ $(value --source-db-instance-identifier) == caring-iggy-disposable-db ]] || exit 1
     [[ $(value --target-db-instance-identifier) != caring-iggy-disposable-db ]] || exit 1
+    [[ $(value --target-db-instance-identifier) != *--* ]] || { echo 'RDS identifier contains consecutive hyphens' >&2; exit 1; }
     [[ " $* " == *' --no-publicly-accessible '* && " $* " == *' --deletion-protection '* ]] || exit 1
     [[ $(value --db-subnet-group-name) == caring-iggy-db-subnet ]] || exit 1
     [[ ${SCENARIO_RESTORE:-ok} == ok ]] || exit 1
@@ -98,12 +113,16 @@ cat >"$fixture_dir/bin/docker" <<'STUB'
 set -euo pipefail
 printf '%s\n' "$*" >>"$TEST_ROOT/docker.log"
 if [[ $1 == compose ]]; then
-  [[ ${IMAGE_TAG:-} == sha-0123456789ab ]] || { echo 'IMAGE_TAG not loaded' >&2; exit 1; }
+  [[ ${IMAGE_TAG:-} =~ ^sha-[0-9a-f]{12}$ ]] || { echo 'IMAGE_TAG not loaded' >&2; exit 1; }
   service=${!#}
   [[ ${SCENARIO_HEALTH:-ok} != missing || $service != frontend ]] || exit 0
   printf 'container-%s\n' "$service"
 elif [[ $1 == inspect ]]; then
-  if [[ ${SCENARIO_HEALTH:-ok} == unhealthy && ${!#} == container-frontend ]]; then echo 'true unhealthy false'
+  if [[ $* == *'.Config.Image'* ]]; then
+    tag=sha-0123456789ab
+    [[ ${SCENARIO_RESTORED_IMAGE:-correct} != wrong || ! -f "$TEST_ROOT/rolled-back" ]] || tag=sha-abcdefabcdef
+    printf 'example/caring-iggy-%s:%s\n' "${!#}" "$tag" | sed 's/caring-iggy-container-/caring-iggy-/'
+  elif [[ ${SCENARIO_HEALTH:-ok} == unhealthy && ${!#} == container-frontend ]]; then echo 'true unhealthy false'
   elif [[ ${SCENARIO_HEALTH:-ok} == oom && ${!#} == container-frontend ]]; then echo 'true healthy true'
   else echo 'true healthy false'; fi
 else exit 2; fi
@@ -116,9 +135,15 @@ STUB
 cat >"$fixture_dir/bin/curl" <<'STUB'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >>"$TEST_ROOT/curl.log"
+for argument; do
+  case $argument in -k*|--insecure|--insecure=*|--proxy-insecure|-[!-]*k*) echo 'insecure curl bypass' >&2; exit 1 ;; esac
+done
+url=${!#}
+[[ $url == http://192.0.2.10/ || $url == https://192.0.2.10/ ]] || { echo 'wrong TLS/redirect target' >&2; exit 1; }
 [[ ${SCENARIO_TLS:-ok} != invalid ]] || exit 60
-if [[ $* == *http://192.0.2.10/* ]]; then
+if [[ $url == http://192.0.2.10/ ]]; then
   [[ ${SCENARIO_REDIRECT:-ok} != invalid ]] || { printf 'HTTP/1.1 200 OK\n'; exit; }
+  [[ ${SCENARIO_REDIRECT:-ok} != lookalike ]] || { printf 'HTTP/1.1 308 Permanent Redirect\nLocation: https://192x0x2x10/\n\n'; exit; }
   printf 'HTTP/1.1 308 Permanent Redirect\nLocation: https://192.0.2.10/\n\n'
 fi
 STUB
@@ -144,12 +169,14 @@ set -eu
 [[ ${SCENARIO_DATABASE:-ok} == ok ]] || exit 1
 echo role-isolation-verified
 STUB
-printf 'AWS_REGION=eu-west-2\nRDS_ENDPOINT=db.example.internal\n' >"$fixture_dir/config/deployment.env"
+printf 'AWS_REGION=eu-west-2\nRDS_ENDPOINT=db.example.internal\nDOCKER_IMAGE_PREFIX=example/caring-iggy\n' >"$fixture_dir/config/deployment.env"
 printf 'sha-0123456789ab\n' >"$fixture_dir/config/current-image-tag"
 chmod +x "$fixture_dir/bin/"* "$fixture_dir/host/init-databases.sh"
 
 reset() {
   rm -f "$fixture_dir/reboot" "$fixture_dir/restored" "$fixture_dir/"command-*
+  rm -f "$fixture_dir/candidate-executed" "$fixture_dir/rolled-back" "$fixture_dir/config/previous-image-tag" "$fixture_dir/config/candidate-image-tag"
+  printf 'sha-0123456789ab\n' >"$fixture_dir/config/current-image-tag"
   printf '0' >"$fixture_dir/count"; printf '0' >"$fixture_dir/pings"
   : >"$fixture_dir/aws.log"; : >"$fixture_dir/docker.log"; : >"$fixture_dir/ports.log"; : >"$fixture_dir/curl.log"
 }
@@ -164,7 +191,13 @@ assert_safe() {
 reject() {
   local label=$1; shift
   reset
-  if run "$@"; then echo "unsafe verification accepted: $label" >&2; exit 1; fi
+  if run "$@"; then
+    cat "$fixture_dir/output.log" >&2
+    cat "$fixture_dir/config/current-image-tag" >&2
+    cat "$fixture_dir/aws.log" >&2
+    echo "unsafe verification accepted: $label" >&2
+    exit 1
+  fi
   assert_safe
 }
 
@@ -177,24 +210,38 @@ assert_safe
 for service in caddy frontend kong animal-service adopter-service user-service matching-service reporting-service; do
   grep -Fq "container-$service" "$fixture_dir/docker.log" || { echo "health not inspected: $service" >&2; exit 1; }
 done
+for service in frontend animal-service adopter-service user-service matching-service reporting-service; do
+  grep -Fq "inspect --format {{.Config.Image}} container-$service" "$fixture_dir/docker.log" || { echo "restored image not inspected: $service" >&2; exit 1; }
+done
 for port in 22 3000 8000 8001 8081 8082 8083 8084 8085 5432 80 443; do
   grep -qx "$port" "$fixture_dir/ports.log" || { echo "public port not checked: $port" >&2; exit 1; }
 done
 grep -Fq -- '--fail' "$fixture_dir/curl.log" || { echo 'trusted HTTPS curl omitted' >&2; exit 1; }
+grep -Fq -- '--fail --silent --show-error --max-time 30 https://192.0.2.10/' "$fixture_dir/curl.log" || { echo 'exact trusted HTTPS target omitted' >&2; exit 1; }
 grep -Fq 'Cleanup checklist' "$fixture_dir/output.log" || { echo 'manual cleanup omitted' >&2; exit 1; }
 [[ -f "$fixture_dir/restored" ]] || { echo 'PITR not requested' >&2; exit 1; }
 SCENARIO_REBOOT=no-transition reject stale-online
 SCENARIO_REBOOT=same-marker reject unchanged-boot-id
+reset
+if ! SCENARIO_REBOOT=always-online run; then
+  cat "$fixture_dir/output.log" >&2; echo 'cached Online with a fresh boot ID rejected' >&2; exit 1
+fi
+assert_safe
 SCENARIO_HEALTH=missing reject absent-container
 SCENARIO_HEALTH=unhealthy reject unhealthy-container
 SCENARIO_HEALTH=oom reject oom-container
 SCENARIO_DATABASE=failed reject database-isolation
 SCENARIO_ROLLBACK=failed reject rollback-failure
+SCENARIO_RESTORED_TAG=wrong reject wrong-but-healthy-restored-tag
+SCENARIO_RESTORED_IMAGE=wrong reject wrong-but-healthy-restored-images
+SCENARIO_CANDIDATE=not-executed reject failure-before-candidate-execution
+! grep -Fq 'deploy-on-host.sh rollback' "$fixture_dir/aws.log" || { echo 'rollback attempted before candidate execution' >&2; exit 1; }
 SCENARIO_PITR_VERIFY=failed reject restored-db-unreachable
 SCENARIO_RESTORE=failed reject restore-failure
 SCENARIO_TLS=invalid reject untrusted-or-wrong-host-TLS
 SCENARIO_EXPIRY=invalid reject expiring-certificate
 SCENARIO_REDIRECT=invalid reject missing-redirect
+SCENARIO_REDIRECT=lookalike reject redirect-lookalike-origin
 SCENARIO_PORT=8001 reject exposed-admin-port
 SCENARIO_PURPOSE=production reject production-stack
 ! grep -q 'ssm send-command\|rds restore-' "$fixture_dir/aws.log" || { echo 'production stack mutated' >&2; exit 1; }
@@ -207,5 +254,8 @@ reject low-budget --budget-ceiling-usd 1
 reject unchanged-certificate --previous-certificate-serial ABCDEF1234
 reset
 run --previous-certificate-serial 12345678 || { cat "$fixture_dir/output.log" >&2; exit 1; }
+assert_safe
+reset
+run --stack-name caring--iggy || { cat "$fixture_dir/output.log" >&2; exit 1; }
 assert_safe
 echo 'disposable verification contract: PASS (reboot, health, TLS, PITR, safety, renewal)'
