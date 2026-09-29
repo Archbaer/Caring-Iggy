@@ -114,6 +114,7 @@ require(contract_run.count('echo "::endgroup::"') == 2,
 for test_name in (
     "secret-scan.test.sh",
     "migration-data.test.sh",
+    "migration-data-contract.test.sh",
     "production-compose.test.sh",
     "template.test.sh",
     "ci-contract.test.sh",

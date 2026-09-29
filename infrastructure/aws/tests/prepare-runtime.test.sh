@@ -91,23 +91,44 @@ cat >"$bin_dir/docker" <<'EOF'
 echo "prepare-runtime must not invoke Docker" >&2
 exit 99
 EOF
-chmod +x "$bin_dir/aws" "$bin_dir/install" "$bin_dir/docker"
+cat >"$bin_dir/stat" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "$1" == "-f" ]]; then
+    echo "overlayfs"
+    exit 0
+fi
+if [[ "$1" == "-c" ]]; then
+    shift 2
+    if "$REAL_STAT" -c '%a' "$1" >/dev/null 2>&1; then
+        exec "$REAL_STAT" -c '%a' "$1"
+    fi
+    exec "$REAL_STAT" -f '%Lp' "$1"
+fi
+exit 2
+EOF
+chmod +x "$bin_dir/aws" "$bin_dir/install" "$bin_dir/docker" "$bin_dir/stat"
 
 log_file="$fixture_dir/output.log"
-PATH="$bin_dir:$PATH" \
-ALLOW_NON_ROOT_TEST=1 \
-AWS_REGION=eu-west-2 \
-APP_SECRET_ARN=app-secret \
-RDS_SECRET_ARN=rds-secret \
-RDS_ENDPOINT=db.example.internal \
-APP_SECRET_FIXTURE="$fixture_dir/app-secret.json" \
-RDS_SECRET_FIXTURE="$fixture_dir/rds-secret.json" \
-RUNTIME_DIR="$runtime_dir" \
-KONG_TEMPLATE="$repo_root/infrastructure/aws/kong.prod.yml.template" \
-    bash "$script" >"$log_file" 2>&1
+real_stat=$(command -v stat)
+if ! PATH="$bin_dir:$PATH" \
+    REAL_STAT="$real_stat" \
+    ALLOW_NON_ROOT_TEST=1 \
+    AWS_REGION=eu-west-2 \
+    APP_SECRET_ARN=app-secret \
+    RDS_SECRET_ARN=rds-secret \
+    RDS_ENDPOINT=db.example.internal \
+    APP_SECRET_FIXTURE="$fixture_dir/app-secret.json" \
+    RDS_SECRET_FIXTURE="$fixture_dir/rds-secret.json" \
+    RUNTIME_DIR="$runtime_dir" \
+    KONG_TEMPLATE="$repo_root/infrastructure/aws/kong.prod.yml.template" \
+    bash "$script" >"$log_file" 2>&1; then
+    cat "$log_file"
+    exit 1
+fi
 
 stat_mode() {
-    stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1"
+    stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"
 }
 
 [[ "$(stat_mode "$runtime_dir")" == "700" ]]
