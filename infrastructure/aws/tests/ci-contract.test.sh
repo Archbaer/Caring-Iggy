@@ -92,12 +92,23 @@ require_lines(contract_step, [
     "for test in infrastructure/aws/tests/*.test.sh; do",
     'echo "::group::Running AWS deployment contract test: $test"',
     'if bash "$test"; then',
+    'status=$?',
     'echo "::error title=AWS contract test failed::$test exited with status $status"',
     'exit "$status"',
 ], "AWS contract test step")
-require(contract_lines.index('echo "::group::Running AWS deployment contract test: $test"')
-        < contract_lines.index('if bash "$test"; then'),
-        "AWS contract test name must print before execution")
+group_start = contract_lines.index('echo "::group::Running AWS deployment contract test: $test"')
+if_index = contract_lines.index('if bash "$test"; then')
+success_close = contract_lines.index('echo "::endgroup::"', if_index)
+else_index = contract_lines.index("else", success_close)
+status_index = contract_lines.index('status=$?', else_index)
+error_index = contract_lines.index(
+    'echo "::error title=AWS contract test failed::$test exited with status $status"', else_index)
+failure_close = contract_lines.index('echo "::endgroup::"', else_index)
+exit_index = contract_lines.index('exit "$status"', else_index)
+require(group_start < if_index < success_close < else_index,
+        "AWS contract test name and success group must precede failure branch")
+require(status_index == else_index + 1 and status_index < error_index < failure_close < exit_index,
+        "AWS contract test must capture failure status before reporting, close group, then exit")
 require(contract_run.count('echo "::endgroup::"') == 2,
         "AWS contract test groups must close on success and failure")
 for test_name in (
