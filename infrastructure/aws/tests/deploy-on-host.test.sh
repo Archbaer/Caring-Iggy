@@ -36,6 +36,22 @@ cat >"$bin_dir/docker" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 printf 'docker %s IMAGE_TAG=%s\n' "$*" "${IMAGE_TAG:-}" >>"$ACTION_LOG"
+if [[ $* == *' config --no-env-resolution --format json' ]]; then
+    [[ -f ${3:-} && ${3:-} == "$CONFIG_DIR/deployment.env" ]] || exit 1
+    printf '%s\n' '{"name":"caring-iggy","networks":{"backend":{"name":"caring-iggy_backend"}}}'
+    exit 0
+elif [[ ${1:-} == network && ${2:-} == inspect ]]; then
+    [[ -f $NETWORK_STATE ]] || exit 1
+    printf '%s\n' '[{"Labels":{"com.docker.compose.project":"caring-iggy","com.docker.compose.network":"backend"}}]'
+    exit 0
+elif [[ ${1:-} == network && ${2:-} == create ]]; then
+    [[ ${FAIL_NETWORK_CREATE:-0} != 1 ]] || exit 1
+    touch "$NETWORK_STATE"
+    exit 0
+elif [[ ${1:-} == run ]]; then
+    [[ -f $NETWORK_STATE ]]
+    exit 0
+fi
 if [[ $* == *' ps --services' ]]; then
     printf '%s\n' caddy kong animal-service adopter-service user-service matching-service reporting-service frontend
 elif [[ $* == *' ps -q '* ]]; then
@@ -52,6 +68,7 @@ EOF
 chmod +x "$bin_dir/"*
 
 export ACTION_LOG="$log"
+export NETWORK_STATE="$fixture/network-state"
 export ALLOW_NON_ROOT_TEST=1
 export INSTALL_DIR="$install_dir"
 export CONFIG_DIR="$config_dir"
@@ -110,6 +127,42 @@ fi
 grep -Fq 'rollback unavailable' "$fixture/rollback.log"
 [[ ! -e "$config_dir/current-image-tag" ]]
 [[ ! -e "$config_dir/candidate-ready" ]]
+
+cp "$repo_root/infrastructure/aws/init-databases.sh" "$install_dir/init-databases.sh"
+password=$(printf '1%.0s' {1..64})
+jq -n --arg password "$password" '{databases: {
+    animals: {username: "animals_app", passwordHex: $password},
+    users: {username: "users_app", passwordHex: $password},
+    adopters: {username: "adopters_app", passwordHex: $password}
+}}' >"$fixture/app-secret.json"
+jq -n '{username: "postgres", password: "fixture-password"}' >"$fixture/rds-secret.json"
+cat >"$bin_dir/aws" <<'EOF'
+#!/usr/bin/env bash
+if [[ $* == *'secret:app'* ]]; then cat "$APP_SECRET_FIXTURE"; else cat "$RDS_SECRET_FIXTURE"; fi
+EOF
+chmod +x "$bin_dir/aws"
+export APP_SECRET_FIXTURE="$fixture/app-secret.json"
+export RDS_SECRET_FIXTURE="$fixture/rds-secret.json"
+: >"$log"
+"$subject" release sha-eeeeeeeeeeee
+prepare_line=$(grep -n '^prepare-runtime.sh ' "$log" | head -1 | cut -d: -f1)
+create_line=$(grep -n '^docker network create ' "$log" | head -1 | cut -d: -f1)
+run_line=$(grep -n '^docker run ' "$log" | head -1 | cut -d: -f1)
+pull_line=$(grep -n '^docker compose .* pull ' "$log" | head -1 | cut -d: -f1)
+((prepare_line < create_line && create_line < run_line && run_line < pull_line))
+
+rm "$NETWORK_STATE"
+: >"$log"
+export FAIL_NETWORK_CREATE=1
+if "$subject" release sha-ffffffffffff >/dev/null 2>&1; then
+    echo "release continued after backend network creation failed" >&2
+    exit 1
+fi
+if grep -Eq '^docker (run |compose .* (pull|up) )' "$log"; then
+    echo "release continued to database or application startup after network failure" >&2
+    exit 1
+fi
+unset FAIL_NETWORK_CREATE
 
 printf 'unexpected\n' >"$source_dir/extra-file"
 if "$subject" install "$source_dir" >/dev/null 2>&1; then

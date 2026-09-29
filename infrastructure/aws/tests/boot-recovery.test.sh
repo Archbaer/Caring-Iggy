@@ -50,7 +50,19 @@ printf '%s\n' "$*" >>"$SYSTEMCTL_LOG"
 EOF
 cat >"$bin_dir/docker" <<'EOF'
 #!/usr/bin/env bash
+set -euo pipefail
 printf '%s IMAGE_TAG=%s\n' "$*" "${IMAGE_TAG:-}" >>"$DOCKER_LOG"
+if [[ $* == *' config --no-env-resolution --format json' ]]; then
+    printf '%s\n' '{"name":"caring-iggy","networks":{"backend":{"name":"caring-iggy_backend"}}}'
+elif [[ ${1:-} == network && ${2:-} == inspect ]]; then
+    [[ -f $NETWORK_STATE ]] || exit 1
+    printf '%s\n' '[{"Labels":{"com.docker.compose.project":"caring-iggy","com.docker.compose.network":"backend"}}]'
+elif [[ ${1:-} == network && ${2:-} == create ]]; then
+    [[ ${FAIL_NETWORK_CREATE:-0} != 1 ]] || exit 1
+    touch "$NETWORK_STATE"
+elif [[ ${1:-} == run ]]; then
+    [[ -f $NETWORK_STATE ]]
+fi
 EOF
 chmod +x "$bin_dir/sleep" "$bin_dir/systemctl" "$bin_dir/docker"
 
@@ -75,6 +87,7 @@ export SLEEP_LOG="$fixture_dir/sleeps"
 export SYSTEMCTL_LOG="$fixture_dir/systemctl"
 export DOCKER_LOG="$fixture_dir/docker"
 export SEQUENCE_LOG="$fixture_dir/sequence"
+export NETWORK_STATE="$fixture_dir/network-state"
 
 run_start_stack() {
     PATH="$bin_dir:$PATH" \
@@ -109,5 +122,42 @@ run_start_stack
 grep -Fq 'compose' "$DOCKER_LOG"
 grep -Fq 'IMAGE_TAG=sha-fedcba987654' "$DOCKER_LOG"
 grep -Fqx 'reset-failed caring-iggy.service' "$SYSTEMCTL_LOG"
+
+cp "$repo_root/infrastructure/aws/init-databases.sh" "$install_dir/init-databases.sh"
+password=$(printf '1%.0s' {1..64})
+jq -n --arg password "$password" '{databases: {
+    animals: {username: "animals_app", passwordHex: $password},
+    users: {username: "users_app", passwordHex: $password},
+    adopters: {username: "adopters_app", passwordHex: $password}
+}}' >"$fixture_dir/app-secret.json"
+jq -n '{username: "postgres", password: "fixture-password"}' >"$fixture_dir/rds-secret.json"
+cat >"$bin_dir/aws" <<'EOF'
+#!/usr/bin/env bash
+if [[ $* == *'app-secret'* ]]; then cat "$APP_SECRET_FIXTURE"; else cat "$RDS_SECRET_FIXTURE"; fi
+EOF
+chmod +x "$bin_dir/aws"
+export APP_SECRET_FIXTURE="$fixture_dir/app-secret.json"
+export RDS_SECRET_FIXTURE="$fixture_dir/rds-secret.json"
+export FAIL_PREPARE_ATTEMPTS=0
+: >"$DOCKER_LOG"
+: >"$ATTEMPT_FILE"
+run_start_stack
+create_line=$(grep -n '^network create ' "$DOCKER_LOG" | head -1 | cut -d: -f1)
+run_line=$(grep -n '^run --rm ' "$DOCKER_LOG" | head -1 | cut -d: -f1)
+pull_line=$(grep -n '^compose .* pull ' "$DOCKER_LOG" | head -1 | cut -d: -f1)
+((create_line < run_line && run_line < pull_line))
+
+rm "$NETWORK_STATE"
+: >"$DOCKER_LOG"
+: >"$ATTEMPT_FILE"
+export FAIL_NETWORK_CREATE=1
+if run_start_stack; then
+    echo "boot recovery continued after backend network creation failed" >&2
+    exit 1
+fi
+if grep -Eq '^(run |compose .* (pull|up) )' "$DOCKER_LOG"; then
+    echo "boot recovery started database or application after network failure" >&2
+    exit 1
+fi
 
 echo "boot recovery contract: PASS"

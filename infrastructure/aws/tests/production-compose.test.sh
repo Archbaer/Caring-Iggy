@@ -50,6 +50,7 @@ jq -e '[.services[] | .restart == "unless-stopped"] | all' "$rendered" >/dev/nul
 jq -e '[.services[] | .logging.options["max-size"] == "10m" and .logging.options["max-file"] == "3"] | all' "$rendered" >/dev/null
 jq -e '.services.caddy.image == "caddy:2.11.4@sha256:040e9f7480b80b6d4a7e5013a21159b950a63dcbdb956e38abe2387fb28d9ec0"' "$rendered" >/dev/null
 jq -e '.services.kong.image == "kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9"' "$rendered" >/dev/null
+jq -e '.services.frontend.healthcheck.test == ["CMD", "curl", "--fail", "--silent", "http://localhost:3000/api/health"]' "$rendered" >/dev/null
 
 grep -Fq 'profile shortlived' "$repo_root/infrastructure/aws/Caddyfile.template"
 grep -Fq 'reverse_proxy frontend:3000' "$repo_root/infrastructure/aws/Caddyfile.template"

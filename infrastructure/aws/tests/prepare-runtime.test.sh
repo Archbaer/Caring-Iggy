@@ -16,6 +16,11 @@ openssl pkey -in "$fixture_dir/private.pem" -pubout \
     -out "$fixture_dir/public.pem" 2>/dev/null
 printf '#>>>???\n' >>"$fixture_dir/private.pem"
 printf '#>>>???\n' >>"$fixture_dir/public.pem"
+for key_file in "$fixture_dir/private.pem" "$fixture_dir/public.pem"; do
+    if (( $(wc -c <"$key_file") % 3 == 0 )); then
+        printf 'x' >>"$key_file"
+    fi
+done
 private_key_base64=$(base64 <"$fixture_dir/private.pem" | tr -d '\n')
 public_key_base64=$(base64 <"$fixture_dir/public.pem" | tr -d '\n')
 

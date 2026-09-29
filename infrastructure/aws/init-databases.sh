@@ -21,8 +21,32 @@ for command in aws docker jq; do
 done
 
 postgres_client_image=${POSTGRES_CLIENT_IMAGE:-postgres:15-alpine@sha256:25d430274d8a31184f9435cc5b2f56aff254952065bbbcac0c51acedb5a1d1e7}
-db_network=${DB_NETWORK:-caring-iggy_backend}
 db_sslmode=${DB_SSLMODE:-require}
+
+if [[ -n ${DB_NETWORK:-} ]]; then
+    db_network=$DB_NETWORK
+else
+    deployment_env_file=${DEPLOYMENT_ENV_FILE:-${CONFIG_DIR:-/etc/caring-iggy}/deployment.env}
+    compose_file=${COMPOSE_FILE:-${INSTALL_DIR:-/opt/caring-iggy}/docker-compose.prod.yml}
+    compose_config=$(docker compose --env-file "$deployment_env_file" -f "$compose_file" \
+        config --no-env-resolution --format json)
+    compose_project=$(jq -er '.name | select(type == "string" and length > 0)' <<<"$compose_config")
+    db_network=$(jq -er '.networks.backend.name | select(type == "string" and length > 0)' <<<"$compose_config")
+    if network_config=$(docker network inspect "$db_network" 2>/dev/null); then
+        jq -e --arg project "$compose_project" '
+            .[0].Labels["com.docker.compose.project"] == $project and
+            .[0].Labels["com.docker.compose.network"] == "backend"
+        ' <<<"$network_config" >/dev/null || {
+            echo "backend network has incorrect Compose labels" >&2
+            exit 1
+        }
+    else
+        docker network create \
+            --label "com.docker.compose.project=$compose_project" \
+            --label 'com.docker.compose.network=backend' \
+            "$db_network" >/dev/null
+    fi
+fi
 
 temp_dir=$(mktemp -d)
 trap 'rm -rf "$temp_dir"' EXIT

@@ -38,7 +38,7 @@ The pinned images the deploy script scans are:
 
 Images are built and pushed by `.github/workflows/docker-publish.yml`.
 
-- On pushes to `main`, the workflow selects changed services. A tag starting with `v*` selects every service.
+- On pushes to `main` or a tag starting with `v*`, the workflow builds all six services. Manual runs can select one service or all six.
 - Every selected service build publishes `sha-${GITHUB_SHA::12}` (for example `sha-0123456789ab`), including git-tag builds.
 - Git-tag builds also publish the version string without the leading `v`. Trivy scans the immutable SHA tag after publication.
 - The workflow also pushes a `:latest` tag, but **production deploys must never use `latest`**. Always deploy an immutable `sha-` tag.
