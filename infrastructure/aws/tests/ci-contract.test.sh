@@ -122,6 +122,14 @@ for test_name in (
     require((root / "infrastructure/aws/tests" / test_name).is_file(),
             f"required AWS contract test is missing: {test_name}")
 
+init_databases_test = (root / "infrastructure/aws/tests/init-databases.test.sh").read_text()
+tcp_ready_probe = 'docker exec "$container_name" pg_isready -h 127.0.0.1 -U postgres'
+require(init_databases_test.count(tcp_ready_probe) == 2,
+        "database test readiness and final assertion must use PostgreSQL TCP")
+require("database TCP readiness timed out" in init_databases_test
+        and 'docker logs --tail 50 "$container_name" >&2 || true' in init_databases_test,
+        "database test must report bounded logs when TCP readiness times out")
+
 for name, expected_image in (
     ("Scan Caddy base image", "caddy:2.11.4@sha256:040e9f7480b80b6d4a7e5013a21159b950a63dcbdb956e38abe2387fb28d9ec0"),
     ("Scan Kong base image", "kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9"),
