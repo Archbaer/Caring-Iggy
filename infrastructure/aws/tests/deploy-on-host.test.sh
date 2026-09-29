@@ -41,14 +41,19 @@ if [[ $* == *' config --no-env-resolution --format json' ]]; then
     printf '%s\n' '{"name":"caring-iggy","networks":{"backend":{"name":"caring-iggy_backend"}}}'
     exit 0
 elif [[ ${1:-} == network && ${2:-} == inspect ]]; then
+    [[ $# == 3 && $3 == caring-iggy_backend ]] || exit 1
     [[ -f $NETWORK_STATE ]] || exit 1
     printf '%s\n' '[{"Labels":{"com.docker.compose.project":"caring-iggy","com.docker.compose.network":"backend"}}]'
     exit 0
 elif [[ ${1:-} == network && ${2:-} == create ]]; then
+    [[ $# == 7 && $3 == --label && $4 == com.docker.compose.project=caring-iggy &&
+        $5 == --label && $6 == com.docker.compose.network=backend &&
+        $7 == caring-iggy_backend ]] || exit 1
     [[ ${FAIL_NETWORK_CREATE:-0} != 1 ]] || exit 1
     touch "$NETWORK_STATE"
     exit 0
 elif [[ ${1:-} == run ]]; then
+    [[ $3 == --network && $4 == caring-iggy_backend ]] || exit 1
     [[ -f $NETWORK_STATE ]]
     exit 0
 fi

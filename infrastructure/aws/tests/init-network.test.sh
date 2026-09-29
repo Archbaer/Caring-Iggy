@@ -31,24 +31,29 @@ set -euo pipefail
 case "$1 $2" in
     'compose --env-file')
         printf 'compose-config\n' >>"$EVENTS"
-        printf '%s\n' '{"name":"caring-iggy","networks":{"backend":{"name":"caring-iggy_backend"}}}'
+        printf '%s\n' '{"name":"ci-dynamic","networks":{"backend":{"name":"ci-dynamic_backend"}}}'
         ;;
     'network inspect')
         printf 'network-inspect\n' >>"$EVENTS"
+        [[ $# == 3 && $3 == ci-dynamic_backend ]] || exit 1
         [[ -f $NETWORK_STATE ]] || exit 1
         if [[ $(<"$NETWORK_STATE") == good ]]; then
-            printf '%s\n' '[{"Labels":{"com.docker.compose.project":"caring-iggy","com.docker.compose.network":"backend"}}]'
+            printf '%s\n' '[{"Labels":{"com.docker.compose.project":"ci-dynamic","com.docker.compose.network":"backend"}}]'
         else
             printf '%s\n' '[{"Labels":{"com.docker.compose.project":"other","com.docker.compose.network":"backend"}}]'
         fi
         ;;
     'network create')
         printf 'network-create\n' >>"$EVENTS"
+        [[ $# == 7 && $3 == --label && $4 == com.docker.compose.project=ci-dynamic &&
+            $5 == --label && $6 == com.docker.compose.network=backend &&
+            $7 == ci-dynamic_backend ]] || exit 1
         [[ ${FAIL_NETWORK_CREATE:-0} != 1 ]] || exit 1
         printf 'good\n' >"$NETWORK_STATE"
         ;;
     'run --rm')
         printf 'database-run\n' >>"$EVENTS"
+        [[ $3 == --network && $4 == ci-dynamic_backend ]] || exit 1
         [[ -f $NETWORK_STATE ]]
         ;;
     *) echo "unexpected Docker call: $*" >&2; exit 1 ;;
