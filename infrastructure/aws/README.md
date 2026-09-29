@@ -236,7 +236,7 @@ export AWS_REGION=eu-west-2
 
 `load-test.sh` creates fixtures, runs a k6 container with `infrastructure/aws/load/k6.js`, and deletes fixtures on exit.
 
-Known limitation: adopter fixtures cannot be deleted through the BFF because there is no `DELETE` route. The disposable stack teardown removes them when the stack is deleted.
+Cleanup rechecks `Purpose=disposable`, deletes animals and staff profiles through the BFF, then uses SSM and existing private database environment files to remove the exact generated adopter profile/account and orphaned staff account (sessions cascade). Operator IAM needs CloudFormation read, Secrets Manager read, and SSM send/read permissions. Failed cleanup returns nonzero and retains the mode-0600 fixture journal for retry with `STACK_NAME`, `BASE_URL`, `AWS_REGION`, `CI_LOAD_TEST=true`, and `K6_FIXTURE_FILE` pointing to that file. The profile ramps continuously from 300 to 700 VUs; login setup traffic is excluded from capacity thresholds. Docker must support host networking; `K6_IMAGE` must pin a release version and SHA-256 digest.
 
 ## 14. Disposable acceptance
 

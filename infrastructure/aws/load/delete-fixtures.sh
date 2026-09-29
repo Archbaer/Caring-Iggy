@@ -1,119 +1,98 @@
 #!/usr/bin/env bash
+set +x
 set -euo pipefail
-
-umask 077
-
-if [[ ${CI_LOAD_TEST:-} != true ]]; then
-    echo "CI_LOAD_TEST must be set to true" >&2
-    exit 1
-fi
-
-if [[ -z ${BASE_URL:-} ]]; then
-    echo "BASE_URL is required" >&2
-    exit 1
-fi
-
-if [[ ${BASE_URL} != https://* ]]; then
-    echo "BASE_URL must use HTTPS" >&2
-    exit 1
-fi
-
-fixture_file=${1:-}
-if [[ -z $fixture_file ]]; then
-    fixture_file=${K6_FIXTURE_FILE:-}
-fi
-if [[ -z $fixture_file || ! -f $fixture_file ]]; then
-    echo "fixture file is required" >&2
-    exit 1
-fi
-
-: "${AWS_REGION:?AWS_REGION is required}"
-
-for command in aws curl jq; do
-    if ! command -v "$command" >/dev/null 2>&1; then
-        echo "required command is unavailable: $command" >&2
-        exit 1
-    fi
-done
-
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck disable=SC1091
+# shellcheck source=common.sh
+source "$script_dir/common.sh"
+require_environment
+# BASE_URL is validated by require_environment in common.sh.
+# shellcheck disable=SC2153
 base_url=${BASE_URL%/}
-
-die() {
-    echo "fixture cleanup error: $1" >&2
-    exit 1
+fixture_file=${1:-${K6_FIXTURE_FILE:-}}
+[[ -f $fixture_file && ! -L $fixture_file ]] || die "fixture file is required and must not be a symlink"
+temp_dir=$(mktemp -d)
+cleanup() {
+    local status=$?
+    trap - EXIT
+    if ! logout_admin; then
+        echo "admin session logout failed" >&2
+        ((status != 0)) || status=1
+    fi
+    rm -rf "$temp_dir"
+    exit "$status"
 }
-
-admin_email=$(jq -r '.admin.email' "$fixture_file")
-admin_password=$(jq -r '.admin.password' "$fixture_file")
-staff_profile_id=$(jq -r '.staff.profileId // empty' "$fixture_file")
-animal_ids_json=$(jq -c '.animalIds // []' "$fixture_file")
-
-if [[ -z $admin_email || $admin_email == null || -z $admin_password || $admin_password == null ]]; then
-    die "fixture file is missing admin credentials"
-fi
-
-csrf_token=""
-csrf_cookie=""
-
-fetch_csrf() {
-    local body
-    body=$(curl -fsS -D - "$base_url/api/auth/session" 2>/dev/null | tr -d '\r')
-    csrf_cookie=$(printf '%s\n' "$body" | awk -F';' '/^[Ss]et-[Cc]ookie: *ci_csrf=/{print $1; exit}' | sed 's/^[Ss]et-[Cc]ookie: *//')
-    csrf_token=$(printf '%s\n' "$body" | awk '/^\r?$/{start=1; next} start{print}' | jq -r '.csrfToken')
-}
-
-admin_session_value=""
-
-login_admin() {
-    local response
-    response=$(curl -fsS -D - -X POST \
-        -H "Content-Type: application/json" \
-        -H "x-csrf-token: $csrf_token" \
-        -b "$csrf_cookie" \
-        -d "{\"email\":\"$admin_email\",\"password\":\"$admin_password\"}" \
-        "$base_url/api/auth/login" 2>/dev/null | tr -d '\r')
-    admin_session_value=$(printf '%s\n' "$response" | awk -F';' '/^[Ss]et-[Cc]ookie: *ci_session=/{print $1; exit}' | sed 's/^[Ss]et-[Cc]ookie: *ci_session=//')
-}
-
-fetch_csrf
+trap cleanup EXIT
+read_stack
+export LOAD_BASE_URL=$base_url LOAD_STACK_NAME=$STACK_NAME
+jq -e --slurpfile stack "$temp_dir/stack.json" '
+    .baseUrl == env.LOAD_BASE_URL and .stackName == env.LOAD_STACK_NAME and .stackId == $stack[0].Stacks[0].StackId and
+    (.prefix | test("^load-[0-9]+-[0-9a-f]{16}$")) and
+    .adopter.email == (.prefix+"-adopter@example.org") and .staff.email == (.prefix+"-staff@example.org") and
+    ([.adopter.accountId,.adopter.profileId,.staff.accountId,.staff.profileId] |
+      all(. == null or (type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")))) and
+    (.animalIds | all(type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")))
+' "$fixture_file" >/dev/null || die "fixture identity or stack does not match"
 login_admin
-
-if [[ -z $admin_session_value ]]; then
-    die "admin login failed"
-fi
-
-delete_count=0
-
-# Delete animals created by the fixture run.
+failed=0 count=0
 while IFS= read -r animal_id; do
-    if [[ -z $animal_id || $animal_id == null ]]; then
-        continue
+    fetch_csrf "$temp_dir/admin.cookies"
+    if request DELETE "/api/animals/$animal_id/delete" "$temp_dir/admin.cookies"; then
+        count=$((count + 1))
+    else
+        failed=1
     fi
-    fetch_csrf
-    if curl -fsS -X DELETE \
-        -H "x-csrf-token: $csrf_token" \
-        -b "ci_session=$admin_session_value; $csrf_cookie" \
-        "$base_url/api/animals/$animal_id/delete" >/dev/null 2>&1; then
-        delete_count=$((delete_count + 1))
-    fi
-done < <(jq -r '.[]' <<<"$animal_ids_json")
-
-# Delete staff account created by the fixture run.
-if [[ -n $staff_profile_id && $staff_profile_id != null ]]; then
-    fetch_csrf
-    if curl -fsS -X DELETE \
-        -H "x-csrf-token: $csrf_token" \
-        -b "ci_session=$admin_session_value; $csrf_cookie" \
-        "$base_url/api/admin/staff/$staff_profile_id" >/dev/null 2>&1; then
-        delete_count=$((delete_count + 1))
+done < <(jq -r '.animalIds[]' "$fixture_file")
+staff_profile=$(jq -r '.staff.profileId // empty' "$fixture_file")
+if [[ -n $staff_profile ]]; then
+    fetch_csrf "$temp_dir/admin.cookies"
+    if request DELETE "/api/admin/staff/$staff_profile" "$temp_dir/admin.cookies"; then
+        count=$((count + 1))
+    else
+        failed=1
     fi
 fi
-
-# Adopter fixtures are intentionally left in place: the application BFF exposes
-# GET+PUT on /api/admin/adopters/[id] but no DELETE, so there is no supported
-# HTTP API to remove an adopter account. They are cleaned up by disposable stack
-# teardown instead.
-
+# The BFF has no adopter deletion API; staff DELETE leaves its auth account.
+# Recheck the tag immediately before narrowly scoped account/profile SQL.
+read_stack
+jq -e --slurpfile stack "$temp_dir/stack.json" '.stackId == $stack[0].Stacks[0].StackId' \
+    "$fixture_file" >/dev/null || die "stack changed during cleanup; fixture journal retained"
+instance_id=$(stack_output InstanceId) || die "stack does not export InstanceId"
+db_host=$(stack_output RdsEndpoint) || die "stack does not export RdsEndpoint"
+[[ $instance_id =~ ^i-[0-9a-f]+$ && $db_host =~ ^[A-Za-z0-9.-]+$ ]] || die "invalid stack cleanup outputs"
+{
+    printf "bash -s <<'CI_LOAD_FIXTURE_CLEANUP'\n"
+    printf 'exec >/dev/null 2>&1\nexport CI_LOAD_TEST=true LOAD_STACK_PURPOSE=disposable\n'
+    printf 'LOAD_DB_HOST=%q\n' "$db_host"
+    for entry in 'LOAD_PREFIX prefix' 'LOAD_ADOPTER_EMAIL adopter.email' 'LOAD_STAFF_EMAIL staff.email' \
+        'LOAD_ADOPTER_ACCOUNT adopter.accountId' 'LOAD_ADOPTER_PROFILE adopter.profileId' \
+        'LOAD_STAFF_ACCOUNT staff.accountId' 'LOAD_STAFF_PROFILE staff.profileId'; do
+        name=${entry%% *} field=${entry#* }
+        printf '%s=%q\n' "$name" "$(jq -r ".$field // empty" "$fixture_file")"
+    done
+    sed '1d' "$script_dir/cleanup-accounts.sh"
+    printf '\nCI_LOAD_FIXTURE_CLEANUP\n'
+} >"$temp_dir/remote.sh"
+jq -Rs '{commands:[.]}' "$temp_dir/remote.sh" >"$temp_dir/parameters.json"
+aws ssm send-command --region "$AWS_REGION" --instance-ids "$instance_id" \
+    --document-name AWS-RunShellScript --parameters "file://$temp_dir/parameters.json" \
+    --output json >"$temp_dir/command.json" 2>/dev/null || die "could not start account cleanup"
+command_id=$(jq -er '.Command.CommandId' "$temp_dir/command.json") || die "missing cleanup command ID"
+status=Pending
+for ((attempt = 0; attempt < 120; attempt++)); do
+    if aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" \
+        --instance-id "$instance_id" --output json >"$temp_dir/invocation.json" 2>/dev/null; then
+        status=$(jq -r '.Status' "$temp_dir/invocation.json")
+        case $status in
+            Success) break ;;
+            Pending|InProgress|Delayed) ;;
+            *) die "account cleanup failed; fixture journal retained" ;;
+        esac
+    fi
+    sleep 2
+done
+[[ $status == Success ]] || die "account cleanup timed out; fixture journal retained"
+((failed == 0)) || die "API cleanup failed; fixture journal retained"
+logout_admin || die "admin session logout failed; fixture journal retained"
 rm -f "$fixture_file"
-
-echo "fixtures deleted: $delete_count"
+echo "fixtures deleted: $((count + 1))"
