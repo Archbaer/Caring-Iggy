@@ -15,6 +15,7 @@ temp_dir=$(mktemp -d)
 cleanup() {
     local status=$?
     trap - EXIT
+    trap '' INT TERM
     if ! logout_admin; then
         echo "admin session logout failed" >&2
         ((status != 0)) || status=1
@@ -23,6 +24,8 @@ cleanup() {
     exit "$status"
 }
 trap cleanup EXIT
+trap 'signal_exit 130' INT
+trap 'signal_exit 143' TERM
 read_stack
 export LOAD_BASE_URL=$base_url LOAD_STACK_NAME=$STACK_NAME
 jq -e --slurpfile stack "$temp_dir/stack.json" '
@@ -74,13 +77,13 @@ db_host=$(stack_output RdsEndpoint) || die "stack does not export RdsEndpoint"
     printf '\nCI_LOAD_FIXTURE_CLEANUP\n'
 } >"$temp_dir/remote.sh"
 jq -Rs '{commands:[.]}' "$temp_dir/remote.sh" >"$temp_dir/parameters.json"
-aws ssm send-command --region "$AWS_REGION" --instance-ids "$instance_id" \
+run_cancellable aws ssm send-command --region "$AWS_REGION" --instance-ids "$instance_id" \
     --document-name AWS-RunShellScript --parameters "file://$temp_dir/parameters.json" \
     --output json >"$temp_dir/command.json" 2>/dev/null || die "could not start account cleanup"
 command_id=$(jq -er '.Command.CommandId' "$temp_dir/command.json") || die "missing cleanup command ID"
 status=Pending
 for ((attempt = 0; attempt < 120; attempt++)); do
-    if aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" \
+    if run_cancellable aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" \
         --instance-id "$instance_id" --output json >"$temp_dir/invocation.json" 2>/dev/null; then
         status=$(jq -r '.Status' "$temp_dir/invocation.json")
         case $status in
@@ -94,5 +97,6 @@ done
 [[ $status == Success ]] || die "account cleanup timed out; fixture journal retained"
 ((failed == 0)) || die "API cleanup failed; fixture journal retained"
 logout_admin || die "admin session logout failed; fixture journal retained"
+jq -e '.pendingMutation == null' "$fixture_file" >/dev/null || die "ambiguous fixture creation; pending mutation journal retained for recovery"
 rm -f "$fixture_file"
 echo "fixtures deleted: $((count + 1))"

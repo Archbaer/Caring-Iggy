@@ -18,6 +18,7 @@ temp_dir=$(mktemp -d)
 cleanup() {
     local status=$?
     trap - EXIT
+    trap '' INT TERM
     if ! logout_admin; then
         echo "admin session logout failed" >&2
         ((status != 0)) || status=1
@@ -29,9 +30,11 @@ cleanup() {
     exit "$status"
 }
 trap cleanup EXIT
+trap 'signal_exit 130' INT
+trap 'signal_exit 143' TERM
 read_stack
 app_secret_arn=$(stack_output AppSecretArn) || die "stack does not export AppSecretArn"
-aws secretsmanager get-secret-value --region "$AWS_REGION" --secret-id "$app_secret_arn" \
+run_cancellable aws secretsmanager get-secret-value --region "$AWS_REGION" --secret-id "$app_secret_arn" \
     --query SecretString --output text >"$temp_dir/secret.json" 2>/dev/null || die "cannot read application secret"
 jq -e '.initialAdmin | (.email | type == "string" and length > 0) and (.passwordHex | type == "string" and length > 0)' \
     "$temp_dir/secret.json" >/dev/null || die "invalid initial-admin credentials"
@@ -49,28 +52,45 @@ jq --slurpfile stack "$temp_dir/stack.json" '{
 }' "$temp_dir/secret.json" >"$fixture_file"
 chmod 600 "$fixture_file"
 unset LOAD_ADOPTER_PASSWORD LOAD_STAFF_PASSWORD
+create_record() {
+    local endpoint=$1 jar=$2
+    # Save non-secret recovery identity before the server can commit the mutation.
+    # shellcheck disable=SC2016
+    journal --arg endpoint "$endpoint" --slurpfile payload "$temp_dir/payload.json" \
+        '.pendingMutation = {endpoint:$endpoint,identity:($payload[0].name // $payload[0].email)}'
+    if ! request POST "$endpoint" "$jar" "$temp_dir/payload.json"; then
+        # Only explicit application rejection resolves the pending mutation.
+        case ${request_status:-transport} in
+            400|401|403|404|409|422) journal 'del(.pendingMutation)' ;;
+        esac
+        die "fixture creation failed"
+    fi
+}
 login_admin
 fetch_csrf "$temp_dir/adopter.cookies"
 jq '{firstName:.prefix,lastName:"Adopter",email:.adopter.email,telephone:"07000000000",password:.adopter.password}' \
     "$fixture_file" >"$temp_dir/payload.json"
-request POST /api/auth/signup "$temp_dir/adopter.cookies" "$temp_dir/payload.json" || die "adopter signup failed"
+create_record /api/auth/signup "$temp_dir/adopter.cookies"
+jq -e '[.user.accountId,.user.profileId] | all(type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"))' \
+    "$temp_dir/response.json" >/dev/null || die "signup returned no valid fixture IDs"
 # shellcheck disable=SC2016
-journal --slurpfile response "$temp_dir/response.json" '.adopter += {accountId:$response[0].user.accountId,profileId:$response[0].user.profileId}'
-jq -e '.adopter | .accountId != null and .profileId != null' "$fixture_file" >/dev/null || die "signup returned no fixture IDs"
+journal --slurpfile response "$temp_dir/response.json" '.adopter += {accountId:$response[0].user.accountId,profileId:$response[0].user.profileId} | del(.pendingMutation)'
 fetch_csrf "$temp_dir/admin.cookies"
 jq '{name:(.prefix+" Staff"),email:.staff.email,password:.staff.password,role:"STAFF",telephone:"07000000000"}' \
     "$fixture_file" >"$temp_dir/payload.json"
-request POST /api/admin/staff "$temp_dir/admin.cookies" "$temp_dir/payload.json" || die "staff provisioning failed"
+create_record /api/admin/staff "$temp_dir/admin.cookies"
+jq -e '[.accountId,.profileId] | all(type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"))' \
+    "$temp_dir/response.json" >/dev/null || die "staff provisioning returned no valid fixture IDs"
 # shellcheck disable=SC2016
-journal --slurpfile response "$temp_dir/response.json" '.staff += {accountId:$response[0].accountId,profileId:$response[0].profileId}'
-jq -e '.staff | .accountId != null and .profileId != null' "$fixture_file" >/dev/null || die "staff provisioning returned no fixture IDs"
+journal --slurpfile response "$temp_dir/response.json" '.staff += {accountId:$response[0].accountId,profileId:$response[0].profileId} | del(.pendingMutation)'
 for index in 1 2 3; do
     fetch_csrf "$temp_dir/admin.cookies"
     jq --arg index "$index" '{name:(.prefix+"-animal-"+$index),animalType:"Dog",breed:"Mixed",gender:"UNKNOWN",size:"MEDIUM",status:"AVAILABLE",temperament:"Friendly",description:"Load test fixture"}' \
         "$fixture_file" >"$temp_dir/payload.json"
-    request POST /api/animals/create "$temp_dir/admin.cookies" "$temp_dir/payload.json" || die "animal creation failed"
+    create_record /api/animals/create "$temp_dir/admin.cookies"
+    jq -e '.id | type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")' \
+        "$temp_dir/response.json" >/dev/null || die "animal creation returned no valid ID"
     # shellcheck disable=SC2016
-    journal --slurpfile response "$temp_dir/response.json" '.animalIds += [$response[0].id]'
-    jq -e '.animalIds | all(type == "string" and length > 0)' "$fixture_file" >/dev/null || die "animal creation returned no ID"
+    journal --slurpfile response "$temp_dir/response.json" '.animalIds += [$response[0].id] | del(.pendingMutation)'
 done
 echo "fixtures created: 5"

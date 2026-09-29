@@ -45,21 +45,27 @@ export function setup() {
   return { adopter: login({ email: fixtures.adopter.email, password: fixtures.adopter.password }),
     staff: login({ email: fixtures.staff.email, password: fixtures.staff.password }), animalIds: fixtures.animalIds };
 }
-function checked(response, label) {
-  check(response, { [label]: r => r.status === 200 }, { phase: "load" });
+function checked(response, label, semantic = () => true) {
+  check(response, { [label]: r => {
+    try { return r.status === 200 && semantic(r); } catch { return false; }
+  } }, { phase: "load" });
 }
 export default function (data) {
   const group = Math.random();
   const id = data.animalIds[Math.floor(Math.random() * data.animalIds.length)];
   if (group < 0.6) {
-    checked(http.get(`${baseUrl}/animals`, params()), "public animal list");
-    checked(http.get(`${baseUrl}/animals/${id}`, params()), "public animal detail");
+    checked(http.get(`${baseUrl}/animals`, params()), "public animal list",
+      r => r.html(`a[href="/animals/${id}"]`).size() > 0);
+    checked(http.get(`${baseUrl}/animals/${id}`, params()), "public animal detail",
+      r => r.html("h1").text().trim() === `${fixtures.prefix}-animal-${data.animalIds.indexOf(id) + 1}`);
   } else if (group < 0.8) {
-    checked(http.get(`${baseUrl}/dashboard`, params(data.adopter)), "adopter dashboard");
+    checked(http.get(`${baseUrl}/dashboard`, params(data.adopter)), "adopter dashboard",
+      r => r.html("h1").text().trim() === `Welcome back, ${fixtures.prefix} Adopter`);
   } else if (group < 0.9) {
     checked(http.put(`${baseUrl}/api/adopter/interests`, JSON.stringify({ interestedAnimalIds: [id] }), params(data.adopter)), "adopter interest write");
   } else {
-    checked(http.get(`${baseUrl}/dashboard`, params(data.staff)), "staff dashboard");
+    checked(http.get(`${baseUrl}/dashboard`, params(data.staff)), "staff dashboard",
+      r => r.html("h1").text().trim() === "Team dashboard");
     checked(http.put(`${baseUrl}/api/animals/${id}/edit`, JSON.stringify({ temperament: "Friendly" }), params(data.staff)), "staff animal write");
   }
   sleep(1);

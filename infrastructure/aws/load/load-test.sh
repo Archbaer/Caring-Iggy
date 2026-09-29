@@ -2,37 +2,18 @@
 set +x
 set -euo pipefail
 umask 077
-
-if [[ ${CI_LOAD_TEST:-} != true ]]; then
-    echo "CI_LOAD_TEST must be set to true" >&2
-    exit 1
-fi
-
-if [[ -z ${BASE_URL:-} ]]; then
-    echo "BASE_URL is required" >&2
-    exit 1
-fi
-
-if [[ ${BASE_URL} != https://* ]]; then
-    echo "BASE_URL must use HTTPS" >&2
-    exit 1
-fi
-
-if [[ -z ${STACK_NAME:-} ]]; then
-    echo "STACK_NAME is required" >&2
-    exit 1
-fi
-
-: "${AWS_REGION:?AWS_REGION is required}"
-
-for command in docker bash aws curl jq openssl mktemp; do
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck disable=SC1091
+# shellcheck source=common.sh
+source "$script_dir/common.sh"
+require_environment
+for command in docker bash; do
     if ! command -v "$command" >/dev/null 2>&1; then
         echo "required command is unavailable: $command" >&2
         exit 1
     fi
 done
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 create_fixtures="$script_dir/create-fixtures.sh"
 delete_fixtures="$script_dir/delete-fixtures.sh"
 k6_script="$script_dir/k6.js"
@@ -67,6 +48,7 @@ chmod 600 "$fixture_file"
 cleanup() {
     local status=$?
     trap - EXIT
+    trap '' INT TERM
     if [[ -s $fixture_file ]]; then
         if ! CI_LOAD_TEST=true BASE_URL="$BASE_URL" AWS_REGION="$AWS_REGION" STACK_NAME="$STACK_NAME" \
             K6_FIXTURE_FILE="$fixture_file" bash "$delete_fixtures"; then
@@ -79,8 +61,10 @@ cleanup() {
     exit "$status"
 }
 trap cleanup EXIT
+trap 'signal_exit 130' INT
+trap 'signal_exit 143' TERM
 
-CI_LOAD_TEST=true BASE_URL="$BASE_URL" STACK_NAME="$STACK_NAME" AWS_REGION="$AWS_REGION" \
+run_cancellable env CI_LOAD_TEST=true BASE_URL="$BASE_URL" STACK_NAME="$STACK_NAME" AWS_REGION="$AWS_REGION" \
     K6_FIXTURE_FILE="$fixture_file" bash "$create_fixtures" >/dev/null
 
 if [[ ! -s $fixture_file ]]; then
@@ -88,7 +72,7 @@ if [[ ! -s $fixture_file ]]; then
     exit 1
 fi
 
-docker run --rm \
+run_cancellable docker run --rm \
     --network host \
     --user "$(id -u):$(id -g)" \
     -e BASE_URL="$BASE_URL" \
