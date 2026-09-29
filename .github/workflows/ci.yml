@@ -196,7 +196,7 @@ jobs:
       - name: Install validation tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck jq docker-compose-plugin
+          sudo apt-get install -y shellcheck jq
           jq --version
           compose_version=$(docker compose version --short)
           compose_version=${compose_version#v}

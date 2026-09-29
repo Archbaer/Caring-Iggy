@@ -67,11 +67,13 @@ for workflow, path in ((ci, ci_path), (publish, publish_path)):
 tool_step = next((step for step in steps if step.get("name") == "Install validation tools"), None)
 require(tool_step is not None, "CI tool installation step is missing")
 require_lines(tool_step, [
-    "sudo apt-get install -y shellcheck jq docker-compose-plugin",
+    "sudo apt-get install -y shellcheck jq",
     "jq --version",
     "compose_version=$(docker compose version --short)",
     "if ((compose_major < 2 || (compose_major == 2 && compose_minor < 30))); then",
 ], "CI tool installation step")
+require("docker-compose-plugin" not in lines(tool_step),
+        "CI must use runner-provided Docker Compose")
 
 shellcheck_step = next((step for step in steps if step.get("name") == "Lint shell scripts"), None)
 require(shellcheck_step is not None
