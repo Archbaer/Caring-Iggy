@@ -86,10 +86,20 @@ require(template_step is not None
 
 contract_step = next((step for step in steps if step.get("name") == "Run AWS deployment contract tests"), None)
 require(contract_step is not None, "AWS contract test step is missing")
+contract_run = contract_step.get("run", "")
+contract_lines = lines(contract_step)
 require_lines(contract_step, [
     "for test in infrastructure/aws/tests/*.test.sh; do",
-    'bash "$test"',
+    'echo "::group::Running AWS deployment contract test: $test"',
+    'if bash "$test"; then',
+    'echo "::error title=AWS contract test failed::$test exited with status $status"',
+    'exit "$status"',
 ], "AWS contract test step")
+require(contract_lines.index('echo "::group::Running AWS deployment contract test: $test"')
+        < contract_lines.index('if bash "$test"; then'),
+        "AWS contract test name must print before execution")
+require(contract_run.count('echo "::endgroup::"') == 2,
+        "AWS contract test groups must close on success and failure")
 for test_name in (
     "secret-scan.test.sh",
     "migration-data.test.sh",

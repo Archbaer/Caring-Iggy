@@ -239,7 +239,15 @@ jobs:
       - name: Run AWS deployment contract tests
         run: |
           for test in infrastructure/aws/tests/*.test.sh; do
-            bash "$test"
+            echo "::group::Running AWS deployment contract test: $test"
+            if bash "$test"; then
+              echo "::endgroup::"
+            else
+              status=$?
+              echo "::error title=AWS contract test failed::$test exited with status $status"
+              echo "::endgroup::"
+              exit "$status"
+            fi
           done
 
       - name: Scan Caddy base image
