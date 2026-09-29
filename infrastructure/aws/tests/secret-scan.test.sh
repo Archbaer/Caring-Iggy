@@ -27,7 +27,15 @@ fail_if_found() {
 }
 
 private_key_pattern='-----BEGIN '
-private_key_pattern+='(RSA |EC |OPENSSH )?PRIVATE KEY-----'
+private_key_pattern+='([A-Z0-9]+ )*'
+private_key_pattern+='PRIVATE KEY-----'
+for key_type in 'ENCRYPTED' 'DSA'; do
+    test_header="-----BEGIN $key_type PRIVATE KEY-----"
+    if ! grep -Eq -e "$private_key_pattern" <<<"$test_header"; then
+        echo "private-key scanner missed a $key_type PEM header" >&2
+        exit 1
+    fi
+done
 fail_if_found 'a private key' "$private_key_pattern"
 
 aws_key_pattern='A(KIA|SIA)'

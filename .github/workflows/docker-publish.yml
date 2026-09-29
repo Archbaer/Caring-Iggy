@@ -99,16 +99,21 @@ jobs:
         env:
           IMAGE: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}
         run: |
+          SHA_TAG="sha-${GITHUB_SHA::12}"
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="sha-${GITHUB_SHA::12}"
+            VERSION="$SHA_TAG"
           fi
 
           {
             echo "version=$VERSION"
+            echo "sha_tag=$SHA_TAG"
             echo "tags<<EOF"
-            echo "$IMAGE:$VERSION"
+            echo "$IMAGE:$SHA_TAG"
+            if [ "$VERSION" != "$SHA_TAG" ]; then
+              echo "$IMAGE:$VERSION"
+            fi
             echo "$IMAGE:latest"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
@@ -128,7 +133,7 @@ jobs:
         if: steps.selection.outputs.build == 'true'
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.meta.outputs.version }}
+          image-ref: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.meta.outputs.sha_tag }}
           severity: CRITICAL
           ignore-unfixed: true
           exit-code: '1'
