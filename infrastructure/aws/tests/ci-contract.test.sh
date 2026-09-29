@@ -50,6 +50,20 @@ infrastructure = jobs.get("infrastructure-validation", {})
 steps = infrastructure.get("steps", [])
 require(steps, "CI infrastructure validation job is missing")
 
+trivy_ref = "aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25"
+trivy_comment = "# Trivy action v0.36.0 pinned to immutable commit"
+for workflow, path in ((ci, ci_path), (publish, publish_path)):
+    all_steps = [step for job in workflow.get("jobs", {}).values()
+                 for step in job.get("steps", [])]
+    trivy_steps = [step for step in all_steps
+                   if step.get("uses", "").startswith("aquasecurity/trivy-action@")]
+    require(trivy_steps, f"Trivy action is missing: {path.name}")
+    require(all(step.get("uses") == trivy_ref for step in trivy_steps),
+            f"Trivy action must use immutable v0.36.0 commit: {path.name}")
+    text = path.read_text()
+    require(text.count(trivy_comment) == len(trivy_steps),
+            f"Each Trivy action pin must identify v0.36.0: {path.name}")
+
 tool_step = next((step for step in steps if step.get("name") == "Install validation tools"), None)
 require(tool_step is not None, "CI tool installation step is missing")
 require_lines(tool_step, [
@@ -89,7 +103,7 @@ for name, expected_image in (
     ("Scan Kong base image", "kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9"),
 ):
     step = next((step for step in steps if step.get("name") == name), None)
-    require(step is not None and step.get("uses") == "aquasecurity/trivy-action@0.28.0",
+    require(step is not None and step.get("uses") == trivy_ref,
             f"Trivy scan step is missing: {name}")
     config = step.get("with", {})
     require(config.get("image-ref") == expected_image, f"Trivy image is not pinned: {name}")

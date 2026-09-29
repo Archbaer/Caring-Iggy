@@ -243,7 +243,8 @@ jobs:
           done
 
       - name: Scan Caddy base image
-        uses: aquasecurity/trivy-action@0.28.0
+        # Trivy action v0.36.0 pinned to immutable commit
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           image-ref: caddy:2.11.4@sha256:040e9f7480b80b6d4a7e5013a21159b950a63dcbdb956e38abe2387fb28d9ec0
           severity: CRITICAL
@@ -251,7 +252,8 @@ jobs:
           exit-code: '1'
 
       - name: Scan Kong base image
-        uses: aquasecurity/trivy-action@0.28.0
+        # Trivy action v0.36.0 pinned to immutable commit
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           image-ref: kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9
           severity: CRITICAL
