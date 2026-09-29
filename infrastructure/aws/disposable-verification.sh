@@ -6,6 +6,7 @@ usage() {
 Usage: disposable-verification.sh \
   --stack-name NAME \
   --budget-ceiling-usd AMOUNT \
+  [--previous-certificate-serial HEX] \
   [--region eu-west-2]
 EOF
 }
@@ -18,10 +19,11 @@ die() {
 stack_name=""
 budget_ceiling=""
 region="${AWS_REGION:-eu-west-2}"
+previous_certificate_serial=""
 
 while (($#)); do
     case "$1" in
-        --stack-name|--budget-ceiling-usd|--region)
+        --stack-name|--budget-ceiling-usd|--region|--previous-certificate-serial)
             (($# >= 2)) || {
                 usage
                 exit 2
@@ -31,6 +33,7 @@ while (($#)); do
                 --stack-name) stack_name=$value ;;
                 --budget-ceiling-usd) budget_ceiling=$value ;;
                 --region) region=$value ;;
+                --previous-certificate-serial) previous_certificate_serial=$value ;;
             esac
             shift 2
             ;;
@@ -45,9 +48,11 @@ done
 [[ $stack_name =~ ^[A-Za-z][A-Za-z0-9-]{0,127}$ ]] || die "invalid stack name"
 [[ -n $budget_ceiling ]] || die "budget ceiling is required"
 [[ $budget_ceiling =~ ^[0-9]+(\.[0-9]+)?$ ]] || die "budget ceiling must be a positive decimal"
+awk -v ceiling="$budget_ceiling" 'BEGIN{exit !(ceiling > 0)}' || die "budget ceiling must be positive"
 [[ $region == eu-west-2 ]] || die "region must be eu-west-2"
+[[ -z $previous_certificate_serial || $previous_certificate_serial =~ ^[0-9A-Fa-f]+$ ]] || die "invalid previous certificate serial"
 
-for command in aws bash curl jq nc openssl; do
+for command in aws awk bash curl jq nc openssl tr; do
     command -v "$command" >/dev/null 2>&1 || die "required command is unavailable: $command"
 done
 
@@ -90,7 +95,8 @@ secret_arn_pattern="^arn:aws:secretsmanager:$region:[0-9]{12}:secret:[A-Za-z0-9/
 [[ $elastic_ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || die "stack returned an invalid Elastic IP"
 [[ $rds_endpoint =~ ^[A-Za-z0-9.-]+$ ]] || die "stack returned an invalid RDS endpoint"
 
-# Monthly cost estimate (eu-west-2 on-demand approximations, not a quote).
+# Conservative planning inputs for this exact template, not live AWS prices.
+# Review an eu-west-2 AWS Pricing Calculator quote before running this verifier.
 instance_type=$(aws ec2 describe-instances \
     --region "$region" \
     --instance-ids "$instance_id" \
@@ -103,33 +109,31 @@ rds_info=$(aws rds describe-db-instances \
     --output json) || die "failed to describe RDS instance"
 db_instance_class=$(jq -r '.[0].DBInstanceClass' <<<"$rds_info")
 db_allocated_storage=$(jq -r '.[0].AllocatedStorage' <<<"$rds_info")
+[[ $(jq -r '.[0].DeletionProtection' <<<"$rds_info") == true ]] || die "source RDS deletion protection must remain enabled"
 [[ -n $db_instance_class && $db_instance_class != null ]] || die "could not determine RDS instance class"
 [[ $db_allocated_storage =~ ^[0-9]+$ ]] || die "could not determine RDS allocated storage"
 
-case "$instance_type" in
-    t3.medium) ec2_hourly=0.0416 ;;
-    t3.small) ec2_hourly=0.0208 ;;
-    t3.micro) ec2_hourly=0.0104 ;;
-    *) ec2_hourly=0.0416 ;;
-esac
-
-case "$db_instance_class" in
-    db.t4g.small) rds_hourly=0.0134 ;;
-    db.t4g.micro) rds_hourly=0.0067 ;;
-    db.t3.small) rds_hourly=0.017 ;;
-    *) rds_hourly=0.0134 ;;
-esac
+[[ $instance_type == t3.medium ]] || die "unsupported EC2 class for cost estimate: $instance_type"
+[[ $db_instance_class == db.t4g.small && $db_allocated_storage == 20 ]] || die "unsupported RDS shape for cost estimate"
+ec2_hourly=0.06
+rds_hourly=0.05
 
 hours_per_month=730
 ec2_monthly=$(awk -v h="$hours_per_month" -v p="$ec2_hourly" 'BEGIN{printf "%.2f", h * p}')
 rds_instance_monthly=$(awk -v h="$hours_per_month" -v p="$rds_hourly" 'BEGIN{printf "%.2f", h * p}')
-# gp3 storage: $0.091/GB-month.
-ec2_storage_monthly=$(awk -v s=40 -v p=0.091 'BEGIN{printf "%.2f", s * p}')
-rds_storage_monthly=$(awk -v s="$db_allocated_storage" -v p=0.091 'BEGIN{printf "%.2f", s * p}')
-monthly_estimate=$(awk -v a="$ec2_monthly" -v b="$rds_instance_monthly" -v c="$ec2_storage_monthly" -v d="$rds_storage_monthly" 'BEGIN{printf "%.2f", a + b + c + d}')
+ec2_storage_monthly=$(awk -v s=40 -v p=0.10 'BEGIN{printf "%.2f", s * p}')
+rds_storage_monthly=$(awk -v s="$db_allocated_storage" -v p=0.14 'BEGIN{printf "%.2f", s * p}')
+ipv4_monthly=$(awk -v h="$hours_per_month" 'BEGIN{printf "%.2f", h * 0.005}')
+secrets_monthly=0.80
+monthly_estimate=$(awk -v a="$ec2_monthly" -v b="$rds_instance_monthly" -v c="$ec2_storage_monthly" -v d="$rds_storage_monthly" -v e="$ipv4_monthly" -v f="$secrets_monthly" 'BEGIN{printf "%.2f", a + b + c + d + e + f}')
+restore_monthly=$(awk -v a="$rds_instance_monthly" -v b="$rds_storage_monthly" 'BEGIN{printf "%.2f", a+b}')
 
 echo "Resource types: EC2 $instance_type, RDS $db_instance_class (postgres), Elastic IP, S3 bucket"
 echo "Monthly estimate (approximate): USD $monthly_estimate"
+echo "Includes EC2, RDS, 40/20 GiB storage, public IPv4, and two secrets."
+echo "PITR adds a retained second DB: approximately USD $restore_monthly/month while retained."
+echo "Excludes VAT, data transfer, API requests, extra backups, S3, and burst CPU credits."
+echo "This gate acknowledges a planning estimate; it is not an AWS billing cap."
 echo "Budget ceiling: USD $budget_ceiling"
 
 if awk -v est="$monthly_estimate" -v ceil="$budget_ceiling" 'BEGIN{exit (est <= ceil)}'; then
@@ -138,8 +142,8 @@ fi
 
 # Public port reachability: only 80/443 should be reachable.
 echo "Checking public ports..."
-for forbidden_port in 22 3000 8000 5432; do
-    if timeout 5 bash -c "exec 3<>/dev/tcp/$elastic_ip/$forbidden_port" 2>/dev/null; then
+for forbidden_port in 22 3000 8000 8001 8081 8082 8083 8084 8085 5432; do
+    if nc -z -w 5 "$elastic_ip" "$forbidden_port" >/dev/null 2>&1; then
         die "forbidden port $forbidden_port is reachable on $elastic_ip"
     fi
 done
@@ -149,21 +153,30 @@ done
 
 # HTTP must redirect to HTTPS.
 redirect_headers=$(curl --silent --show-error --max-time 10 -I "http://$elastic_ip/")
-if ! grep -Eiq '^Location:\s*https://' <<<"$redirect_headers"; then
+if ! grep -Eiq '^HTTP/[^ ]+ 30[1278] ' <<<"$redirect_headers" ||
+    ! grep -Eiq "^Location:[[:space:]]*https://$elastic_ip/([[:space:]]|$)" <<<"$redirect_headers"; then
     die "HTTP did not redirect to HTTPS"
 fi
 echo "HTTP redirects to HTTPS"
 
-# TLS must be trusted and not expire within one day.
-if ! openssl s_client -connect "$elastic_ip:443" -servername "$elastic_ip" -verify_return_error </dev/null >/dev/null 2>&1; then
-    die "TLS certificate is not trusted"
-fi
-cert_pem=$(openssl s_client -connect "$elastic_ip:443" -servername "$elastic_ip" 2>/dev/null) || die "failed to fetch TLS certificate"
+# Curl checks both the trust chain and the IP SAN against its normal CA store.
+curl --fail --silent --show-error --max-time 30 "https://$elastic_ip/" >/dev/null || die "trusted HTTPS application check failed"
+cert_pem=$(openssl s_client -connect "$elastic_ip:443" -servername "$elastic_ip" </dev/null 2>/dev/null) || die "failed to fetch TLS certificate"
 if ! printf '%s\n' "$cert_pem" | openssl x509 -checkend 86400 -noout >/dev/null 2>&1; then
     die "TLS certificate expires within one day"
 fi
 cert_issuer=$(printf '%s\n' "$cert_pem" | openssl x509 -noout -issuer)
+cert_serial=$(printf '%s\n' "$cert_pem" | openssl x509 -noout -serial)
+cert_serial=${cert_serial#serial=}
+cert_expiry=$(printf '%s\n' "$cert_pem" | openssl x509 -noout -enddate)
+[[ $cert_serial =~ ^[0-9A-Fa-f]+$ ]] || die "invalid certificate serial"
+if [[ -n $previous_certificate_serial &&
+    $(tr '[:lower:]' '[:upper:]' <<<"$cert_serial") == "$(tr '[:lower:]' '[:upper:]' <<<"$previous_certificate_serial")" ]]; then
+    die "certificate serial has not changed; renewal remains unverified"
+fi
 echo "TLS issuer: $cert_issuer"
+echo "TLS serial: $cert_serial"
+echo "TLS expiry: $cert_expiry"
 
 ssm_wait_online() {
     local attempt online
@@ -180,7 +193,7 @@ ssm_wait_online() {
 }
 
 ssm_run() {
-    local command=$1 response command_id status attempt
+    local command=$1 mode=${2:-wait} response command_id status attempt
     response=$(aws ssm send-command \
         --region "$region" \
         --instance-ids "$instance_id" \
@@ -188,12 +201,16 @@ ssm_run() {
         --parameters "$(jq -cn --arg command "$command" '{commands:[$command]}')" \
         --output json)
     command_id=$(jq -er '.Command.CommandId' <<<"$response")
+    [[ $mode != dispatch ]] || return 0
     for ((attempt = 1; attempt <= 120; attempt++)); do
-        response=$(aws ssm get-command-invocation \
+        if ! response=$(aws ssm get-command-invocation \
             --region "$region" \
             --command-id "$command_id" \
             --instance-id "$instance_id" \
-            --output json)
+            --output json 2>/dev/null); then
+            sleep 5
+            continue
+        fi
         status=$(jq -er '.Status' <<<"$response")
         case $status in
             Success)
@@ -202,7 +219,7 @@ ssm_run() {
                 ;;
             Pending|InProgress|Delayed) sleep 5 ;;
             *)
-                jq -r '.StandardErrorContent // "SSM command failed"' <<<"$response" >&2
+                echo "SSM command failed ($status)" >&2
                 return 1
                 ;;
         esac
@@ -215,20 +232,61 @@ ssm_wait_online
 
 # Compose health: every expected service container must report healthy.
 echo "Checking container health..."
-health_command="cd /opt/caring-iggy && docker compose --env-file /etc/caring-iggy/deployment.env -f docker-compose.prod.yml ps -q | while read -r container; do [[ -n \$container ]] || continue; status=\$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}missing{{end}}' \"\$container\"); [[ \$status == healthy ]] || { echo \"unhealthy container: \$status\" >&2; exit 1; }; done; echo all-healthy"
+health_body=$(cat <<'BASH'
+set -euo pipefail
+cd /opt/caring-iggy
+read -r IMAGE_TAG </etc/caring-iggy/current-image-tag
+[[ $IMAGE_TAG =~ ^sha-[0-9a-f]{12}$ ]]
+export IMAGE_TAG
+for service in caddy frontend kong animal-service adopter-service user-service matching-service reporting-service; do
+    container=$(docker compose --env-file /etc/caring-iggy/deployment.env -f docker-compose.prod.yml ps --all -q "$service")
+    [[ -n $container && $container != *$'\n'* ]] || { echo "missing or duplicate container: $service" >&2; exit 1; }
+    status=$(docker inspect --format '{{.State.Running}} {{if .State.Health}}{{.State.Health.Status}}{{else}}missing{{end}} {{.State.OOMKilled}}' "$container")
+    [[ $status == "true healthy false" ]] || { echo "unhealthy container: $service" >&2; exit 1; }
+done
+echo all-healthy
+BASH
+)
+printf -v health_command 'bash -c %q' "$health_body"
 ssm_run "$health_command" >/dev/null || die "compose health check failed"
 echo "All containers healthy"
 
 # Database role isolation is verified by init-databases.sh (idempotent, ends with verify_role).
 echo "Checking per-database role isolation..."
-ssm_run "bash /opt/caring-iggy/init-databases.sh" >/dev/null || die "database isolation check failed"
+ssm_run "set -a; . /etc/caring-iggy/deployment.env; set +a; bash /opt/caring-iggy/init-databases.sh" >/dev/null || die "database isolation check failed"
 echo "Database role isolation verified"
 
 # Reboot recovery: restart the host and confirm the stack comes back healthy.
 echo "Checking reboot recovery..."
-ssm_run "shutdown -r +0" >/dev/null || die "reboot command failed"
-ssm_wait_online
-ssm_run "$health_command" >/dev/null || die "health check after reboot failed"
+boot_id_before=$(ssm_run "cat /proc/sys/kernel/random/boot_id") || die "could not read pre-reboot boot ID"
+[[ $boot_id_before =~ ^[0-9a-f-]{36}$ ]] || die "invalid pre-reboot boot ID"
+# Reboot can terminate its own SSM invocation; dispatch acceptance is sufficient.
+ssm_run "shutdown -r +0" dispatch >/dev/null || die "reboot dispatch failed"
+offline=false
+for ((attempt = 1; attempt <= 60; attempt++)); do
+    online=$(aws ssm describe-instance-information --region "$region" \
+        --filters "Key=InstanceIds,Values=$instance_id" \
+        --query 'InstanceInformationList[0].PingStatus' --output text 2>/dev/null || true)
+    if [[ $online != Online ]]; then offline=true; break; fi
+    sleep 10
+done
+[[ $offline == true ]] || die "no reboot/offline transition observed"
+recovered=false
+for ((attempt = 1; attempt <= 120; attempt++)); do
+    online=$(aws ssm describe-instance-information --region "$region" \
+        --filters "Key=InstanceIds,Values=$instance_id" \
+        --query 'InstanceInformationList[0].PingStatus' --output text 2>/dev/null || true)
+    if [[ $online == Online ]]; then
+        boot_id_after=$(ssm_run "cat /proc/sys/kernel/random/boot_id" 2>/dev/null || true)
+        if [[ $boot_id_after =~ ^[0-9a-f-]{36}$ && $boot_id_after != "$boot_id_before" ]] &&
+            ssm_run "$health_command" >/dev/null 2>&1; then
+            recovered=true
+            break
+        fi
+    fi
+    sleep 10
+done
+[[ $recovered == true ]] || die "fresh boot and healthy containers were not verified after reboot"
 echo "Reboot recovery verified"
 
 # Bad-tag rollback: a non-existent image release must be undoable.
@@ -253,18 +311,19 @@ security_groups=()
 while IFS= read -r sg; do
     [[ -n $sg ]] && security_groups+=("$sg")
 done < <(jq -r '.[0].VpcSecurityGroups[]? .VpcSecurityGroupId' <<<"$rds_info")
-db_subnet_group=$(jq -r '.[0].DBSubnetGroupName' <<<"$rds_info")
-restore_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+db_subnet_group=$(jq -r '.[0].DBSubnetGroup.DBSubnetGroupName' <<<"$rds_info")
 
 ((${#security_groups[@]} > 0)) || die "could not determine RDS security groups"
 [[ -n $db_subnet_group && $db_subnet_group != null ]] || die "could not determine RDS subnet group"
+echo "PITR target (retained for manual review): $target_db_id"
 
 aws rds restore-db-instance-to-point-in-time \
     --region "$region" \
     --source-db-instance-identifier "$source_db_id" \
     --target-db-instance-identifier "$target_db_id" \
-    --restore-time "$restore_time" \
+    --use-latest-restorable-time \
     --no-publicly-accessible \
+    --deletion-protection \
     --vpc-security-group-ids "${security_groups[@]}" \
     --db-subnet-group-name "$db_subnet_group" \
     --copy-tags-to-snapshot >/dev/null || die "PITR restore request failed"
@@ -279,7 +338,8 @@ temp_endpoint=$(aws rds describe-db-instances \
     --query 'DBInstances[0].Endpoint.Address' \
     --output text) || die "could not read temporary RDS endpoint"
 
-pit_verify_command="export AWS_REGION='$region'; secret=\$(aws secretsmanager get-secret-value --region '$region' --secret-id '$rds_secret_arn' --query SecretString --output text); user=\$(printf '%s' \"\$secret\" | jq -r '.username'); pass=\$(printf '%s' \"\$secret\" | jq -r '.password'); docker run --rm --network caring-iggy_backend -e PGUSER=\"\$user\" -e PGPASSWORD=\"\$pass\" -e PGSSLMODE=require postgres:15-alpine sh -ec 'psql -h $temp_endpoint -U \"\$PGUSER\" -d postgres -Atqc \"SELECT 1\" | grep -qx 1'"
+[[ $temp_endpoint =~ ^[A-Za-z0-9.-]+$ ]] || die "invalid restored RDS endpoint"
+pit_verify_command="set -eu; secret=\$(aws secretsmanager get-secret-value --region '$region' --secret-id '$rds_secret_arn' --query SecretString --output text); PGUSER=\$(printf '%s' \"\$secret\" | jq -er '.username'); PGPASSWORD=\$(printf '%s' \"\$secret\" | jq -er '.password'); export PGUSER PGPASSWORD; docker run --rm --network caring-iggy_backend -e PGUSER -e PGPASSWORD -e PGSSLMODE=require postgres:15-alpine@sha256:25d430274d8a31184f9435cc5b2f56aff254952065bbbcac0c51acedb5a1d1e7 sh -ec 'psql -h $temp_endpoint -U \"\$PGUSER\" -d postgres -Atqc \"SELECT 1\" | grep -qx 1'"
 ssm_run "$pit_verify_command" >/dev/null || die "temporary RDS verification failed"
 echo "Point-in-time restore verified: $target_db_id ($temp_endpoint)"
 
@@ -288,7 +348,7 @@ cat <<EOF
 
 Cleanup checklist (manual):
 - Review CloudFormation stack "$stack_name" (RDS deletion protection remains enabled)
-- Delete the temporary RDS instance "$target_db_id" after review
+- Review the protected temporary RDS instance "$target_db_id"; disable only its protection before a separate manual deletion
 - Empty the S3 artifact bucket "$artifact_bucket" only when decommissioning the stack
 - Delete the CloudFormation stack separately when you are ready to create the final RDS snapshot
 - No automated destroy command exists in this repository

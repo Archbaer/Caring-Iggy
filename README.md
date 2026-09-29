@@ -140,6 +140,8 @@ frontend/tests/
 
 For the single-host AWS stack, see [infrastructure/aws/README.md](infrastructure/aws/README.md). The entrypoint is [infrastructure/aws/deploy-aws.sh](infrastructure/aws/deploy-aws.sh).
 
+Repository implementation and local contracts are available. Live disposable deployment, trusted IP certificate renewal, reboot, rollback, PITR, and 300/700-user capacity acceptance remain pending; this is not a production acceptance result.
+
 - `infrastructure/.env.example` — sample environment variables for local Docker Compose.
 - Each microservice connects to its own isolated PostgreSQL database.
 - No backend service binds a host port; the BFF reaches them only through Kong (`infrastructure/kong/kong.yml`).
