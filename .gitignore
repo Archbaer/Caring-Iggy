@@ -11,14 +11,9 @@
 **/.mvn/
 **/*.class
 
-# Sisyphus
-.sisyphus/
-.playwright-mcp/
-
 # Agent tooling (not committed)
 .agents/
 .claude/
-.cursor/
 .remember/
 .opencode/
 
