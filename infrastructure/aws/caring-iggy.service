@@ -1,0 +1,16 @@
+[Unit]
+Description=Caring Iggy production container stack
+Wants=network-online.target
+After=network-online.target docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/caring-iggy
+ExecStart=/opt/caring-iggy/start-stack.sh
+Restart=on-failure
+RestartSec=5min
+
+[Install]
+WantedBy=multi-user.target

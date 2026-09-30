@@ -1,0 +1,347 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Simple single-host production infrastructure for Caring Iggy
+
+Parameters:
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: Current x86_64 Amazon Linux 2023 AMI
+  EnableRdsDeletionProtection:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: Keep true except during the documented final decommission step
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.42.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-vpc
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VpcGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId:
+        Ref: InternetGateway
+      VpcId:
+        Ref: Vpc
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      CidrBlock: 10.42.0.0/24
+      MapPublicIpOnLaunch: true
+      VpcId:
+        Ref: Vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-public
+
+  PrivateDatabaseSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      CidrBlock: 10.42.10.0/24
+      MapPublicIpOnLaunch: false
+      VpcId:
+        Ref: Vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-database-a
+
+  PrivateDatabaseSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      CidrBlock: 10.42.11.0/24
+      MapPublicIpOnLaunch: false
+      VpcId:
+        Ref: Vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-database-b
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-public
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  PublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      SubnetId:
+        Ref: PublicSubnet
+
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Public HTTPS and ACME redirect traffic for Caring Iggy
+      VpcId:
+        Ref: Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP redirect and ACME challenge
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS application traffic
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PostgreSQL access from the application host only
+      VpcId:
+        Ref: Vpc
+
+  DatabaseSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId:
+        Fn::GetAtt: [DatabaseSecurityGroup, GroupId]
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId:
+        Fn::GetAtt: [ApplicationSecurityGroup, GroupId]
+      Description: PostgreSQL from application host
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Two isolated subnets for Caring Iggy RDS
+      SubnetIds:
+        - Ref: PrivateDatabaseSubnetA
+        - Ref: PrivateDatabaseSubnetB
+
+  DatabaseParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Require TLS for Caring Iggy PostgreSQL clients
+      Family: postgres15
+      Parameters:
+        rds.force_ssl: "1"
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      AllocatedStorage: 20
+      AutoMinorVersionUpgrade: true
+      BackupRetentionPeriod: 7
+      CopyTagsToSnapshot: true
+      DBInstanceClass: db.t4g.small
+      DBParameterGroupName:
+        Ref: DatabaseParameterGroup
+      DBSubnetGroupName:
+        Ref: DatabaseSubnetGroup
+      DeletionProtection:
+        Ref: EnableRdsDeletionProtection
+      Engine: postgres
+      EngineVersion: "15.17"
+      ManageMasterUserPassword: true
+      MasterUsername: caring_iggy_master
+      MultiAZ: false
+      Port: 5432
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      StorageType: gp3
+      VPCSecurityGroups:
+        - Fn::GetAtt: [DatabaseSecurityGroup, GroupId]
+
+  ApplicationSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description:
+        Fn::Sub: Runtime application secrets for ${AWS::StackName}
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireDeploymentArtifacts
+            Status: Enabled
+            Prefix: deployments/
+            ExpirationInDays: 1
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ApplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: CaringIggyRuntimeRead
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadRuntimeSecrets
+                Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource:
+                  - Ref: ApplicationSecret
+                  - Fn::GetAtt: [Database, MasterUserSecret.SecretArn]
+              - Sid: ReadDeploymentArtifact
+                Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  Fn::Sub: ${ArtifactBucket.Arn}/deployments/*
+
+  ApplicationInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: ApplicationRole
+
+  ApplicationInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      ImageId:
+        Ref: LatestAmiId
+      InstanceType: t3.medium
+      IamInstanceProfile:
+        Ref: ApplicationInstanceProfile
+      SubnetId:
+        Ref: PublicSubnet
+      SecurityGroupIds:
+        - Fn::GetAtt: [ApplicationSecurityGroup, GroupId]
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 2
+        InstanceMetadataTags: disabled
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            DeleteOnTermination: true
+            Encrypted: true
+            VolumeSize: 40
+            VolumeType: gp3
+      UserData:
+        Fn::Base64: |
+            #!/usr/bin/env bash
+            set -euo pipefail
+            dnf install -y docker jq tar gzip
+            systemctl enable --now docker
+            systemctl enable --now amazon-ssm-agent
+
+            compose_version=v5.5.1
+            compose_sha256=db1889184726840f75c4f9c001048430d4f25b3be3cb084d3ddd762bc0aed576
+            compose_dir=/usr/local/libexec/docker/cli-plugins
+            install -d -m 0755 "$compose_dir"
+            curl --fail --silent --show-error --location \
+              "https://github.com/docker/compose/releases/download/$compose_version/docker-compose-linux-x86_64" \
+              --output "$compose_dir/docker-compose"
+            echo "$compose_sha256  $compose_dir/docker-compose" | sha256sum --check --strict
+            chmod 0755 "$compose_dir/docker-compose"
+            docker compose version
+
+            install -d -m 0755 /etc/caring-iggy /opt/caring-iggy
+            install -d -m 0700 /run/caring-iggy
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-application
+
+  ApplicationEip:
+    Type: AWS::EC2::EIP
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  ApplicationEipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::GetAtt: [ApplicationEip, AllocationId]
+      InstanceId:
+        Ref: ApplicationInstance
+
+Outputs:
+  InstanceId:
+    Value:
+      Ref: ApplicationInstance
+  ElasticIp:
+    Value:
+      Ref: ApplicationEip
+  RdsEndpoint:
+    Value:
+      Fn::GetAtt: [Database, Endpoint.Address]
+  AppSecretArn:
+    Value:
+      Ref: ApplicationSecret
+  RdsSecretArn:
+    Value:
+      Fn::GetAtt: [Database, MasterUserSecret.SecretArn]
+  ArtifactBucketName:
+    Value:
+      Ref: ArtifactBucket
+  InstanceProfileArn:
+    Value:
+      Fn::GetAtt: [ApplicationInstanceProfile, Arn]
+  StackName:
+    Value:
+      Ref: AWS::StackName

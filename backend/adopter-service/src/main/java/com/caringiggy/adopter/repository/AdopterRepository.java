@@ -1,8 +1,8 @@
 package com.caringiggy.adopter.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import com.caringiggy.adopter.model.Adopter;
 import com.caringiggy.adopter.model.AdopterStatus;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.*;
 public class AdopterRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     private final RowMapper<Adopter> adopterRowMapper = (rs, rowNum) -> {
         Adopter adopter = Adopter.builder()
@@ -52,7 +52,7 @@ public class AdopterRepository {
 
         try {
             return objectMapper.readValue(preferencesJson, new TypeReference<>() {});
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new SQLException("Failed to parse adopter preferences JSON", exception);
         }
     }

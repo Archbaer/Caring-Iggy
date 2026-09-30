@@ -64,6 +64,7 @@ services:
       DB_NAME: animals_db
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/dev
       JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       postgres-animals:
@@ -86,6 +87,7 @@ services:
       DB_NAME: adopters_db
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/dev
       JWT_JWKS_URI: http://user-service:8085/.well-known/jwks.json
     depends_on:
       postgres-adopters:
@@ -108,6 +110,7 @@ services:
       DB_NAME: users_db
       DB_USERNAME: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/dev
       ADOPTER_SERVICE_URL: ${ADOPTER_SERVICE_URL:-http://adopter-service:8082}
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
@@ -184,7 +187,7 @@ services:
       retries: 3
 
   kong:
-    image: kong:3.6
+    image: kong:3.9.3
     container_name: caring-iggy-kong
     environment:
       KONG_DATABASE: "off"

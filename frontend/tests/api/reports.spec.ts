@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 import {
-  loginAsAdmin,
-  loginAsStaff,
   ERROR_SHAPE,
 } from "./helpers";
 
@@ -39,9 +37,7 @@ test.describe("Unauthenticated requests", () => {
 // ── Staff (non-admin) access ─────────────────────────────────────
 
 test.describe("Staff access (non-admin)", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.use({ storageState: ".auth/staff.json" });
 
   test("GET /api/reports/intake as STAFF returns 403", async ({ request }) => {
     const resp = await request.get(`/api/reports/intake?month=${VALID_MONTH}`);
@@ -61,9 +57,7 @@ test.describe("Staff access (non-admin)", () => {
 // ── Admin — input validation ─────────────────────────────────────
 
 test.describe("Admin — input validation", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("GET /api/reports/intake without month param returns 400", async ({ request }) => {
     const resp = await request.get("/api/reports/intake");
@@ -94,9 +88,7 @@ test.describe("Admin — input validation", () => {
 // ── Admin — happy path ───────────────────────────────────────────
 
 test.describe("Admin — valid requests", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("GET /api/reports/intake with valid month returns 200 with report shape", async ({ request }) => {
     const resp = await request.get(`/api/reports/intake?month=${VALID_MONTH}`);

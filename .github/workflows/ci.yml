@@ -183,3 +183,87 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         run: docker compose -f infrastructure/docker-compose.yml logs
+
+  infrastructure-validation:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck jq
+          jq --version
+          compose_version=$(docker compose version --short)
+          compose_version=${compose_version#v}
+          IFS=. read -r compose_major compose_minor _ <<<"$compose_version"
+          if ((compose_major < 2 || (compose_major == 2 && compose_minor < 30))); then
+            echo "Docker Compose 2.30 or later required; found $compose_version" >&2
+            exit 1
+          fi
+
+      - name: Install cfn-lint
+        run: pip install cfn-lint
+
+      - name: Lint shell scripts
+        run: |
+          shopt -s nullglob
+          scripts=(
+            infrastructure/aws/*.sh
+            infrastructure/aws/tests/*.sh
+            infrastructure/aws/load/*.sh
+          )
+          if ((${#scripts[@]} > 0)); then
+            shellcheck "${scripts[@]}"
+          fi
+
+      - name: Syntax-check shell scripts
+        run: |
+          shopt -s nullglob
+          scripts=(
+            infrastructure/aws/*.sh
+            infrastructure/aws/tests/*.sh
+            infrastructure/aws/load/*.sh
+          )
+          for script in "${scripts[@]}"; do
+            bash -n "$script"
+          done
+
+      - name: Lint CloudFormation template
+        run: cfn-lint -r eu-west-2 -t infrastructure/aws/template.yml
+
+      - name: Run AWS deployment contract tests
+        run: |
+          for test in infrastructure/aws/tests/*.test.sh; do
+            echo "::group::Running AWS deployment contract test: $test"
+            if bash "$test"; then
+              echo "::endgroup::"
+            else
+              status=$?
+              echo "::error title=AWS contract test failed::$test exited with status $status"
+              echo "::endgroup::"
+              exit "$status"
+            fi
+          done
+
+      - name: Scan Caddy base image
+        # Trivy action v0.36.0 pinned to immutable commit
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: caddy:2.11.4@sha256:040e9f7480b80b6d4a7e5013a21159b950a63dcbdb956e38abe2387fb28d9ec0
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Scan Kong base image
+        # Trivy action v0.36.0 pinned to immutable commit
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: kong:3.9.3@sha256:d56dba2a916b7bb842ec0b5caae3e0956b18afc10119ea90203a41650c01f7c9
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'

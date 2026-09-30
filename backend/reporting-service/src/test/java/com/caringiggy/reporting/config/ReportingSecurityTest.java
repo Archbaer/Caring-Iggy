@@ -5,8 +5,8 @@ import com.caringiggy.reporting.dto.SummaryReport;
 import com.caringiggy.reporting.service.ReportingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReportingSecurityTest {
 
     @Autowired MockMvc mvc;
-    @MockBean ReportingService reportingService;
+    @MockitoBean ReportingService reportingService;
 
     @Test
     void noTokenIsUnauthorized() throws Exception {

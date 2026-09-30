@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
   getCsrfToken,
-  loginAsAdopter,
-  loginAsStaff,
   ERROR_SHAPE,
 } from "./helpers";
 
@@ -31,68 +29,73 @@ test.describe("Unauthenticated requests", () => {
 // ── Preferences ─────────────────────────────────────────────────
 
 test.describe("PUT /api/adopter/preferences", () => {
-  test("valid preferences returns 200 with ok:true", async ({
-    request,
-  }) => {
-    await loginAsAdopter(request);
-    const csrfToken = await getCsrfToken(request);
+  test.describe("as ADOPTER", () => {
+    test.use({ storageState: ".auth/adopter.json" });
 
-    const resp = await request.put("/api/adopter/preferences", {
-      data: {
-        preferences: {
-          preferredAnimalTypes: ["Dog"],
-          minAge: 1,
-          maxAge: 5,
-          notes: "E2E test preferences",
+    test("valid preferences returns 200 with ok:true", async ({
+      request,
+    }) => {
+      const csrfToken = await getCsrfToken(request);
+
+      const resp = await request.put("/api/adopter/preferences", {
+        data: {
+          preferences: {
+            preferredAnimalTypes: ["Dog"],
+            minAge: 1,
+            maxAge: 5,
+            notes: "E2E test preferences",
+          },
         },
-      },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(200);
+      const body = await resp.json();
+      expect(body).toMatchObject({ ok: true });
     });
-    expect(resp.status()).toBe(200);
-    const body = await resp.json();
-    expect(body).toMatchObject({ ok: true });
+
+    test("minAge > maxAge returns 422", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+
+      const resp = await request.put("/api/adopter/preferences", {
+        data: { minAge: 10, maxAge: 2 },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(422);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("without CSRF returns 403", async ({ request }) => {
+      const resp = await request.put("/api/adopter/preferences", {
+        data: { preferredAnimalTypes: ["Dog"] },
+      });
+      expect(resp.status()).toBe(403);
+    });
   });
 
-  test("minAge > maxAge returns 422", async ({ request }) => {
-    await loginAsAdopter(request);
-    const csrfToken = await getCsrfToken(request);
+  test.describe("as STAFF", () => {
+    test.use({ storageState: ".auth/staff.json" });
 
-    const resp = await request.put("/api/adopter/preferences", {
-      data: { minAge: 10, maxAge: 2 },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    test("as STAFF returns 403 (not ADOPTER)", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+
+      const resp = await request.put("/api/adopter/preferences", {
+        data: { preferredAnimalTypes: ["Cat"] },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(403);
     });
-    expect(resp.status()).toBe(422);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
-  });
-
-  test("as STAFF returns 403 (not ADOPTER)", async ({ request }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-
-    const resp = await request.put("/api/adopter/preferences", {
-      data: { preferredAnimalTypes: ["Cat"] },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-    });
-    expect(resp.status()).toBe(403);
-  });
-
-  test("without CSRF returns 403", async ({ request }) => {
-    await loginAsAdopter(request);
-    const resp = await request.put("/api/adopter/preferences", {
-      data: { preferredAnimalTypes: ["Dog"] },
-    });
-    expect(resp.status()).toBe(403);
   });
 });
 
 // ── Interests ───────────────────────────────────────────────────
 
 test.describe("PUT /api/adopter/interests", () => {
+  test.use({ storageState: ".auth/adopter.json" });
+
   test("valid interests returns 200 with ok:true", async ({
     request,
   }) => {
-    await loginAsAdopter(request);
     const csrfToken = await getCsrfToken(request);
 
     const resp = await request.put("/api/adopter/interests", {
@@ -110,7 +113,6 @@ test.describe("PUT /api/adopter/interests", () => {
   });
 
   test("exactly MAX_INTERESTS (3) accepted", async ({ request }) => {
-    await loginAsAdopter(request);
     const csrfToken = await getCsrfToken(request);
 
     const resp = await request.put("/api/adopter/interests", {
@@ -127,7 +129,6 @@ test.describe("PUT /api/adopter/interests", () => {
   });
 
   test("exceeds MAX_INTERESTS returns 422", async ({ request }) => {
-    await loginAsAdopter(request);
     const csrfToken = await getCsrfToken(request);
 
     const resp = await request.put("/api/adopter/interests", {
@@ -144,7 +145,6 @@ test.describe("PUT /api/adopter/interests", () => {
   });
 
   test("without CSRF returns 403", async ({ request }) => {
-    await loginAsAdopter(request);
     const resp = await request.put("/api/adopter/interests", {
       data: { interestedAnimalIds: ["test"] },
     });
@@ -155,9 +155,7 @@ test.describe("PUT /api/adopter/interests", () => {
 // ── Edge Cases ──────────────────────────────────────────────────
 
 test.describe("Edge cases", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdopter(request);
-  });
+  test.use({ storageState: ".auth/adopter.json" });
 
   test("interest ID deduplication: same ID 3 times counts as 1", async ({
     request,
@@ -209,9 +207,7 @@ test.describe("Edge cases", () => {
 // ── Malformed JSON ──────────────────────────────────────────────
 
 test.describe("Malformed JSON", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdopter(request);
-  });
+  test.use({ storageState: ".auth/adopter.json" });
 
   test("PUT malformed JSON returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);

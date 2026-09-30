@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
   getCsrfToken,
-  loginAsAdmin,
-  loginAsStaff,
   ERROR_SHAPE,
   NON_EXISTENT_ID,
 } from "./helpers";
@@ -42,9 +40,7 @@ test.describe("Unauthenticated requests", () => {
 // ── Staff Endpoints (as ADMIN) ──────────────────────────────────
 
 test.describe("Staff endpoints (as ADMIN)", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("GET /api/admin/staff returns 200 with array of employees", async ({
     request,
@@ -233,10 +229,11 @@ test.describe("Staff endpoints (as ADMIN)", () => {
 // ── Role Boundary ────────────────────────────────────────────────
 
 test.describe("Role boundary", () => {
+  test.use({ storageState: ".auth/staff.json" });
+
   test("GET /api/admin/staff as STAFF returns 403", async ({
     request,
   }) => {
-    await loginAsStaff(request);
     const resp = await request.get("/api/admin/staff");
     expect(resp.status()).toBe(403);
   });
@@ -245,9 +242,7 @@ test.describe("Role boundary", () => {
 // ── Adopter Endpoints (as ADMIN) ─────────────────────────────────
 
 test.describe("Adopter endpoints (as ADMIN)", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("GET /api/admin/adopters returns 200 with array", async ({
     request,
@@ -339,9 +334,7 @@ test.describe("Adopter endpoints (as ADMIN)", () => {
 // ── CSRF Enforcement ─────────────────────────────────────────────
 
 test.describe("CSRF enforcement", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("POST /api/admin/staff without CSRF returns 403", async ({
     request,
@@ -380,9 +373,7 @@ test.describe("CSRF enforcement", () => {
 // ── Malformed JSON ───────────────────────────────────────────────
 
 test.describe("Malformed JSON", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsAdmin(request);
-  });
+  test.use({ storageState: ".auth/admin.json" });
 
   test("POST malformed JSON returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);

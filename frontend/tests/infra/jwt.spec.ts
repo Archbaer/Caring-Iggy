@@ -55,9 +55,9 @@ test("valid JWT passes the gateway", async () => {
 
 test("login is IP rate-limited (429 after threshold)", async () => {
   const ctx = await request.newContext({ baseURL: base });
-  // user-auth route allows 120/min per IP; hammer past it with cheap wrong-password attempts.
+  // user-auth route allows 200/min per IP; hammer past it with cheap wrong-password attempts.
   let saw429 = false;
-  for (let i = 0; i < 130; i++) {
+  for (let i = 0; i < 210; i++) {
     const res = await ctx.post("/api/auth/login", { data: { email: "x@x.com", password: "wrong" } });
     if (res.status() === 429) { saw429 = true; break; }
   }

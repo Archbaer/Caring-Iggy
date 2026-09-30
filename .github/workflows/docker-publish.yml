@@ -99,16 +99,21 @@ jobs:
         env:
           IMAGE: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}
         run: |
+          SHA_TAG="sha-${GITHUB_SHA::12}"
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="sha-${GITHUB_SHA::12}"
+            VERSION="$SHA_TAG"
           fi
 
           {
             echo "version=$VERSION"
+            echo "sha_tag=$SHA_TAG"
             echo "tags<<EOF"
-            echo "$IMAGE:$VERSION"
+            echo "$IMAGE:$SHA_TAG"
+            if [ "$VERSION" != "$SHA_TAG" ]; then
+              echo "$IMAGE:$VERSION"
+            fi
             echo "$IMAGE:latest"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
@@ -123,6 +128,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+      - name: Scan image for vulnerabilities
+        if: steps.selection.outputs.build == 'true'
+        # Trivy action v0.36.0 pinned to immutable commit
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.meta.outputs.sha_tag }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
 
       - name: Create deployment summary
         if: steps.selection.outputs.build == 'true'
