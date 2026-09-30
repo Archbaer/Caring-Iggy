@@ -55,7 +55,6 @@ export default async function SignupPage({ searchParams }: PageProps) {
             Join the Caring Iggy community.
           </p>
 
-          {/* SignupForm component — keep imported, keep logic */}
           <SignupForm />
         </div>
       </div>
