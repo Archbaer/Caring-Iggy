@@ -84,7 +84,7 @@ export default async function AdminAdoptersPage() {
               <h2 className="text-xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-ink)] mb-2">
                 {adopter.name}
               </h2>
-              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed break-all">
                 {adopter.email} · {adopter.telephone}
               </p>
               <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed mt-2">

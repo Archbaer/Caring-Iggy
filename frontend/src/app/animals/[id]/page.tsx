@@ -193,25 +193,25 @@ export default async function AnimalDetailPage({ params }: PageProps) {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <DetailCard title="Name">
-              <p className="text-sm font-semibold text-[var(--color-ink)]">
+              <p className="text-sm font-semibold text-[var(--color-ink)] break-words">
                 {animal.previousOwner.name}
               </p>
             </DetailCard>
             <DetailCard title="Telephone">
-              <p className="text-sm font-semibold text-[var(--color-ink)]">
+              <p className="text-sm font-semibold text-[var(--color-ink)] break-all">
                 {animal.previousOwner.telephone}
               </p>
             </DetailCard>
             {animal.previousOwner.email && (
               <DetailCard title="Email">
-                <p className="text-sm font-semibold text-[var(--color-ink)]">
+                <p className="text-sm font-semibold text-[var(--color-ink)] break-all">
                   {animal.previousOwner.email}
                 </p>
               </DetailCard>
             )}
             {animal.previousOwner.address && (
               <DetailCard title="Address">
-                <p className="text-sm font-semibold text-[var(--color-ink)]">
+                <p className="text-sm font-semibold text-[var(--color-ink)] break-words">
                   {animal.previousOwner.address}
                 </p>
               </DetailCard>
