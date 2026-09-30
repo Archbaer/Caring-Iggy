@@ -52,13 +52,20 @@ chmod +x "$fixture_dir/bin/aws"
 docker network create "$network_name" >/dev/null
 docker run -d --name "$container_name" --network "$network_name" \
     -e POSTGRES_PASSWORD="$master_password" postgres:15-alpine >/dev/null
+database_ready=0
 for _ in {1..30}; do
-    if docker exec "$container_name" pg_isready -U postgres >/dev/null 2>&1; then
+    if docker exec "$container_name" pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1; then
+        database_ready=1
         break
     fi
     sleep 1
 done
-docker exec "$container_name" pg_isready -U postgres >/dev/null
+if ((database_ready == 0)); then
+    echo "database TCP readiness timed out for $container_name; last 50 container log lines follow" >&2
+    docker logs --tail 50 "$container_name" >&2 || true
+    exit 1
+fi
+docker exec "$container_name" pg_isready -h 127.0.0.1 -U postgres >/dev/null
 
 docker exec "$container_name" psql -U postgres -v ON_ERROR_STOP=1 \
     -c "CREATE ROLE users_app LOGIN PASSWORD '$users_password'" >/dev/null
