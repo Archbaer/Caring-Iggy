@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
   getCsrfToken,
-  loginAsStaff,
-  loginAsAdopter,
   createAnimal,
   ANIMAL_DETAIL_SHAPE,
   ERROR_SHAPE,
@@ -12,113 +10,115 @@ import {
 // ── POST /api/animals/create ─────────────────────────────────────
 
 test.describe("POST /api/animals/create", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.describe("as STAFF", () => {
+    test.use({ storageState: ".auth/staff.json" });
 
-  test("valid animal returns 201 with AnimalDetail shape", async ({
-    request,
-  }) => {
-    const resp = await createAnimal(request, {
-      name: "Buddy",
-      animalType: "Dog",
-      breed: "Golden Retriever",
+    test("valid animal returns 201 with AnimalDetail shape", async ({
+      request,
+    }) => {
+      const resp = await createAnimal(request, {
+        name: "Buddy",
+        animalType: "Dog",
+        breed: "Golden Retriever",
+      });
+      expect(resp.status()).toBe(201);
+      const body = await resp.json();
+      expect(body).toMatchObject(ANIMAL_DETAIL_SHAPE);
+      expect(body.name).toBe("Buddy");
+      expect(body.status).toBe("AVAILABLE");
     });
-    expect(resp.status()).toBe(201);
-    const body = await resp.json();
-    expect(body).toMatchObject(ANIMAL_DETAIL_SHAPE);
-    expect(body.name).toBe("Buddy");
-    expect(body.status).toBe("AVAILABLE");
-  });
 
-  test("name only (minimum valid) returns 201", async ({ request }) => {
-    const resp = await createAnimal(request, { name: "Minimal" });
-    expect(resp.status()).toBe(201);
-  });
-
-  test("all fields filled returns 201 with all data persisted", async ({
-    request,
-  }) => {
-    const resp = await createAnimal(request, {
-      name: "Full Fields",
-      animalType: "Cat",
-      breed: "Siamese",
-      status: "PENDING",
-      gender: "FEMALE",
-      size: "SMALL",
-      dateOfBirth: "2023-06-15",
-      intakeDate: "2024-01-10",
-      temperament: "Friendly and playful",
-      description: "A lovely cat looking for a home.",
-      imageUrl: "https://example.com/cat.jpg",
+    test("name only (minimum valid) returns 201", async ({ request }) => {
+      const resp = await createAnimal(request, { name: "Minimal" });
+      expect(resp.status()).toBe(201);
     });
-    expect(resp.status()).toBe(201);
-    const body = await resp.json();
-    expect(body.name).toBe("Full Fields");
-    expect(body.animalType).toBe("CAT"); // Backend normalizes to uppercase
-    expect(body.breed).toBe("Siamese");
-    expect(body.status).toBe("PENDING");
-    expect(body.gender).toBe("FEMALE");
-    expect(body.size).toBe("SMALL");
-    expect(body.temperament).toBe("Friendly and playful");
+
+    test("all fields filled returns 201 with all data persisted", async ({
+      request,
+    }) => {
+      const resp = await createAnimal(request, {
+        name: "Full Fields",
+        animalType: "Cat",
+        breed: "Siamese",
+        status: "PENDING",
+        gender: "FEMALE",
+        size: "SMALL",
+        dateOfBirth: "2023-06-15",
+        intakeDate: "2024-01-10",
+        temperament: "Friendly and playful",
+        description: "A lovely cat looking for a home.",
+        imageUrl: "https://example.com/cat.jpg",
+      });
+      expect(resp.status()).toBe(201);
+      const body = await resp.json();
+      expect(body.name).toBe("Full Fields");
+      expect(body.animalType).toBe("CAT"); // Backend normalizes to uppercase
+      expect(body.breed).toBe("Siamese");
+      expect(body.status).toBe("PENDING");
+      expect(body.gender).toBe("FEMALE");
+      expect(body.size).toBe("SMALL");
+      expect(body.temperament).toBe("Friendly and playful");
+    });
+
+    test("missing name returns 422", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.post("/api/animals/create", {
+        data: { animalType: "Dog" },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(422);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("invalid status enum returns 422", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.post("/api/animals/create", {
+        data: { name: "Bad Status", status: "INVALID_STATUS" },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(422);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("invalid gender enum returns 422", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.post("/api/animals/create", {
+        data: { name: "Bad Gender", gender: "NEUTRAL" },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(422);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("without CSRF token returns 403", async ({ request }) => {
+      const resp = await request.post("/api/animals/create", {
+        data: { name: "No CSRF" },
+      });
+      expect(resp.status()).toBe(403);
+    });
+
+    test("without auth returns 401", async ({ request }) => {
+      const resp = await request.post("/api/animals/create", {
+        data: { name: "No Auth" },
+      });
+      expect(resp.status()).toBe(403); // CSRF check fires before auth check
+    });
   });
 
-  test("missing name returns 422", async ({ request }) => {
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.post("/api/animals/create", {
-      data: { animalType: "Dog" },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-    });
-    expect(resp.status()).toBe(422);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
-  });
+  test.describe("as ADOPTER", () => {
+    test.use({ storageState: ".auth/adopter.json" });
 
-  test("invalid status enum returns 422", async ({ request }) => {
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.post("/api/animals/create", {
-      data: { name: "Bad Status", status: "INVALID_STATUS" },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    test("as ADOPTER role returns 403", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.post("/api/animals/create", {
+        data: { name: "Adopter Animal" },
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(403);
     });
-    expect(resp.status()).toBe(422);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
-  });
-
-  test("invalid gender enum returns 422", async ({ request }) => {
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.post("/api/animals/create", {
-      data: { name: "Bad Gender", gender: "NEUTRAL" },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-    });
-    expect(resp.status()).toBe(422);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
-  });
-
-  test("without auth returns 401", async ({ request }) => {
-    const resp = await request.post("/api/animals/create", {
-      data: { name: "No Auth" },
-    });
-    expect(resp.status()).toBe(403); // CSRF check fires before auth check
-  });
-
-  test("as ADOPTER role returns 403", async ({ request }) => {
-    await loginAsAdopter(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.post("/api/animals/create", {
-      data: { name: "Adopter Animal" },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-    });
-    expect(resp.status()).toBe(403);
-  });
-
-  test("without CSRF token returns 403", async ({ request }) => {
-    await loginAsStaff(request);
-    const resp = await request.post("/api/animals/create", {
-      data: { name: "No CSRF" },
-    });
-    expect(resp.status()).toBe(403);
   });
 });
 
@@ -127,57 +127,102 @@ test.describe("POST /api/animals/create", () => {
 test.describe("PUT /api/animals/{id}/edit", () => {
   let createdAnimalId: string;
 
-  test.beforeAll(async ({ request }) => {
-    await loginAsStaff(request);
-    const resp = await createAnimal(request, {
-      name: "Editable Animal",
-      status: "AVAILABLE",
-    });
-    expect(resp.status()).toBe(201);
-    const body = await resp.json();
-    createdAnimalId = body.id;
-  });
+  test.describe("as STAFF", () => {
+    test.use({ storageState: ".auth/staff.json" });
 
-  test("change status returns 200 with updated data", async ({
-    request,
-  }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.put(`/api/animals/${createdAnimalId}/edit`, {
-      data: { status: "PENDING" },
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+    test.beforeAll(async ({ request }) => {
+      const resp = await createAnimal(request, {
+        name: "Editable Animal",
+        status: "AVAILABLE",
+      });
+      expect(resp.status()).toBe(201);
+      const body = await resp.json();
+      createdAnimalId = body.id;
     });
-    expect(resp.status()).toBe(200);
-    const body = await resp.json();
-    expect(body.status).toBe("PENDING");
-    expect(body.id).toBe(createdAnimalId);
-  });
 
-  test("empty body returns 422", async ({ request }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.put(`/api/animals/${createdAnimalId}/edit`, {
-      data: {},
-      headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-    });
-    expect(resp.status()).toBe(422);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
-  });
-
-  test("non-existent id returns 404", async ({ request }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.put(
-      `/api/animals/${NON_EXISTENT_ID}/edit`,
-      {
-        data: { name: "Ghost" },
+    test("change status returns 200 with updated data", async ({
+      request,
+    }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.put(`/api/animals/${createdAnimalId}/edit`, {
+        data: { status: "PENDING" },
         headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-      },
-    );
-    expect(resp.status()).toBe(404);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
+      });
+      expect(resp.status()).toBe(200);
+      const body = await resp.json();
+      expect(body.status).toBe("PENDING");
+      expect(body.id).toBe(createdAnimalId);
+    });
+
+    test("empty body returns 422", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.put(`/api/animals/${createdAnimalId}/edit`, {
+        data: {},
+        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+      });
+      expect(resp.status()).toBe(422);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("non-existent id returns 404", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.put(
+        `/api/animals/${NON_EXISTENT_ID}/edit`,
+        {
+          data: { name: "Ghost" },
+          headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+        },
+      );
+      expect(resp.status()).toBe(404);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("without CSRF returns 403", async ({ request }) => {
+      const resp = await request.put(
+        `/api/animals/${createdAnimalId}/edit`,
+        { data: { name: "No CSRF" } },
+      );
+      expect(resp.status()).toBe(403);
+    });
+
+    test("concurrent duplicate edits are idempotent", async ({ request }) => {
+      const createResp = await createAnimal(request, { name: "Idempotent Test" });
+      const animal = await createResp.json();
+
+      const csrfToken = await getCsrfToken(request);
+
+      const editPayload = { name: "Idempotent Updated" };
+      const headers = { "x-csrf-token": csrfToken, origin: "http://localhost:3000" };
+
+      const [resp1, resp2] = await Promise.all([
+        request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
+        request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
+      ]);
+
+      expect([200, 403]).toContain(resp1.status());
+      expect([200, 403]).toContain(resp2.status());
+
+      const anySuccess = resp1.status() === 200 || resp2.status() === 200;
+      expect(anySuccess).toBe(true);
+    });
+  });
+
+  test.describe("as ADOPTER", () => {
+    test.use({ storageState: ".auth/adopter.json" });
+
+    test("as ADOPTER returns 403", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.put(
+        `/api/animals/${createdAnimalId}/edit`,
+        {
+          data: { name: "Adopter Edit" },
+          headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
+        },
+      );
+      expect(resp.status()).toBe(403);
+    });
   });
 
   test("without auth returns 401", async ({ request }) => {
@@ -187,51 +232,6 @@ test.describe("PUT /api/animals/{id}/edit", () => {
     );
     expect(resp.status()).toBe(401);
   });
-
-  test("as ADOPTER returns 403", async ({ request }) => {
-    await loginAsAdopter(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.put(
-      `/api/animals/${createdAnimalId}/edit`,
-      {
-        data: { name: "Adopter Edit" },
-        headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" },
-      },
-    );
-    expect(resp.status()).toBe(403);
-  });
-
-  test("without CSRF returns 403", async ({ request }) => {
-    await loginAsStaff(request);
-    const resp = await request.put(
-      `/api/animals/${createdAnimalId}/edit`,
-      { data: { name: "No CSRF" } },
-    );
-    expect(resp.status()).toBe(403);
-  });
-
-  test("concurrent duplicate edits are idempotent", async ({ request }) => {
-    await loginAsStaff(request);
-
-    const createResp = await createAnimal(request, { name: "Idempotent Test" });
-    const animal = await createResp.json();
-
-    const csrfToken = await getCsrfToken(request);
-
-    const editPayload = { name: "Idempotent Updated" };
-    const headers = { "x-csrf-token": csrfToken, origin: "http://localhost:3000" };
-
-    const [resp1, resp2] = await Promise.all([
-      request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
-      request.put(`/api/animals/${animal.id}/edit`, { data: editPayload, headers }),
-    ]);
-
-    expect([200, 403]).toContain(resp1.status());
-    expect([200, 403]).toContain(resp2.status());
-
-    const anySuccess = resp1.status() === 200 || resp2.status() === 200;
-    expect(anySuccess).toBe(true);
-  });
 });
 
 // ── DELETE /api/animals/{id}/delete ──────────────────────────────
@@ -239,39 +239,47 @@ test.describe("PUT /api/animals/{id}/edit", () => {
 test.describe("DELETE /api/animals/{id}/delete", () => {
   let deleteTargetId: string;
 
-  test.beforeAll(async ({ request }) => {
-    await loginAsStaff(request);
-    const resp = await createAnimal(request, {
-      name: "Delete Me",
+  test.describe("as STAFF", () => {
+    test.use({ storageState: ".auth/staff.json" });
+
+    test.beforeAll(async ({ request }) => {
+      const resp = await createAnimal(request, {
+        name: "Delete Me",
+      });
+      expect(resp.status()).toBe(201);
+      const body = await resp.json();
+      deleteTargetId = body.id;
     });
-    expect(resp.status()).toBe(201);
-    const body = await resp.json();
-    deleteTargetId = body.id;
-  });
 
-  test("valid delete returns 200 with ok:true", async ({ request }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-    const resp = await request.delete(
-      `/api/animals/${deleteTargetId}/delete`,
-      { headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" } },
-    );
-    expect(resp.status()).toBe(200);
-    const body = await resp.json();
-    expect(body).toMatchObject({ ok: true });
-  });
+    test("valid delete returns 200 with ok:true", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      const resp = await request.delete(
+        `/api/animals/${deleteTargetId}/delete`,
+        { headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" } },
+      );
+      expect(resp.status()).toBe(200);
+      const body = await resp.json();
+      expect(body).toMatchObject({ ok: true });
+    });
 
-  test("already deleted returns 404", async ({ request }) => {
-    await loginAsStaff(request);
-    const csrfToken = await getCsrfToken(request);
-    // Delete the same ID again
-    const resp = await request.delete(
-      `/api/animals/${deleteTargetId}/delete`,
-      { headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" } },
-    );
-    expect(resp.status()).toBe(404);
-    const body = await resp.json();
-    expect(body).toMatchObject(ERROR_SHAPE);
+    test("already deleted returns 404", async ({ request }) => {
+      const csrfToken = await getCsrfToken(request);
+      // Delete the same ID again
+      const resp = await request.delete(
+        `/api/animals/${deleteTargetId}/delete`,
+        { headers: { "x-csrf-token": csrfToken, origin: "http://localhost:3000" } },
+      );
+      expect(resp.status()).toBe(404);
+      const body = await resp.json();
+      expect(body).toMatchObject(ERROR_SHAPE);
+    });
+
+    test("without CSRF returns 403", async ({ request }) => {
+      const resp = await request.delete(
+        `/api/animals/${deleteTargetId}/delete`,
+      );
+      expect(resp.status()).toBe(403);
+    });
   });
 
   test("without auth returns 401", async ({ request }) => {
@@ -280,22 +288,12 @@ test.describe("DELETE /api/animals/{id}/delete", () => {
     );
     expect(resp.status()).toBe(401);
   });
-
-  test("without CSRF returns 403", async ({ request }) => {
-    await loginAsStaff(request);
-    const resp = await request.delete(
-      `/api/animals/${deleteTargetId}/delete`,
-    );
-    expect(resp.status()).toBe(403);
-  });
 });
 
 // ── Malformed JSON ────────────────────────────────────────────────
 
 test.describe("Malformed JSON", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.use({ storageState: ".auth/staff.json" });
 
   test("POST malformed JSON returns 422", async ({ request }) => {
     const csrfToken = await getCsrfToken(request);
@@ -317,9 +315,7 @@ test.describe("Malformed JSON", () => {
 // ── Enum coverage ─────────────────────────────────────────────────
 
 test.describe("Enum coverage", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.use({ storageState: ".auth/staff.json" });
 
   for (const status of ["AVAILABLE", "PENDING", "ADOPTED", "IN_TREATMENT", "DECEASED"]) {
     test(`status ${status} accepted`, async ({ request }) => {
@@ -352,9 +348,7 @@ test.describe("Enum coverage", () => {
 // ── Derived fields ────────────────────────────────────────────────
 
 test.describe("Derived fields", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.use({ storageState: ".auth/staff.json" });
 
   test("age computed from dateOfBirth", async ({ request }) => {
     const resp = await createAnimal(request, {
@@ -381,9 +375,7 @@ test.describe("Derived fields", () => {
 // ── Edge Cases ────────────────────────────────────────────────────
 
 test.describe("Edge cases", () => {
-  test.beforeEach(async ({ request }) => {
-    await loginAsStaff(request);
-  });
+  test.use({ storageState: ".auth/staff.json" });
 
   test("previousOwner: name without telephone returns 422", async ({
     request,

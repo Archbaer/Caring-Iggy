@@ -81,7 +81,7 @@ services:
         strip_path: false
         plugins:
           - name: rate-limiting
-            config: { minute: 120, limit_by: ip, policy: local }
+            config: { minute: 200, limit_by: ip, policy: local }
       # Session validation / logout / token exchange / JWKS: called on ordinary page loads,
       # must never be throttled like credential submission.
       - name: user-public

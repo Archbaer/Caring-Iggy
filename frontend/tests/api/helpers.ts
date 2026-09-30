@@ -43,13 +43,6 @@ export async function loginAsStaff(request: APIRequestContext): Promise<void> {
 }
 
 /**
- * Login as adopter (testadopter@caringiggy.test)
- */
-export async function loginAsAdopter(request: APIRequestContext): Promise<void> {
-  await loginAs(request, TEST_CREDENTIALS.adopter.email, TEST_CREDENTIALS.adopter.password);
-}
-
-/**
  * Create an animal via API. Requires already logged in as staff.
  */
 export async function createAnimal(
