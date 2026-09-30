@@ -101,7 +101,7 @@ export function SignupForm() {
         Create your login
       </h2>
       <p className="text-sm text-[var(--color-ink-soft)] mb-6 leading-relaxed">
-        This form is limited to adopter registration and posts only to the frontend auth BFF.
+        Use a valid email and password to create your account.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
