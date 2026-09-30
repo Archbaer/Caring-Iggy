@@ -11,12 +11,6 @@
 **/.mvn/
 **/*.class
 
-# Agent tooling (not committed)
-.agents/
-.claude/
-.remember/
-.opencode/
-
 # IDE / editor artifacts
 **/.classpath
 **/.project
@@ -33,17 +27,6 @@
 
 # Environment files
 .env
-opencode.json
-CLAUDE.md
-AGENTS.md
 
 # Test output
 **/test-results/
-
-# Local JWT signing keys (test fixtures stay tracked)
-*-private.pem
-!**/src/test/resources/test-jwt-private.pem
-
-# Local planning docs (not committed); screenshots referenced by the README are
-/docs/*
-!/docs/screenshots/
