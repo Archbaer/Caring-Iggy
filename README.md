@@ -1,148 +1,69 @@
 # Caring Iggy
 
-Pet adoption platform. Adopters browse and register interest in animals. Staff manage animal records. Admins manage staff, adopters, and the full catalog.
+*Every animal deserves a loving home.*
 
-## Architecture
+![The Caring Iggy home page](docs/screenshots/home.png)
 
-```
-Browser → Next.js BFF (port 3000) → Spring Boot microservices
-```
+Caring Iggy is a website that helps an animal shelter find homes for the animals in its care. Visitors can browse the animals, read their stories, and say "I'm interested." Shelter staff keep the animal profiles up to date, and the shelter's administrator manages everyone's accounts.
 
-The Next.js app is the only public-facing entry point. Microservice URLs are server-side only — never exposed to the browser. All mutations are CSRF-guarded through BFF route handlers.
+## Who uses it, and what can they do?
 
-## Repository Layout
+**Visitors and adopters** can browse the full catalog of animals, filter by the kind of companion they're looking for, and open any animal's profile to learn its story. Once signed up, an adopter can save their preferences and mark up to three animals they're interested in.
 
-```
-frontend/          Next.js 16 app (UI + BFF route handlers)
-backend/           Spring Boot services (Maven multi-module)
-infrastructure/    Docker Compose + database definitions
-.github/workflows/ CI/CD pipelines
-```
+**Shelter staff** can do everything an adopter can, plus add new animals to the catalog, edit their details, and update their status (for example, marking an animal as adopted).
 
-## Frontend Stack
+**The shelter administrator** can do everything staff can, plus manage the people: creating staff accounts and overseeing adopter accounts.
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16, App Router, React 19 |
-| Styling | Tailwind CSS v4 + CSS custom properties (design tokens) |
-| Primitives | CVA (`class-variance-authority`) + Radix Slot |
-| Animation | CSS keyframes + Framer Motion (selective) |
-| Icons | `lucide-react` |
-| Auth | Cookie-based opaque sessions, CSRF-guarded mutations |
-| Testing | Playwright — E2E browser tests + API contract tests |
-| Language | TypeScript (strict) |
+## How it's built
 
-## Backend Services
+The whole system is a small team of cooperating programs, each with a clear job.
 
-| Service | Port | Responsibility |
-|---|---|---|
-| `animal-service` | 8081 | Animal CRUD, status tracking, intake records |
-| `adopter-service` | 8082 | Adopter profiles, preferences, interest lists |
-| `user-service` | 8085 | Staff/admin account management, auth (login, sessions) |
-| `matching-service` | — | Preference-based adopter-animal matching |
-| `reporting-service` | — | Intake and adoption summary reports |
+**The website you see — Next.js and React.** The pages are built with Next.js 16 and React 19, styled with Tailwind CSS. It works on phones and desktops alike: the layout rearranges itself to fit the screen.
 
-All services are Spring Boot 3 / Java 17. Each has its own PostgreSQL database.
+**The front door — Kong.** All traffic from the website to the inner services goes through one checkpoint called Kong. It checks that requests carry a valid login token, throttles repeated login attempts to slow down password guessing, and makes sure only the website — never the public — can reach the inner services. Every inner address stays invisible to the outside world.
 
-## Roles
+**The workers — five Spring Boot services.** Behind the door, five small Java programs each do one job: one keeps track of the animals, one keeps track of adopters and their interests, one handles logins and accounts, one matches adopters with animals based on their preferences, and one produces summary reports for the shelter. They're built with Spring Boot 4 and plain Java, with no exotic machinery.
 
-| Role | Capabilities |
-|---|---|
-| `ADOPTER` | Browse animals, manage own preferences and interest list (max 3) |
-| `STAFF` | Adopter permissions + create/edit/delete animal records |
-| `ADMIN` | Staff permissions + manage adopter accounts and staff accounts |
+**The filing cabinets — one database each.** Each worker keeps its records in its own PostgreSQL database. The animal worker's files can't be reached by the adopter worker, and so on. If one part of the system needs care, the others keep working.
 
-## Pages
+## Why it's built this way
 
-**Public:** `/` `/animals` `/animals/[id]` `/login` `/signup` `/about` `/donate`
+**One front door.** Everything you see in the browser comes from a single website. The inner services never speak to the public directly, which leaves far less to defend.
 
-**Authenticated (all roles):** `/dashboard`
+**Wristbands, not ID cards.** Your login is an invisible wristband stored in your browser, not a plastic card you wave around. When the website needs to ask a worker for something private, it quietly trades the wristband for a short-lived pass at the front door. Passes expire quickly, so a stolen one doesn't stay useful for long.
 
-**Adopter:** `/dashboard/preferences` `/dashboard/interests` `/dashboard/matches`
+**One job per worker.** Each of the five services has a single responsibility and its own files. Changes stay small and contained, and a mistake in one corner can't topple the whole shelter.
 
-**Staff + Admin:** `/dashboard/animals/new` `/dashboard/animals/[id]/edit`
+**Safety locks.** Anything that changes data (saving an animal, editing a profile) requires a secret second key that only the website and your browser share — so a random page elsewhere on the internet can't make changes on your behalf. Logins are rate-limited at the door. Sensitive configuration never lives in the code.
 
-**Admin only:** `/dashboard/admin` `/dashboard/admin/staff/[id]` `/dashboard/admin/adopters/[id]`
+**Tested like a user.** The site is exercised end to end with real browser automation (Playwright): signing in, browsing, filtering, and editing all happen through the same pages a person would use, and the test logins are saved and reused exactly the way a returning visitor's session would be. The same suite checks the front door's rules — that strangers are turned away, and that login attempts get throttled.
 
-## Quick Start
+## Take a look around
 
-**Prerequisites:** Java 17+, Maven 3.8+, Node.js 22+, Docker + Docker Compose
+**The animal catalog**, with filters for status, species, sex, size, and breed:
 
-### 1. Start the full Docker stack
+![The animal catalog with filters](docs/screenshots/animals.png)
 
-```bash
-bash infrastructure/kong/bootstrap-keys.sh
-docker compose -f infrastructure/docker-compose.yml up -d --build --wait
-```
+**An animal's profile**, with details, temperament, and the previous owner's contact information:
 
-This starts the PostgreSQL instances, five backend services, Kong on `http://localhost:8000`, and the production frontend on `http://localhost:3000`. The frontend BFF is the only client of Kong; it exchanges its session for a short-lived JWT at `/internal/token`. Never commit `infrastructure/kong/kong.yml` with the real public key injected.
+![Buddy the dog's profile page](docs/screenshots/animal-detail.png)
 
-### 2. Run the frontend dev server instead (optional)
+**Signing in** — the front door asks for your email and password:
 
-```bash
-docker compose -f infrastructure/docker-compose.yml up -d --build --wait kong
-cp frontend/.env.local.example frontend/.env.local   # set service URLs
-npm --prefix frontend ci
-npm --prefix frontend run dev
-```
+![The sign-in page](docs/screenshots/login.png)
 
-Targeting `kong` starts every backend dependency without starting the Compose frontend, leaving port 3000 available for hot reload.
+**The shelter administrator's workspace**, with a bird's-eye view of adopters, staff, and animals:
 
-## Frontend Environment Variables
+![The admin workspace](docs/screenshots/admin-dashboard.png)
 
-| Variable | Default | Description |
-|---|---|---|
-| `KONG_URL` | `http://localhost:8000` | Kong gateway base URL; all backend calls go through it |
-| `TRUST_PROXY_HEADERS` | `false` | Forward `X-Forwarded-For` to Kong; only behind an edge proxy that overwrites it |
-| `AUTH_SESSION_STATE_SECRET` | — | HMAC secret for signing session state cookie |
-| `AUTH_CSRF_SECRET` | — | HMAC secret for signing CSRF tokens |
-| `APP_ORIGIN` | — | Trusted origin for CSRF origin check (e.g. `https://caringiggy.com`) |
+**An adopter's dashboard**, where preferences and interests live:
 
-In development, `AUTH_SESSION_STATE_SECRET` and `AUTH_CSRF_SECRET` fall back to hardcoded local values if unset.
+![An adopter's dashboard](docs/screenshots/adopter-dashboard.png)
 
-## Testing
+**The same site on a phone** — one column, everything stacked, nothing cut off:
 
-Tests require a running app (`npm run dev` or `npm run start`).
+![The home page on a phone](docs/screenshots/home-mobile.png)
 
-```bash
-# All tests
-npm --prefix frontend run test:e2e
+## Deployment
 
-# API contract tests only (fastest, no browser)
-npm --prefix frontend run test:api
-
-# Auth + RBAC tests
-npm --prefix frontend run test:auth
-
-# Smoke suite (tagged @smoke)
-npm --prefix frontend run test:smoke
-```
-
-Test layout:
-
-```
-frontend/tests/
-├─ api/          API contract tests (auth, animals, admin, adopter, CSRF, session)
-├─ auth/         Login, redirects, and role-boundary E2E tests
-├─ forms/        Staff form tests (animal create/edit)
-└─ infra/        Kong gateway tests (hit :8000 directly: JWT, rate limit, network isolation)
-```
-
-## CI
-
-`.github/workflows/ci.yml` — runs backend build + lint and frontend lint + build on every push.
-
-`.github/workflows/docker-publish.yml` — builds and publishes Docker images on tagged releases.
-
-## Infrastructure Notes
-
-### AWS deployment
-
-For the single-host AWS stack, see [infrastructure/aws/README.md](infrastructure/aws/README.md). The entrypoint is [infrastructure/aws/deploy-aws.sh](infrastructure/aws/deploy-aws.sh).
-
-Repository implementation and local contracts are available. Live disposable deployment, trusted IP certificate renewal, reboot, rollback, PITR, and 300/700-user capacity acceptance remain pending; this is not a production acceptance result.
-
-- `infrastructure/.env.example` — sample environment variables for local Docker Compose.
-- Each microservice connects to its own isolated PostgreSQL database.
-- No backend service binds a host port; the BFF reaches them only through Kong (`infrastructure/kong/kong.yml`).
-- The default Compose stack runs the standalone production frontend. Target `kong` when running the frontend dev server separately.
+The project includes a single-host AWS deployment; the operational details live in [infrastructure/aws/README.md](infrastructure/aws/README.md).
