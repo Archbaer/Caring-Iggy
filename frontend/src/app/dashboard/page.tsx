@@ -122,7 +122,7 @@ export default async function DashboardPage() {
         <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
           <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
             <dt className="text-xs text-[var(--color-ink-soft)] font-medium mt-1">Name</dt>
-            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-primary)]">{profile.name}</dd>
+            <dd className="text-xl font-bold font-[family-name:var(--font-display)] text-[var(--color-primary)] break-words">{profile.name}</dd>
           </div>
           <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
             <dt className="text-xs text-[var(--color-ink-soft)] font-medium mt-1">Interested</dt>
@@ -132,7 +132,7 @@ export default async function DashboardPage() {
           </div>
           <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
             <dt className="text-xs text-[var(--color-ink-soft)] font-medium mt-1">Contact</dt>
-            <dd className="text-3xl font-extrabold font-[family-name:var(--font-display)] text-[var(--color-primary)]">{profile.email}</dd>
+            <dd className="text-base font-bold font-[family-name:var(--font-display)] text-[var(--color-primary)] break-all">{profile.email}</dd>
           </div>
           <div className="rounded-2xl bg-[var(--color-primary-pale)] p-6 text-center">
             <dt className="text-xs text-[var(--color-ink-soft)] font-medium mt-1">Types</dt>

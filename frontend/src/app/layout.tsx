@@ -48,7 +48,7 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <PublicHeader />
           {/* MAIN: NO width constraint — each page sets its own max-w */}
-          <main className="flex-1 py-8">
+          <main className="flex-1">
             {children}
           </main>
           <PublicFooter />

@@ -74,7 +74,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
           <ul className="flex flex-col gap-3 text-sm">
             <li className="flex flex-col gap-0.5">
               <span className="text-xs text-[var(--color-ink-faint)]">Email</span>
-              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.email}</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold break-all">{currentAdopter.email}</span>
             </li>
             <li className="flex flex-col gap-0.5">
               <span className="text-xs text-[var(--color-ink-faint)]">Telephone</span>
@@ -82,7 +82,7 @@ export function AdminAdopterDetailClient({ adopter }: Props) {
             </li>
             <li className="flex flex-col gap-0.5">
               <span className="text-xs text-[var(--color-ink-faint)]">Address</span>
-              <span className="text-sm text-[var(--color-ink)] font-semibold">{currentAdopter.address ?? "No address on file."}</span>
+              <span className="text-sm text-[var(--color-ink)] font-semibold break-words">{currentAdopter.address ?? "No address on file."}</span>
             </li>
             <li className="flex flex-col gap-0.5">
               <span className="text-xs text-[var(--color-ink-faint)]">Interested animals</span>
